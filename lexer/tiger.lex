@@ -11,6 +11,38 @@ end
 (* val _ = reset () *)
 
 
+structure StringBuilder =
+struct
+    val sb : string ref = ref ""
+    val startPos : int ref = ref 0
+
+    val inStrState : bool ref = ref false
+
+    fun enterStrState() = inStrState := true
+    fun exitStrState() = inStrState := false
+
+    fun isEmpty() = String.size (!sb) = 0
+
+    fun concat(s) = sb := !sb ^ s
+
+    fun appendChar(c) = !sb ^ Char.toString c
+
+    fun reset() = (sb := ""; startPos := 0)
+
+    fun toString(endPos) = 
+        let
+            val token = Tokens.STRING(!sb, !startPos, endPos)
+        in
+            (* print (!sb); *)
+            reset();
+            token
+        end;
+end
+
+(* convert escaped ascii in form \ddd to char *)
+fun toChar ascii = Char.chr (valOf (Int.fromString (String.extract (ascii, 1, NONE))));
+
+
 type pos = int
 type lexresult = Tokens.token
 
@@ -22,29 +54,29 @@ fun eof() =
     let 
         val pos = hd(!linePos) 
     in 
-        (* if StringBuilder.inStrState () 
+        if !StringBuilder.inStrState 
         then 
-            ErrorMsg.error yypos ("End of File still unclosed String")
+            ErrorMsg.error pos ("End of File still unclosed String")
         else if !Comment.nestedLoop <> 0
         then 
-            ErrorMsg.error yypos ("End of File still unclosed Comment")
+            ErrorMsg.error pos ("End of File still unclosed Comment")
         else
-            (); *)
-        reset ();
-        Tokens.EOF(pos,pos);
+            ();
+        Comment.reset ();
+        StringBuilder.reset ();
+        Tokens.EOF(pos,pos)
     end
 
+fun newLine(yypos) = (lineNum := !lineNum+1; linePos := yypos :: !linePos);
 %%
 %s COMMENT STRING;
 alpha=[A-Za-z];
 digit=[0-9];
 ws = [\r\ \t];
+ascii = [digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5]];
 
 %%
-<INITIAL, COMMENT, STRING>\n      => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
-
-
-
+<INITIAL, COMMENT>\n      => (newLine yypos; continue());
 
 <INITIAL>type    => (Tokens.TYPE(yypos,yypos+4));
 <INITIAL>var     => (Tokens.VAR(yypos,yypos+3));
@@ -87,20 +119,22 @@ ws = [\r\ \t];
 <INITIAL>":"     => (Tokens.COLON(yypos,yypos+1));
 <INITIAL>","     => (Tokens.COMMA(yypos,yypos+1));
 
-<INITIAL>{alpha}({alpha}|{digit})* => (Tokens.ID(yytext, yypos, yypos+size(yytext)-1));
+<INITIAL>{alpha}({alpha}|{digit}|_)* => (Tokens.ID(yytext, yypos, yypos+size(yytext)));
+<INITIAL>{digit}+ => (Tokens.INT(valOf (Int.fromString(yytext)), yypos, yypos+size(yytext)));
 
+<INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(); continue());
 
-<INITIAL>{digit}+ => (Tokens.INT(valOf (Int.fromString(yytext)), yypos, yypos+size(yytext)-1));
+<STRING>\\\\    => (StringBuilder.concat "\\"; continue());
+<STRING>\\\"    => (StringBuilder.concat "\""; continue());
+<STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
+<STRING>\\t    => (StringBuilder.concat yytext; continue());
+<STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 
-
-<INITIAL>"\""   => (YYBEGIN STRING; continue());
-<STRING>"\""    => (YYBEGIN INITIAL; continue());
+<STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
 <STRING>.       => (continue());
 
-<INITIAL>"/*"   => (Comment.incrementLoop();print "enter comment\n"; YYBEGIN COMMENT; continue());
-<COMMENT>"/*"   => (Comment.incrementLoop();print "enter comment deeper\n";continue());
-<COMMENT>"*/"   => (Comment.decrementLoop();print ("out comment layer" ^ (Int.toString(!nestedLoop)) ^ "\n"); if !Comment.nestedLoop = 0 then YYBEGIN INITIAL else (); continue());
+<INITIAL>"/*"   => (Comment.incrementLoop(); YYBEGIN COMMENT; continue());
+<COMMENT>"/*"   => (Comment.incrementLoop(); continue());
+<COMMENT>"*/"   => (Comment.decrementLoop(); if !Comment.nestedLoop = 0 then YYBEGIN INITIAL else (); continue());
 <COMMENT>.      => (continue());
-
-
 <INITIAL>.      => (continue());
