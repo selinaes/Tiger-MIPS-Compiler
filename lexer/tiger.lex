@@ -1,3 +1,17 @@
+(* structure Comment = Mlex.UserDeclarations *)
+
+(* (* Define a global variable *) *)
+(* val nestedLoop : int ref = ref 0 *)
+
+(* fun incrementLoop () = *)
+(*     Comment.set nestedLoop (!nestedLoop + 1) *)
+
+(* fun reset () = *)
+(*     (Comment.reset (); *)
+(*      nestedLoop := 0) *)
+
+(* val _ = reset () *)
+
 type pos = int
 type lexresult = Tokens.token
 
@@ -14,7 +28,7 @@ alpha=[A-Za-z];
 digit=[0-9];
 ws = [\ \t];
 %%
-\n      => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
+<INITIAL, COMMENT, STRING>\n      => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
 ","     => (Tokens.COMMA(yypos,yypos+1));
 var     => (Tokens.VAR(yypos,yypos+3));
 "123"   => (Tokens.INT(123,yypos,yypos+3));
@@ -61,11 +75,13 @@ var     => (Tokens.VAR(yypos,yypos+3));
 <INITIAL>";"     => (Tokens.SEMICOLON(yypos,yypos+1));
 <INITIAL>":"     => (Tokens.COLON(yypos,yypos+1));
 <INITIAL>","     => (Tokens.COMMA(yypos,yypos+1));
-(* Start & end of strings *)
+(* Strings *)
 <INITIAL>"\""   => (YYBEGIN STRING; continue());
 <STRING>"\""    => (YYBEGIN INITIAL; continue());
-(* Start & end of comments *)
+(*Need to handle escape sequence*)
+<STRING>.       => (continue());
+(* Comments *)
 <INITIAL>"/*"   => (YYBEGIN COMMENT; continue());
 <COMMENT>"*/"   => (YYBEGIN INITIAL; continue());
-(* EOF handling *)
-<INITIAL>EOF     => (Tokens.EOF(yypos,yypos));
+<COMMENT>.      => (continue());
+
