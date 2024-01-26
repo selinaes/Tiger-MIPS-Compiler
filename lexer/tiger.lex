@@ -1,3 +1,28 @@
+structure MyLexer = struct
+    structure User = Mlex.UserDeclarations
+
+    (* Define a global variable *)
+    val myGlobalVar : int ref = ref 0
+
+    (* Lexer rule that increments the global variable when matched *)
+    fun incrementGlobalVar () =
+    (User.set myGlobalVar (!myGlobalVar + 1);
+     Tokens.PLUS)
+
+(* Reset function to reset the global state, including the global variable *)
+fun reset () =
+    (User.reset ();
+    myGlobalVar := 0)
+
+(* Lexer rules *)
+rule resetRule = "{RESET}" => (reset (); Tokens.RESET)
+
+rule someRule = "some_pattern" => (doSomething (); Tokens.SOME_TOKEN)
+| "{RESET}" => (reset (); Tokens.RESET)
+
+end;
+
+
 type pos = int
 type lexresult = Tokens.token
 
