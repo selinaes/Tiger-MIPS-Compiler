@@ -2,7 +2,9 @@
 ahahah */ var */
 let
 	var s1 = "\n\t\\\""
-	val s2 = 
+	val s2 = "asdf \
+	\   asd \ 
+	\"
 	type  arrtype = array of int
 	var arr1:arrtype := arrtype [10] of 0
 in
