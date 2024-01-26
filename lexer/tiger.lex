@@ -18,7 +18,7 @@ struct
 
     val inStrState : bool ref = ref false
 
-    fun enterStrState() = inStrState := true
+    fun enterStrState(yypos) = (inStrState := true; startPos := yypos)
     fun exitStrState() = inStrState := false
 
     fun isEmpty() = String.size (!sb) = 0
@@ -72,9 +72,8 @@ fun newLine(yypos) = (lineNum := !lineNum+1; linePos := yypos :: !linePos);
 %s COMMENT STRING;
 alpha=[A-Za-z];
 digit=[0-9];
-ws = [\r\ \t];
 ascii = [digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5]];
-
+formatChars = [\t\ \f\r];
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
 
@@ -122,13 +121,16 @@ ascii = [digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5]];
 <INITIAL>{alpha}({alpha}|{digit}|_)* => (Tokens.ID(yytext, yypos, yypos+size(yytext)));
 <INITIAL>{digit}+ => (Tokens.INT(valOf (Int.fromString(yytext)), yypos, yypos+size(yytext)));
 
-<INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(); continue());
+<INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(yypos); continue());
 
 <STRING>\\\\    => (StringBuilder.concat "\\"; continue());
 <STRING>\\\"    => (StringBuilder.concat "\""; continue());
 <STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
 <STRING>\\t    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
+<STRING>\\{formatChars}*\\ => (continue());
+<STRING>\\{formatChars}*\n{formatChars}*\\ => (newLine yypos; continue());
+
 
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
 <STRING>.       => (continue());
