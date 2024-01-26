@@ -1,16 +1,16 @@
-(* structure Comment = Mlex.UserDeclarations *)
 
-(* (* Define a global variable *) *)
-(* val nestedLoop : int ref = ref 0 *)
 
-(* fun incrementLoop () = *)
-(*     Comment.set nestedLoop (!nestedLoop + 1) *)
-
-(* fun reset () = *)
-(*     (Comment.reset (); *)
-(*      nestedLoop := 0) *)
-
+(* Define a global variable *)
+structure Comment =
+struct
+    val nestedLoop = ref 0
+    fun incrementLoop () = nestedLoop := (!nestedLoop + 1)
+    fun decrementLoop () = nestedLoop := (!nestedLoop - 1)
+    fun reset () = nestedLoop := 0
+end
 (* val _ = reset () *)
+
+
 type pos = int
 type lexresult = Tokens.token
 
@@ -18,10 +18,23 @@ val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 fun err(p1,p2) = ErrorMsg.error p1
 
-fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
+fun eof() = 
+    let 
+        val pos = hd(!linePos) 
+    in 
+        (* if StringBuilder.inStrState () 
+        then 
+            ErrorMsg.error yypos ("End of File still unclosed String")
+        else if !Comment.nestedLoop <> 0
+        then 
+            ErrorMsg.error yypos ("End of File still unclosed Comment")
+        else
+            (); *)
+        reset ();
+        Tokens.EOF(pos,pos);
+    end
 
 %%
-%structure TigerLex
 %s COMMENT STRING;
 alpha=[A-Za-z];
 digit=[0-9];
@@ -29,10 +42,8 @@ ws = [\r\ \t];
 
 %%
 <INITIAL, COMMENT, STRING>\n      => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
-","     => (Tokens.COMMA(yypos,yypos+1));
-var     => (Tokens.VAR(yypos,yypos+3));
-"123"   => (Tokens.INT(123,yypos,yypos+3));
-.       => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
+
+
 
 
 <INITIAL>type    => (Tokens.TYPE(yypos,yypos+4));
@@ -79,14 +90,17 @@ var     => (Tokens.VAR(yypos,yypos+3));
 <INITIAL>{alpha}({alpha}|{digit})* => (Tokens.ID(yytext, yypos, yypos+size(yytext)-1));
 
 
-<INITIAL>{digit}+ => (Tokens.INT(Int.fromString(yytext), yypos, yypos+size(yytext)-1));
+<INITIAL>{digit}+ => (Tokens.INT(valOf (Int.fromString(yytext)), yypos, yypos+size(yytext)-1));
 
 
 <INITIAL>"\""   => (YYBEGIN STRING; continue());
 <STRING>"\""    => (YYBEGIN INITIAL; continue());
 <STRING>.       => (continue());
 
-<INITIAL>"/*"   => (YYBEGIN COMMENT; continue());
-<COMMENT>"*/"   => (YYBEGIN INITIAL; continue());
+<INITIAL>"/*"   => (Comment.incrementLoop();print "enter comment\n"; YYBEGIN COMMENT; continue());
+<COMMENT>"/*"   => (Comment.incrementLoop();print "enter comment deeper\n";continue());
+<COMMENT>"*/"   => (Comment.decrementLoop();print ("out comment layer" ^ (Int.toString(!nestedLoop)) ^ "\n"); if !Comment.nestedLoop = 0 then YYBEGIN INITIAL else (); continue());
 <COMMENT>.      => (continue());
 
+
+<INITIAL>.      => (continue());
