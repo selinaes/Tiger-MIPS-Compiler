@@ -1,27 +1,16 @@
-structure MyLexer = struct
-    structure User = Mlex.UserDeclarations
+(* structure Comment = Mlex.UserDeclarations *)
 
-    (* Define a global variable *)
-    val myGlobalVar : int ref = ref 0
+(* (* Define a global variable *) *)
+(* val nestedLoop : int ref = ref 0 *)
 
-    (* Lexer rule that increments the global variable when matched *)
-    fun incrementGlobalVar () =
-    (User.set myGlobalVar (!myGlobalVar + 1);
-     Tokens.PLUS)
+(* fun incrementLoop () = *)
+(*     Comment.set nestedLoop (!nestedLoop + 1) *)
 
-(* Reset function to reset the global state, including the global variable *)
-fun reset () =
-    (User.reset ();
-    myGlobalVar := 0)
+(* fun reset () = *)
+(*     (Comment.reset (); *)
+(*      nestedLoop := 0) *)
 
-(* Lexer rules *)
-rule resetRule = "{RESET}" => (reset (); Tokens.RESET)
-
-rule someRule = "some_pattern" => (doSomething (); Tokens.SOME_TOKEN)
-| "{RESET}" => (reset (); Tokens.RESET)
-
-end;
-
+(* val _ = reset () *)
 
 type pos = int
 type lexresult = Tokens.token
@@ -40,7 +29,6 @@ fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 var     => (Tokens.VAR(yypos,yypos+3));
 "123"   => (Tokens.INT(123,yypos,yypos+3));
 .       => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
-
 
 type    => (Tokens.TYPE(yypos,yypos+4));
 function    => (Tokens.FUNCTION(yypos,yypos+7));
