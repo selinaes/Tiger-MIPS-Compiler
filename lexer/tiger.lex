@@ -11,7 +11,6 @@
 (*      nestedLoop := 0) *)
 
 (* val _ = reset () *)
-
 type pos = int
 type lexresult = Tokens.token
 
@@ -21,12 +20,13 @@ fun err(p1,p2) = ErrorMsg.error p1
 
 fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
-
 %%
 %structure TigerLex
+%s COMMENT STRING;
 alpha=[A-Za-z];
 digit=[0-9];
-ws = [\ \t];
+ws = [\r\ \t];
+
 %%
 <INITIAL, COMMENT, STRING>\n      => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
 ","     => (Tokens.COMMA(yypos,yypos+1));
@@ -34,7 +34,7 @@ var     => (Tokens.VAR(yypos,yypos+3));
 "123"   => (Tokens.INT(123,yypos,yypos+3));
 .       => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
 
-(* Reserved words and punctuations *)
+
 <INITIAL>type    => (Tokens.TYPE(yypos,yypos+4));
 <INITIAL>var     => (Tokens.VAR(yypos,yypos+3));
 <INITIAL>function    => (Tokens.FUNCTION(yypos,yypos+7));
@@ -75,12 +75,17 @@ var     => (Tokens.VAR(yypos,yypos+3));
 <INITIAL>";"     => (Tokens.SEMICOLON(yypos,yypos+1));
 <INITIAL>":"     => (Tokens.COLON(yypos,yypos+1));
 <INITIAL>","     => (Tokens.COMMA(yypos,yypos+1));
-(* Strings *)
+
+<INITIAL>{alpha}({alpha}|{digit})* => (Tokens.ID(yytext, yypos, yypos+size(yytext)-1));
+
+
+<INITIAL>{digit}+ => (Tokens.INT(Int.fromString(yytext), yypos, yypos+size(yytext)-1));
+
+
 <INITIAL>"\""   => (YYBEGIN STRING; continue());
 <STRING>"\""    => (YYBEGIN INITIAL; continue());
-(*Need to handle escape sequence*)
 <STRING>.       => (continue());
-(* Comments *)
+
 <INITIAL>"/*"   => (YYBEGIN COMMENT; continue());
 <COMMENT>"*/"   => (YYBEGIN INITIAL; continue());
 <COMMENT>.      => (continue());
