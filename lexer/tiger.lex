@@ -7,6 +7,7 @@ type lexresult = Tokens.token
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 fun err(p1,p2) = ErrorMsg.error p1
+fun newLine(yypos) = (lineNum := !lineNum+1; linePos := yypos :: !linePos);
 
 structure Comment =
 struct
@@ -20,11 +21,28 @@ structure StringBuilder =
 struct
     val sb : string ref = ref ""
     val startPos : int ref = ref 0
-
     val inStrState : bool ref = ref false
 
     fun enterStrState(yypos) = (inStrState := true; startPos := yypos)
     fun exitStrState() = inStrState := false
+
+    fun formatHandler(yypos, str) = 
+        let
+            
+            fun countHelper([], posList, lineSize) : int list = posList
+            | countHelper(#"\n"::rest, posList, lineSize) = countHelper(rest, (yypos + lineSize) :: posList, lineSize + 1)
+            | countHelper(_::rest, posList, lineSize) = countHelper(rest, posList, lineSize + 1)
+            val pl = countHelper(String.explode str, [], 0)
+            fun callNewLine (x, acc) = 
+                let val f = newLine x;
+                in 
+                    acc
+                end
+        in
+            print str;
+            foldr callNewLine () pl
+        end;
+        
 
     fun isEmpty() = String.size (!sb) = 0
 
@@ -69,13 +87,12 @@ fun eof() =
         Tokens.EOF(pos,pos)
     end
 
-fun newLine(yypos) = (lineNum := !lineNum+1; linePos := yypos :: !linePos);
 %%
-%s COMMENT STRING STRING_FORMAT;
+%s COMMENT STRING;
 alpha=[A-Za-z];
 digit=[0-9];
-ascii = [digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5]];
-formatChars = [\t \f\r];
+ascii = digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
+formatChars = [\\t \\f\\r];
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
 
@@ -125,21 +142,17 @@ formatChars = [\t \f\r];
 
 <INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(yypos); continue());
 
+<String>\\{formatChars}+\\   => (StringBuilder.formatHandler (yypos, yytext); continue());
+
 <STRING>\\\\    => (StringBuilder.concat "\\"; continue());
 <STRING>\\\"    => (StringBuilder.concat "\""; continue());
 <STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
 <STRING>\\t    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
-<STRING>\\    => (YYBEGIN STRING_FORMAT; print "enter format state\n"; continue());
+<STRING>\\[^formatChars]  => (ErrorMsg.error (hd (!linePos)); continue());
+
 <STRING>.       => (StringBuilder.concat yytext; continue());
-
-
-<STRING_FORMAT>\\    => (YYBEGIN STRING; continue());
-<STRING_FORMAT>\\n    => (newLine yypos; continue());
-<STRING_FORMAT>{formatChars}+    => (print (yytext ^ "helo"); continue());
-
-<STRING_FORMAT>. => (ErrorMsg.error (hd (!linePos)) ("String illformed format chars at " ^ (Int.toString (!lineNum))); continue());
 
 
 
