@@ -2,7 +2,9 @@
 ahahah */ var */
 let
 	var s1 = "\n\t\\\""
-	val s2 = "asd\   \f\f\asd"
+	val s2 = "asd\ 
+	
+	\asd"
 	val s3 = "str\
 	\hahaaha"
 	type  arrtype = array of int

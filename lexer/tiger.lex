@@ -92,7 +92,7 @@ fun eof() =
 alpha=[A-Za-z];
 digit=[0-9];
 ascii = digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
-formatChars = [\\t \\f\\r];
+formatChars = [\t \f\r\n];
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
 
@@ -142,15 +142,15 @@ formatChars = [\\t \\f\\r];
 
 <INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(yypos); continue());
 
-<String>\\{formatChars}+\\   => (StringBuilder.formatHandler (yypos, yytext); continue());
+<STRING>\\{formatChars}+\\   => (StringBuilder.formatHandler (yypos, yytext); continue());
 
-<STRING>\\\\    => (StringBuilder.concat "\\"; continue());
+<STRING>"\\"    => (StringBuilder.concat "\\"; continue());
 <STRING>\\\"    => (StringBuilder.concat "\""; continue());
-<STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
-<STRING>\\t    => (StringBuilder.concat yytext; continue());
+<STRING>"\n"    => (StringBuilder.concat yytext; newLine yypos; continue());
+<STRING>"\t"    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
-<STRING>\\[^formatChars]  => (ErrorMsg.error (hd (!linePos)); continue());
+
 
 <STRING>.       => (StringBuilder.concat yytext; continue());
 
