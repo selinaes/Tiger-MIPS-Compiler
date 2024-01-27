@@ -1,6 +1,13 @@
 
 
 (* Define a global variable *)
+type pos = int
+type lexresult = Tokens.token
+
+val lineNum = ErrorMsg.lineNum
+val linePos = ErrorMsg.linePos
+fun err(p1,p2) = ErrorMsg.error p1
+
 structure Comment =
 struct
     val nestedLoop = ref 0
@@ -8,8 +15,6 @@ struct
     fun decrementLoop () = nestedLoop := (!nestedLoop - 1)
     fun reset () = nestedLoop := 0
 end
-(* val _ = reset () *)
-
 
 structure StringBuilder =
 struct
@@ -33,7 +38,8 @@ struct
         let
             val token = Tokens.STRING(!sb, !startPos, endPos)
         in
-            (* print (!sb); *)
+            (* print ("linePos: " ^ (Int.toString (hd (!linePos)))); *)
+            (* print (Int.toString (!lineNum)); *)
             reset();
             token
         end;
@@ -43,12 +49,7 @@ end
 fun toChar ascii = Char.chr (valOf (Int.fromString (String.extract (ascii, 1, NONE))));
 
 
-type pos = int
-type lexresult = Tokens.token
 
-val lineNum = ErrorMsg.lineNum
-val linePos = ErrorMsg.linePos
-fun err(p1,p2) = ErrorMsg.error p1
 
 fun eof() = 
     let 
@@ -64,16 +65,17 @@ fun eof() =
             ();
         Comment.reset ();
         StringBuilder.reset ();
+        ErrorMsg.reset ();
         Tokens.EOF(pos,pos)
     end
 
 fun newLine(yypos) = (lineNum := !lineNum+1; linePos := yypos :: !linePos);
 %%
-%s COMMENT STRING;
+%s COMMENT STRING STRING_FORMAT;
 alpha=[A-Za-z];
 digit=[0-9];
 ascii = [digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5]];
-formatChars = [\t\ \f\r];
+formatChars = [\t \f\r];
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
 
@@ -128,12 +130,18 @@ formatChars = [\t\ \f\r];
 <STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
 <STRING>\\t    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
-<STRING>\\{formatChars}*\\ => (continue());
-<STRING>\\{formatChars}*\n{formatChars}*\\ => (newLine yypos; continue());
-
-
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
-<STRING>.       => (continue());
+<STRING>\\    => (YYBEGIN STRING_FORMAT; print "enter format state\n"; continue());
+<STRING>.       => (StringBuilder.concat yytext; continue());
+
+
+<STRING_FORMAT>\\    => (YYBEGIN STRING; continue());
+<STRING_FORMAT>\\n    => (newLine yypos; continue());
+<STRING_FORMAT>{formatChars}+    => (print (yytext ^ "helo"); continue());
+
+<STRING_FORMAT>. => (ErrorMsg.error (hd (!linePos)) ("String illformed format chars at " ^ (Int.toString (!lineNum))); continue());
+
+
 
 <INITIAL>"/*"   => (Comment.incrementLoop(); YYBEGIN COMMENT; continue());
 <COMMENT>"/*"   => (Comment.incrementLoop(); continue());
