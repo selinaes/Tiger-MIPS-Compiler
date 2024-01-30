@@ -140,26 +140,23 @@ formatChars = [ \t\f\r\n];
 <INITIAL>{digit}+ => (Tokens.INT(valOf (Int.fromString(yytext)), yypos, yypos+size(yytext)));
 
 <INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(yypos); continue());
-
-
 <STRING>\\\\    => (StringBuilder.concat "\\"; continue());
 <STRING>\\\"    => (StringBuilder.concat "\""; continue());
 <STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
 <STRING>\\t    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
-<STRING>\\{formatChars}+\\   => (print yytext; StringBuilder.formatHandler (yypos, yytext); continue());
+<STRING>\\{formatChars}+\\   => (StringBuilder.formatHandler (yypos, yytext); continue());
 <STRING>\\.+\\   => (ErrorMsg.error yypos ("Malformed multi-line String at " ^ yytext ); continue());
-
-<STRING>\\.    => (ErrorMsg.error yypos ("Unrecongized escaped chars in " ^ yytext); continue());
-
-<STRING>{formatChars} => (print "at a formatChars"; continue());
-
-
+<STRING>\\.    => (ErrorMsg.error yypos ("Unrecongized escaped chars : " ^ yytext); continue());
+<STRING>{formatChars}+ => (continue());
+<STRING>.   => (StringBuilder.concat yytext; continue());
 
 
 <INITIAL>"/*"   => (Comment.incrementLoop(); YYBEGIN COMMENT; continue());
 <COMMENT>"/*"   => (Comment.incrementLoop(); continue());
 <COMMENT>"*/"   => (Comment.decrementLoop(); if !Comment.nestedLoop = 0 then YYBEGIN INITIAL else (); continue());
 <COMMENT>.      => (continue());
+
+
 <INITIAL>.      => (ErrorMsg.error yypos ("Incorrect unmatched : " ^ String.extract(yytext, 0, NONE)); continue());
