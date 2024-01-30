@@ -93,6 +93,7 @@ ascii = digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
 formatChars = [\t\ \f\r\n];
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
+<INITIAL, COMMENT>{formatChars}+      => (continue());
 
 <INITIAL>type    => (Tokens.TYPE(yypos,yypos+4));
 <INITIAL>var     => (Tokens.VAR(yypos,yypos+3));
@@ -151,8 +152,8 @@ formatChars = [\t\ \f\r\n];
 
 <STRING>\\.    => (ErrorMsg.error yypos ("Unrecongized escaped chars in " ^ yytext); continue());
 
+<STRING>{formatChars} => (print "at a formatChars"; continue());
 
-<STRING>.       => (StringBuilder.concat yytext; continue());
 
 
 
@@ -160,4 +161,4 @@ formatChars = [\t\ \f\r\n];
 <COMMENT>"/*"   => (Comment.incrementLoop(); continue());
 <COMMENT>"*/"   => (Comment.decrementLoop(); if !Comment.nestedLoop = 0 then YYBEGIN INITIAL else (); continue());
 <COMMENT>.      => (continue());
-<INITIAL>.      => (continue());
+<INITIAL>.      => (ErrorMsg.error yypos ("Incorrect unmatched : " ^ String.extract(yytext, 0, NONE)); continue());
