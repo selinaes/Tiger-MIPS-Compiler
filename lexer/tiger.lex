@@ -90,7 +90,7 @@ fun eof() =
 alpha=[A-Za-z];
 digit=[0-9];
 ascii = digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
-formatChars = [\t\ \f\r\n];
+formatChars = [ \t\f\r\n];
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
 <INITIAL, COMMENT>{formatChars}+      => (continue());
@@ -149,6 +149,7 @@ formatChars = [\t\ \f\r\n];
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
 <STRING>\\{formatChars}+\\   => (print yytext; StringBuilder.formatHandler (yypos, yytext); continue());
+<STRING>\\.+\\   => (ErrorMsg.error yypos ("Malformed multi-line String at " ^ yytext ); continue());
 
 <STRING>\\.    => (ErrorMsg.error yypos ("Unrecongized escaped chars in " ^ yytext); continue());
 
