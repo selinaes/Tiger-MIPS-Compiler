@@ -1,3 +1,4 @@
 .DS_Store
 lexer/.cm/
 lexer/tiger.lex.sml
+lexer/.DS_Store
