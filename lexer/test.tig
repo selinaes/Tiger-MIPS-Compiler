@@ -1,8 +1,8 @@
 /* blah blha /* h
 ahahah */ var */
 let
-	var s1 = "\n\t\\\""
-	val s2 = "asd\ 
+	var s1 = "\n\t\\\"" 
+	val s2 = "asd\ \n
 	\asd"
 	val s3 = "str\
 	\hahaaha"

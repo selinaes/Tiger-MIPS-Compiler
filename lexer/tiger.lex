@@ -39,7 +39,6 @@ struct
                     acc
                 end
         in
-            (* print str; *)
             foldr callNewLine () pl
         end;
         
@@ -56,8 +55,6 @@ struct
         let
             val token = Tokens.STRING(!sb, !startPos, endPos)
         in
-            (* print ("linePos: " ^ (Int.toString (hd (!linePos)))); *)
-            (* print (Int.toString (!lineNum)); *)
             reset();
             token
         end;
@@ -93,7 +90,7 @@ fun eof() =
 alpha=[A-Za-z];
 digit=[0-9];
 ascii = digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
-formatChars = [\t \f\r\n];
+formatChars = [\t\ \f\r\n];
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
 
@@ -143,14 +140,16 @@ formatChars = [\t \f\r\n];
 
 <INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(yypos); continue());
 
-<STRING>\\{formatChars}+\\   => (StringBuilder.formatHandler (yypos, yytext); continue());
 
-<STRING>"\\"    => (StringBuilder.concat "\\"; continue());
+<STRING>\\\\    => (StringBuilder.concat "\\"; continue());
 <STRING>\\\"    => (StringBuilder.concat "\""; continue());
-<STRING>"\n"    => (StringBuilder.concat yytext; newLine yypos; continue());
-<STRING>"\t"    => (StringBuilder.concat yytext; continue());
+<STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
+<STRING>\\t    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
+<STRING>\\{formatChars}+\\   => (print yytext; StringBuilder.formatHandler (yypos, yytext); continue());
+
+<STRING>\\.    => (ErrorMsg.error yypos ("Unrecongized escaped chars in " ^ yytext); continue());
 
 
 <STRING>.       => (StringBuilder.concat yytext; continue());
