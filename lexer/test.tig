@@ -3,10 +3,14 @@ ahahah */ var */
 let
 	var s1 = "\n\t\\\""
 	val s2 = "asd\ 
-	
 	\asd"
 	val s3 = "str\
 	\hahaaha"
+	var s4 = "\123"
+	var s5 = "this is a really long string\
+    \ that spans multiple  lines\
+    \ the slash at the end of the line says to continue to the next\
+    \ and the slash at the front of the line says where to start it"
 	type  arrtype = array of int
 	var arr1:arrtype := arrtype [10] of 0
 in

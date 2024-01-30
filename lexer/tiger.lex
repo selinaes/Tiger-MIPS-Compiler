@@ -39,7 +39,7 @@ struct
                     acc
                 end
         in
-            print str;
+            (* print str; *)
             foldr callNewLine () pl
         end;
         
@@ -48,7 +48,7 @@ struct
 
     fun concat(s) = sb := !sb ^ s
 
-    fun appendChar(c) = !sb ^ Char.toString c
+    fun appendChar(c) = sb := !sb ^ (Char.toString c)
 
     fun reset() = (sb := ""; startPos := 0)
 
@@ -64,7 +64,8 @@ struct
 end
 
 (* convert escaped ascii in form \ddd to char *)
-fun toChar ascii = Char.chr (valOf (Int.fromString (String.extract (ascii, 1, NONE))));
+fun toChar ascii = 
+                Char.chr (valOf (Int.fromString (String.extract (ascii, 1, NONE))));
 
 
 
