@@ -147,11 +147,10 @@ formatChars = [ \t\f\r\n];
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
 <STRING>\\{formatChars}+\\   => (StringBuilder.formatHandler (yypos, yytext); continue());
-<STRING>\\.+\\   => (ErrorMsg.error yypos ("Malformed multi-line String at " ^ yytext ); continue());
 <STRING>\\.    => (ErrorMsg.error yypos ("Unrecongized escaped chars : " ^ yytext); continue());
-<STRING>{formatChars}+ => (continue());
-<STRING>.   => (StringBuilder.concat yytext; continue());
 
+<STRING>.   => (StringBuilder.concat yytext; continue());
+<STRING>{formatChars}+ => (continue());
 
 <INITIAL>"/*"   => (Comment.incrementLoop(); YYBEGIN COMMENT; continue());
 <COMMENT>"/*"   => (Comment.incrementLoop(); continue());
