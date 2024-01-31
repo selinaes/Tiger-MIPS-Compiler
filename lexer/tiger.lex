@@ -144,6 +144,7 @@ formatChars = [ \t\f\r\n];
 <STRING>\\\"    => (StringBuilder.concat "\""; continue());
 <STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
 <STRING>\\t    => (StringBuilder.concat yytext; continue());
+<STRING>[ ]+    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
 <STRING>\"    => (YYBEGIN INITIAL; StringBuilder.exitStrState(); StringBuilder.toString(yypos+1));
 <STRING>\\{formatChars}+\\   => (StringBuilder.formatHandler (yypos, yytext); continue());

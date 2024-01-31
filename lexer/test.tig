@@ -2,6 +2,9 @@
 ahahah */ var */
 let
 	var s1 = "\n\t\\\"" 
+	var t1 = "abc   \
+	\"
+	var t2 = "abc   \n"
 	val s2 = "asd\ \n
 	\asd"
 	val s3 = "str\
