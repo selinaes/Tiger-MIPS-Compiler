@@ -5,19 +5,34 @@
   | INT of int | STRING of string
   | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK
   | LBRACE | RBRACE | DOT
-  | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE
+  | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE | UMINUS
   | AND | OR | ASSIGN
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
   | FUNCTION | VAR | TYPE
 
-%nonterm  exp | program
+%nonterm  exp | program | arithmeticExp | lvalue | assignment | array | fundec | tyfields
+  | vardec | ty | tydec | expseq | dec | decs | funargs | functionCall | booleanExp | recflds
+  | record | comparison
 
 %pos int
 %verbose
 %start program
 %eop EOF
 %noshift EOF
+
+
+%nonassoc ASSIGN
+%nonassoc OF
+%right DO
+%right THEN ELSE
+%left OR
+%left AND
+%nonassoc EQ NEQ LT LE GT GE
+%left PLUS MINUS
+%left TIMES DIVIDE
+%left UMINUS
+
 
 %name Tiger
 
@@ -37,7 +52,86 @@ DO OF NIL
                  *  to replace the two dummy productions below with an actual grammar.
                  *)
 
-program	: exp				()
+program	: exp				(print "R0 program : exp\n")
 
 
-exp: 			()
+exp: 	INT		(print "R1 exp : INT\n")
+   |  STRING  (print "R2 exp : STRING\n")
+   |  NIL   (print "R3 exp : NIL\n")
+   |  lvalue (print "R4 exp : lvalue\n")
+   |  arithmeticExp (print "R5 exp : arithmeticExp\n")
+   |  booleanExp (print "R6 exp : booleanExp\n")
+   |  comparison (print "R7 exp : comparison\n")
+  (*  valueless expression *)
+   |  functionCall (print "R8 exp : functionCall\n")
+   |  assignment (print "R9 exp : assignment\n")
+   | IF exp THEN exp ELSE exp (print "R10 exp : IF exp THEN exp ELSE exp\n")
+   | IF exp THEN exp  (print "R11 exp : IF exp THEN exp\n")
+   | WHILE exp DO exp (print "R12 exp : WHILE exp DO exp\n")
+   | FOR ID ASSIGN exp TO exp DO exp  (print "R13 exp : FOR ID ASSIGN exp TO exp DO exp\n") 
+   | BREAK  (print "R14 exp : BREAK\n")
+  (* done *)
+   | LET decs IN expseq END (print "R15 exp : LET decs IN expseq END\n")
+   (* Sequencing *)
+   | LPAREN expseq RPAREN (print "R16 exp : LPAREN expseq RPAREN\n")
+   | array (print "R17 exp : array\n")
+   | record (print "R18 exp : record\n")
+
+record: ID LBRACE recflds RBRACE (print "R19 record: ID LBRACE recflds RBRACE\n")
+recflds: ID EQ exp  (print "R20 recflds: ID EQ exp\n")
+       | ID EQ exp COLON recflds (print "R21 recflds: ID EQ exp COLON recflds\n")
+ 
+functionCall: ID LPAREN RPAREN (print "R22 functionCall: ID LPAREN RPAREN\n")
+            | ID LPAREN funargs RPAREN (print "R23 functionCall: ID LPAREN funargs RPAREN\n")
+
+funargs: exp (print "R24 funargs: exp\n")
+       | exp COMMA funargs (print "R25 funargs: exp COMMA funargs\n")
+
+decs: dec (print "R26 decs: dec\n")
+    | decs dec  (print "R27 decs: decs dec\n")
+
+expseq: exp SEMICOLON expseq (print "R28 expseq: exp SEMICOLON expseq\n")
+      | exp (print "R29 expseq: exp\n")
+
+dec: tydec (print "R30 dec: tydec\n")
+   | vardec (print "R31 dec: vardec\n")
+   | fundec (print "R32 dec: fundec\n")
+
+tydec: TYPE ID EQ ty  (print "R33 tydec: TYPE ID EQ ty\n")
+ty: ID  (print "R34 ty: ID\n")
+  | LBRACE tyfields RBRACE  (print "R35 ty: LBRACE tyfields RBRACE\n")
+  | LBRACE RBRACE (print "R36 ty: LBRACE RBRACE\n")
+  | ARRAY OF ID (print "R37 ty: ARRAY OF ID\n")
+
+tyfields: ID COLON ID (print "R38 tyfields: ID COLON ID\n")
+        | ID COLON ID COMMA tyfields  (print "R39 tyfields: ID COLON ID COMMA tyfields\n")
+
+
+vardec: VAR ID ASSIGN exp (print "R40 vardec: VAR ID ASSIGN exp\n")
+      | VAR ID COLON ID ASSIGN exp  (print "R41 vardec: VAR ID COLON ID ASSIGN exp\n")
+
+fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp (print "R42 fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp\n")
+      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  (print "R43 fundec: FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp\n")
+
+array: ID LBRACK exp RBRACK OF exp (print "R44 array: ID LBRACK exp RBRACK OF exp\n")
+
+assignment: lvalue ASSIGN exp (print "R45 assignment: lvalue ASSIGN exp\n")
+
+
+lvalue: ID (print "R46 lvalue: ID\n")
+      | lvalue LBRACK exp RBRACK (print "R47 lvalue: lvalue LBRACK exp RBRACK\n")
+      | lvalue DOT ID (print "R48 lvalue: lvalue DOT ID\n")
+
+comparison: exp EQ exp (print "R49 comparison: exp EQ exp\n")
+          | exp NEQ exp (print "R50 comparison: exp NEQ exp\n")
+          | exp GT exp  (print "R51 comparison: exp GT exp\n")
+          | exp LT exp (print "R52 comparison: exp LT exp\n")
+          | exp GE exp   (print "R53 comparison: exp GE exp\n")
+          | exp LE exp   (print "R54 comparison: exp LE exp\n")
+booleanExp: exp AND exp  (print "R55 booleanExp: exp AND exp\n")
+          | exp OR exp  (print "R56 booleanExp: exp OR exp\n")
+arithmeticExp: exp PLUS exp (print "R57 arithmeticExp: exp PLUS exp\n")
+             | exp MINUS exp (print "R58 arithmeticExp: exp MINUS exp\n")
+             | exp TIMES exp  (print "R59 arithmeticExp: exp TIMES exp\n")
+             | exp DIVIDE exp (print "R60 arithmeticExp: exp DIVIDE exp\n")
+             | MINUS exp %prec UMINUS (print "R61 arithmeticExp: MINUS exp %prec UMINUS \n")
