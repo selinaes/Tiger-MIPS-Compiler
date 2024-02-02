@@ -756,26 +756,30 @@ expseq1 ()
 end; ()))
  in ( LrTable.NT 0, ( result, LPAREN1left, RPAREN1right), rest671)
 end
-|  ( 17, ( ( _, ( MlyValue.ntVOID array1, array1left, array1right)) ::
- rest671)) => let val  result = MlyValue.ntVOID (fn _ => ( let val  (
-array as array1) = array1 ()
- in (print "R17 exp : array\n")
+|  ( 17, ( ( _, ( MlyValue.ntVOID arrayCreation1, arrayCreation1left, 
+arrayCreation1right)) :: rest671)) => let val  result = 
+MlyValue.ntVOID (fn _ => ( let val  (arrayCreation as arrayCreation1)
+ = arrayCreation1 ()
+ in (print "R17 exp : arrayCreation\n")
 end; ()))
- in ( LrTable.NT 0, ( result, array1left, array1right), rest671)
+ in ( LrTable.NT 0, ( result, arrayCreation1left, arrayCreation1right)
+, rest671)
 end
-|  ( 18, ( ( _, ( MlyValue.ntVOID record1, record1left, record1right))
- :: rest671)) => let val  result = MlyValue.ntVOID (fn _ => ( let val 
- (record as record1) = record1 ()
- in (print "R18 exp : record\n")
+|  ( 18, ( ( _, ( MlyValue.ntVOID recordCreation1, recordCreation1left
+, recordCreation1right)) :: rest671)) => let val  result = 
+MlyValue.ntVOID (fn _ => ( let val  (recordCreation as recordCreation1
+) = recordCreation1 ()
+ in (print "R18 exp : recordCreation\n")
 end; ()))
- in ( LrTable.NT 0, ( result, record1left, record1right), rest671)
+ in ( LrTable.NT 0, ( result, recordCreation1left, 
+recordCreation1right), rest671)
 end
 |  ( 19, ( ( _, ( _, _, RBRACE1right)) :: ( _, ( MlyValue.ntVOID 
 recflds1, _, _)) :: _ :: ( _, ( MlyValue.ID ID1, ID1left, _)) :: 
 rest671)) => let val  result = MlyValue.ntVOID (fn _ => ( let val  (ID
  as ID1) = ID1 ()
  val  (recflds as recflds1) = recflds1 ()
- in (print "R19 record: ID LBRACE recflds RBRACE\n")
+ in (print "R19 recordCreation: ID LBRACE recflds RBRACE\n")
 end; ()))
  in ( LrTable.NT 18, ( result, ID1left, RBRACE1right), rest671)
 end
@@ -985,8 +989,9 @@ ID1left, _)) :: rest671)) => let val  result = MlyValue.ntVOID (fn _
  => ( let val  (ID as ID1) = ID1 ()
  val  (exp as exp1) = exp1 ()
  val  exp2 = exp2 ()
- in (print "R44 array: ID LBRACK exp RBRACK OF exp\n")
-end; ()))
+ in (print "R44 arrayCreation: ID LBRACK exp RBRACK OF exp\n")
+end; ()
+))
  in ( LrTable.NT 5, ( result, ID1left, exp2right), rest671)
 end
 |  ( 45, ( ( _, ( MlyValue.ntVOID exp1, _, exp1right)) :: _ :: ( _, ( 

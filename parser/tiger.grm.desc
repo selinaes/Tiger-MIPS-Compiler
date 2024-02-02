@@ -23,10 +23,10 @@ state 0:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -43,7 +43,7 @@ state 1:
 
 state 2:
 
-	exp : record .  (reduce by rule 18)
+	exp : recordCreation .  (reduce by rule 18)
 
 
 
@@ -70,7 +70,7 @@ state 4:
 
 state 5:
 
-	exp : array .  (reduce by rule 17)
+	exp : arrayCreation .  (reduce by rule 17)
 
 
 
@@ -208,10 +208,10 @@ state 14:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -238,10 +238,10 @@ state 15:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -267,10 +267,10 @@ state 16:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -296,11 +296,11 @@ state 17:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	expseq	goto 48
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -328,10 +328,10 @@ error:  state 20: shift/reduce conflict (shift LBRACK, reduce by rule 46)
 state 20:
 
 	lvalue : ID .  (reduce by rule 46)
-	array : ID . LBRACK exp RBRACK OF exp 
+	arrayCreation : ID . LBRACK exp RBRACK OF exp 
 	functionCall : ID . LPAREN RPAREN 
 	functionCall : ID . LPAREN funargs RPAREN 
-	record : ID . LBRACE recflds RBRACE 
+	recordCreation : ID . LBRACE recflds RBRACE 
 
 	LPAREN	shift 52
 	LBRACK	shift 51
@@ -361,10 +361,10 @@ state 21:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -400,10 +400,10 @@ state 23:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -429,10 +429,10 @@ state 24:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -458,10 +458,10 @@ state 25:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -487,10 +487,10 @@ state 26:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -516,10 +516,10 @@ state 27:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -545,10 +545,10 @@ state 28:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -574,10 +574,10 @@ state 29:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -603,10 +603,10 @@ state 30:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -632,10 +632,10 @@ state 31:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -661,10 +661,10 @@ state 32:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -690,10 +690,10 @@ state 33:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -719,10 +719,10 @@ state 34:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -748,10 +748,10 @@ state 35:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -990,7 +990,7 @@ state 49:
 
 state 50:
 
-	record : ID LBRACE . recflds RBRACE 
+	recordCreation : ID LBRACE . recflds RBRACE 
 
 	ID	shift 79
 
@@ -1001,7 +1001,7 @@ state 50:
 
 state 51:
 
-	array : ID LBRACK . exp RBRACK OF exp 
+	arrayCreation : ID LBRACK . exp RBRACK OF exp 
 
 	ID	shift 20
 	INT	shift 19
@@ -1019,10 +1019,10 @@ state 51:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -1050,11 +1050,11 @@ state 52:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	funargs	goto 81
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -1574,11 +1574,11 @@ state 69:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	expseq	goto 85
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -1637,10 +1637,10 @@ state 73:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -1666,10 +1666,10 @@ state 74:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -1696,10 +1696,10 @@ state 75:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -1734,11 +1734,11 @@ state 77:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	expseq	goto 93
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -1746,7 +1746,7 @@ state 77:
 
 state 78:
 
-	record : ID LBRACE recflds . RBRACE 
+	recordCreation : ID LBRACE recflds . RBRACE 
 
 	RBRACE	shift 94
 
@@ -1771,7 +1771,7 @@ state 80:
 	arithmeticExp : exp . MINUS exp 
 	arithmeticExp : exp . TIMES exp 
 	arithmeticExp : exp . DIVIDE exp 
-	array : ID LBRACK exp . RBRACK OF exp 
+	arrayCreation : ID LBRACK exp . RBRACK OF exp 
 	booleanExp : exp . AND exp 
 	booleanExp : exp . OR exp 
 	comparison : exp . EQ exp 
@@ -1905,10 +1905,10 @@ state 87:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2049,7 +2049,7 @@ state 93:
 
 state 94:
 
-	record : ID LBRACE recflds RBRACE .  (reduce by rule 19)
+	recordCreation : ID LBRACE recflds RBRACE .  (reduce by rule 19)
 
 
 
@@ -2077,10 +2077,10 @@ state 95:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2088,7 +2088,7 @@ state 95:
 
 state 96:
 
-	array : ID LBRACK exp RBRACK . OF exp 
+	arrayCreation : ID LBRACK exp RBRACK . OF exp 
 
 	OF	shift 111
 
@@ -2125,11 +2125,11 @@ state 98:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	funargs	goto 112
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2270,10 +2270,10 @@ state 108:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2299,10 +2299,10 @@ state 109:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2345,7 +2345,7 @@ state 110:
 
 state 111:
 
-	array : ID LBRACK exp RBRACK OF . exp 
+	arrayCreation : ID LBRACK exp RBRACK OF . exp 
 
 	ID	shift 20
 	INT	shift 19
@@ -2363,10 +2363,10 @@ state 111:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2430,10 +2430,10 @@ state 116:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2546,7 +2546,7 @@ state 122:
 	arithmeticExp : exp . MINUS exp 
 	arithmeticExp : exp . TIMES exp 
 	arithmeticExp : exp . DIVIDE exp 
-	array : ID LBRACK exp RBRACK OF exp .  (reduce by rule 44)
+	arrayCreation : ID LBRACK exp RBRACK OF exp .  (reduce by rule 44)
 	booleanExp : exp . AND exp 
 	booleanExp : exp . OR exp 
 	comparison : exp . EQ exp 
@@ -2644,10 +2644,10 @@ state 126:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2694,10 +2694,10 @@ state 129:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
@@ -2819,10 +2819,10 @@ state 135:
 	arithmeticExp	goto 8
 	lvalue	goto 7
 	assignment	goto 6
-	array	goto 5
+	arrayCreation	goto 5
 	functionCall	goto 4
 	booleanExp	goto 3
-	record	goto 2
+	recordCreation	goto 2
 	comparison	goto 1
 
 	.	error
