@@ -2,9 +2,7 @@
 
 ```sml
 CM.make "sources.cm";
-Parse.parse "test.tig";
-Tokens.STRING(!StringBuilder.sb, !StringBuilder.startPos, yypos+1)
-formatChars = [\t\ \f\r\n];
+Parse.parse "../testcases/test1.tig";
 ```
 
 ## Lexer
