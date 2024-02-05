@@ -13,7 +13,7 @@
 
 %nonterm  exp | program | arithmeticExp | lvalue | assignment | arrayCreation | fundec | tyfields
   | vardec | ty | tydec | expseq | dec | decs | funargs | functionCall | booleanExp | recflds
-  | recordCreation | comparison
+  | recordCreation | comparison | typeID
 
 %pos int
 %verbose
@@ -77,7 +77,9 @@ exp: 	INT		(print "R1 exp : INT\n")
    | arrayCreation (print "R17 exp : arrayCreation\n")
    | recordCreation (print "R18 exp : recordCreation\n")
 
-recordCreation: ID LBRACE recflds RBRACE (print "R19 recordCreation: ID LBRACE recflds RBRACE\n")
+typeID: ID  (print "typeID reduce\n")
+
+recordCreation: typeID LBRACE recflds RBRACE (print "R19 recordCreation: ID LBRACE recflds RBRACE\n")
 recflds: ID EQ exp  (print "R20 recflds: ID EQ exp\n")
        | ID EQ exp COLON recflds (print "R21 recflds: ID EQ exp COLON recflds\n")
  
@@ -97,29 +99,31 @@ dec: tydec (print "R30 dec: tydec\n")
    | vardec (print "R31 dec: vardec\n")
    | fundec (print "R32 dec: fundec\n")
 
-tydec: TYPE ID EQ ty  (print "R33 tydec: TYPE ID EQ ty\n")
-ty: ID  (print "R34 ty: ID\n")
+tydec: TYPE typeID EQ ty  (print "R33 tydec: TYPE ID EQ ty\n")
+ty: typeID  (print "R34 ty: ID\n")
   | LBRACE tyfields RBRACE  (print "R35 ty: LBRACE tyfields RBRACE\n")
   | LBRACE RBRACE (print "R36 ty: LBRACE RBRACE\n")
-  | ARRAY OF ID (print "R37 ty: ARRAY OF ID\n")
+  | ARRAY OF typeID (print "R37 ty: ARRAY OF ID\n")
 
-tyfields: ID COLON ID (print "R38 tyfields: ID COLON ID\n")
-        | ID COLON ID COMMA tyfields  (print "R39 tyfields: ID COLON ID COMMA tyfields\n")
+tyfields: ID COLON typeID (print "R38 tyfields: ID COLON ID\n")
+        | ID COLON typeID COMMA tyfields  (print "R39 tyfields: ID COLON ID COMMA tyfields\n")
 
 
 vardec: VAR ID ASSIGN exp (print "R40 vardec: VAR ID ASSIGN exp\n")
-      | VAR ID COLON ID ASSIGN exp  (print "R41 vardec: VAR ID COLON ID ASSIGN exp\n")
+      | VAR ID COLON typeID ASSIGN exp  (print "R41 vardec: VAR ID COLON ID ASSIGN exp\n")
 
 fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp (print "R42 fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp\n")
-      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  (print "R43 fundec: FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp\n")
+      | FUNCTION ID LPAREN tyfields RPAREN COLON typeID EQ exp  (print "R43 fundec: FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp\n")
 
-arrayCreation: ID LBRACK exp RBRACK OF exp (print "R44 arrayCreation: ID LBRACK exp RBRACK OF exp\n")
+arrayCreation: typeID LBRACK exp RBRACK OF exp (print "R44 arrayCreation: ID LBRACK exp RBRACK OF exp\n")
 
 assignment: lvalue ASSIGN exp (print "R45 assignment: lvalue ASSIGN exp\n")
 
 
-lvalue: ID (print "R46 lvalue: ID\n")
+lvalue:(* ID (print "R46 lvalue: ID\n")*)
+       ID LBRACK exp RBRACK   ()
       | lvalue LBRACK exp RBRACK (print "R47 lvalue: lvalue LBRACK exp RBRACK\n")
+      | ID DOT ID ()
       | lvalue DOT ID (print "R48 lvalue: lvalue DOT ID\n")
 
 comparison: exp EQ exp (print "R49 comparison: exp EQ exp\n")
