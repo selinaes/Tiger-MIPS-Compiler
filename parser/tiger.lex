@@ -93,8 +93,8 @@ fun eof() =
 %s COMMENT STRING;
 alpha=[A-Za-z];
 digit=[0-9];
-ascii = digit|1-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
-formatChars = [ \t\f\r\n];
+ascii = 00digit|01-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
+formatChars = [ \t\012\r\n];
 
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
