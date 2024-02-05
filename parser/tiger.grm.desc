@@ -25,17 +25,17 @@ state 0:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
 
 state 1:
 
-	lvalue : dotTmp .  (reduce by rule 48)
-	tmp : dotTmp . LBRACK exp RBRACK 
-	dotTmp : dotTmp . DOT ID 
+	lvalue : fieldLvalue .  (reduce by rule 48)
+	subscriptLvalue : fieldLvalue . LBRACK exp RBRACK 
+	fieldLvalue : fieldLvalue . DOT ID 
 
 	LBRACK	shift 24
 	DOT	shift 23
@@ -46,9 +46,9 @@ state 1:
 
 state 2:
 
-	lvalue : tmp .  (reduce by rule 47)
-	tmp : tmp . LBRACK exp RBRACK 
-	dotTmp : tmp . DOT ID 
+	lvalue : subscriptLvalue .  (reduce by rule 47)
+	subscriptLvalue : subscriptLvalue . LBRACK exp RBRACK 
+	fieldLvalue : subscriptLvalue . DOT ID 
 
 	LBRACK	shift 26
 	DOT	shift 25
@@ -234,8 +234,8 @@ state 16:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -266,8 +266,8 @@ state 17:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -297,8 +297,8 @@ state 18:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -329,8 +329,8 @@ state 19:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -360,8 +360,8 @@ state 22:
 	functionCall : ID . LPAREN RPAREN 
 	functionCall : ID . LPAREN funargs RPAREN 
 	recordCreation : ID . LBRACE recflds RBRACE 
-	tmp : ID . LBRACK exp RBRACK 
-	dotTmp : ID . DOT ID 
+	subscriptLvalue : ID . LBRACK exp RBRACK 
+	fieldLvalue : ID . DOT ID 
 
 	LPAREN	shift 57
 	LBRACK	shift 56
@@ -374,7 +374,7 @@ state 22:
 
 state 23:
 
-	dotTmp : dotTmp DOT . ID 
+	fieldLvalue : fieldLvalue DOT . ID 
 
 	ID	shift 58
 
@@ -384,7 +384,7 @@ state 23:
 
 state 24:
 
-	tmp : dotTmp LBRACK . exp RBRACK 
+	subscriptLvalue : fieldLvalue LBRACK . exp RBRACK 
 
 	ID	shift 22
 	INT	shift 21
@@ -407,15 +407,15 @@ state 24:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
 
 state 25:
 
-	dotTmp : tmp DOT . ID 
+	fieldLvalue : subscriptLvalue DOT . ID 
 
 	ID	shift 60
 
@@ -425,7 +425,7 @@ state 25:
 
 state 26:
 
-	tmp : tmp LBRACK . exp RBRACK 
+	subscriptLvalue : subscriptLvalue LBRACK . exp RBRACK 
 
 	ID	shift 22
 	INT	shift 21
@@ -448,8 +448,8 @@ state 26:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -479,8 +479,8 @@ state 27:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -510,8 +510,8 @@ state 28:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -541,8 +541,8 @@ state 29:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -572,8 +572,8 @@ state 30:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -603,8 +603,8 @@ state 31:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -634,8 +634,8 @@ state 32:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -665,8 +665,8 @@ state 33:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -696,8 +696,8 @@ state 34:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -727,8 +727,8 @@ state 35:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -758,8 +758,8 @@ state 36:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -789,8 +789,8 @@ state 37:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -820,8 +820,8 @@ state 38:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -851,8 +851,8 @@ state 39:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -1090,7 +1090,7 @@ state 53:
 
 state 54:
 
-	dotTmp : ID DOT . ID 
+	fieldLvalue : ID DOT . ID 
 
 	ID	shift 85
 
@@ -1112,7 +1112,7 @@ state 55:
 state 56:
 
 	arrayCreation : ID LBRACK . exp RBRACK OF exp 
-	tmp : ID LBRACK . exp RBRACK 
+	subscriptLvalue : ID LBRACK . exp RBRACK 
 
 	ID	shift 22
 	INT	shift 21
@@ -1135,8 +1135,8 @@ state 56:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -1169,15 +1169,15 @@ state 57:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
 
 state 58:
 
-	dotTmp : dotTmp DOT ID .  (reduce by rule 53)
+	fieldLvalue : fieldLvalue DOT ID .  (reduce by rule 53)
 
 
 
@@ -1198,7 +1198,7 @@ state 59:
 	comparison : exp . LT exp 
 	comparison : exp . GE exp 
 	comparison : exp . LE exp 
-	tmp : dotTmp LBRACK exp . RBRACK 
+	subscriptLvalue : fieldLvalue LBRACK exp . RBRACK 
 
 	RBRACK	shift 92
 	PLUS	shift 39
@@ -1220,7 +1220,7 @@ state 59:
 
 state 60:
 
-	dotTmp : tmp DOT ID .  (reduce by rule 54)
+	fieldLvalue : subscriptLvalue DOT ID .  (reduce by rule 54)
 
 
 
@@ -1241,7 +1241,7 @@ state 61:
 	comparison : exp . LT exp 
 	comparison : exp . GE exp 
 	comparison : exp . LE exp 
-	tmp : tmp LBRACK exp . RBRACK 
+	subscriptLvalue : subscriptLvalue LBRACK exp . RBRACK 
 
 	RBRACK	shift 93
 	PLUS	shift 39
@@ -1738,8 +1738,8 @@ state 76:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -1802,8 +1802,8 @@ state 80:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -1833,8 +1833,8 @@ state 81:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -1865,8 +1865,8 @@ state 82:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -1906,15 +1906,15 @@ state 84:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
 
 state 85:
 
-	dotTmp : ID DOT ID .  (reduce by rule 52)
+	fieldLvalue : ID DOT ID .  (reduce by rule 52)
 
 
 
@@ -1957,7 +1957,7 @@ state 88:
 	comparison : exp . LT exp 
 	comparison : exp . GE exp 
 	comparison : exp . LE exp 
-	tmp : ID LBRACK exp . RBRACK 
+	subscriptLvalue : ID LBRACK exp . RBRACK 
 
 	RBRACK	shift 105
 	PLUS	shift 39
@@ -2033,7 +2033,7 @@ state 91:
 
 state 92:
 
-	tmp : dotTmp LBRACK exp RBRACK .  (reduce by rule 51)
+	subscriptLvalue : fieldLvalue LBRACK exp RBRACK .  (reduce by rule 51)
 
 
 
@@ -2042,7 +2042,7 @@ state 92:
 
 state 93:
 
-	tmp : tmp LBRACK exp RBRACK .  (reduce by rule 50)
+	subscriptLvalue : subscriptLvalue LBRACK exp RBRACK .  (reduce by rule 50)
 
 
 
@@ -2097,8 +2097,8 @@ state 96:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2271,8 +2271,8 @@ state 104:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2280,7 +2280,7 @@ state 104:
 state 105:
 
 	arrayCreation : ID LBRACK exp RBRACK . OF exp 
-	tmp : ID LBRACK exp RBRACK .  (reduce by rule 49)
+	subscriptLvalue : ID LBRACK exp RBRACK .  (reduce by rule 49)
 
 	OF	shift 120
 
@@ -2323,8 +2323,8 @@ state 107:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2469,8 +2469,8 @@ state 117:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2500,8 +2500,8 @@ state 118:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2566,8 +2566,8 @@ state 120:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2635,8 +2635,8 @@ state 125:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2851,8 +2851,8 @@ state 135:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -2903,8 +2903,8 @@ state 138:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 
@@ -3030,8 +3030,8 @@ state 144:
 	booleanExp	goto 5
 	recordCreation	goto 4
 	comparison	goto 3
-	tmp	goto 2
-	dotTmp	goto 1
+	subscriptLvalue	goto 2
+	fieldLvalue	goto 1
 
 	.	error
 

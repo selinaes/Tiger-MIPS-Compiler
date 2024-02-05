@@ -1,3 +1,4 @@
+structure A = Absyn
 %%
 %term
     EOF
@@ -11,9 +12,14 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE
 
-%nonterm  exp | program | arithmeticExp | lvalue | assignment | arrayCreation | fundec | tyfields
-  | vardec | ty | tydec | expseq | dec | decs | funargs | functionCall | booleanExp | recflds
-  | recordCreation | comparison  |tmp | dotTmp
+%nonterm  exp of A.exp | program of A.exp | arithmeticExp of A.exp | lvalue of A.var
+  | assignment of A.AssignExp | arrayCreation of A.ArrayExp | fundec of A.fundec 
+  | tyfields of A.field | vardec of A.VarDec| ty of A.ty 
+  | tydec of A.TypeDec | expseq of A.SeqExp | dec of A.dec | decs of A.dec list 
+  | funargs of A.field list
+  | functionCall of A.CallExp | booleanExp | recflds of (A.symbol * A.exp * A.pos) list
+  | recordCreation of A.RecordExp | comparison of A.oper 
+  | subscriptLvalue of A.SubscriptVar | fieldLvalue of A.FieldVar
 
 %pos int
 %verbose
@@ -55,11 +61,11 @@ DO OF NIL
 program	: exp				(print "R0 program : exp\n")
 
 
-exp: 	INT		(print "R1 exp : INT\n")
-   |  STRING  (print "R2 exp : STRING\n")
-   |  NIL   (print "R3 exp : NIL\n")
-   |  lvalue (print "R4 exp : lvalue\n")
-   |  arithmeticExp (print "R5 exp : arithmeticExp\n")
+exp: 	INT		(print "R1 exp : INT\n"; A.IntExp(INT))
+   |  STRING  (print "R2 exp : STRING\n"; A.StringExp(STRING, STRINGleft))
+   |  NIL   (print "R3 exp : NIL\n"; A.NilExp)
+   |  lvalue (print "R4 exp : lvalue\n"; A.VarExp(lvalue))
+   |  arithmeticExp (print "R5 exp : arithmeticExp\n"; A.())
    |  booleanExp (print "R6 exp : booleanExp\n")
    |  comparison (print "R7 exp : comparison\n")
   (*  valueless expression *)
@@ -77,7 +83,7 @@ exp: 	INT		(print "R1 exp : INT\n")
    | arrayCreation (print "R17 exp : arrayCreation\n")
    | recordCreation (print "R18 exp : recordCreation\n")
 
-recordCreation: ID LBRACE recflds RBRACE (print "R19 recordCreation: ID LBRACE recflds RBRACE\n")
+recordCreation: ID LBRACE recflds RBRACE (print "R19 recordCreation: ID LBRACE recflds RBRACE\n"; A.RecordExp())
 recflds: ID EQ exp  (print "R20 recflds: ID EQ exp\n")
        | ID EQ exp COLON recflds (print "R21 recflds: ID EQ exp COLON recflds\n")
  
@@ -122,16 +128,16 @@ assignment: lvalue ASSIGN exp (print "R45 assignment: lvalue ASSIGN exp\n")
       | lvalue LBRACK exp RBRACK (print "R47 lvalue: lvalue LBRACK exp RBRACK\n")
       | lvalue DOT ID (print "R48 lvalue: lvalue DOT ID\n")  *)
 lvalue: ID (print ("R46 lvalue: ID =" ^ID^ " \n"))
-      | tmp (print "R46.1\n")
-      | dotTmp (print "R46.2\n")
+      | subscriptLvalue (print "R46.1\n")
+      | fieldLvalue (print "R46.2\n")
 
-tmp: ID LBRACK exp RBRACK  (print ("R47 tmp:  ID = " ^ ID ^ "LBRACK exp RBRACK\n"))
-   | tmp LBRACK exp RBRACK (print "R47.2\n")
-   | dotTmp LBRACK exp RBRACK(print "R47.3\n")
+subscriptLvalue: ID LBRACK exp RBRACK  (print ("R47 subscriptLvalue:  ID = " ^ ID ^ "LBRACK exp RBRACK\n"))
+               | subscriptLvalue LBRACK exp RBRACK (print "R47.2\n")
+               | fieldLvalue LBRACK exp RBRACK(print "R47.3\n")
 
-dotTmp: ID DOT ID (print ("R48 dotTmp: ID=" ^ ID1 ^" DOT ID=" ^ID2^ " \n"))
-      | dotTmp DOT ID (print ("R48.2 dotTmp : dotTmp DOT ID="^ID^ "\n"))
-      | tmp DOT ID(print ("R48.3 dotTmp:tmp DOT ID="^ID^"\n"))
+fieldLvalue: ID DOT ID (print ("R48 fieldLvalue: ID=" ^ ID1 ^" DOT ID=" ^ID2^ " \n"))
+           | fieldLvalue DOT ID (print ("R48.2 fieldLvalue : fieldLvalue DOT ID="^ID^ "\n"))
+           | subscriptLvalue DOT ID(print ("R48.3 fieldLvalue:subscriptLvalue DOT ID="^ID^"\n"))
 
 comparison: exp EQ exp (print "R49 comparison: exp EQ exp\n")
           | exp NEQ exp (print "R50 comparison: exp NEQ exp\n")
@@ -141,7 +147,7 @@ comparison: exp EQ exp (print "R49 comparison: exp EQ exp\n")
           | exp LE exp   (print "R54 comparison: exp LE exp\n")
 booleanExp: exp AND exp  (print "R55 booleanExp: exp AND exp\n")
           | exp OR exp  (print "R56 booleanExp: exp OR exp\n")
-arithmeticExp: exp PLUS exp (print "R57 arithmeticExp: exp PLUS exp\n")
+arithmeticExp: exp PLUS exp (print "R57 arithmeticExp: exp PLUS exp\n"; A.OpExp(exp, PlusOp, exp, A.pos))
              | exp MINUS exp (print "R58 arithmeticExp: exp MINUS exp\n")
              | exp TIMES exp  (print "R59 arithmeticExp: exp TIMES exp\n")
              | exp DIVIDE exp (print "R60 arithmeticExp: exp DIVIDE exp\n")

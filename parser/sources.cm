@@ -4,6 +4,11 @@ tiger.lex
 errormsg.sml
 parsetest.sml
 tiger.grm
+absyn.sml
+prabsyn.sml
+symbol.sml
+table.sig
+table.sml
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
 $/basis.cm
