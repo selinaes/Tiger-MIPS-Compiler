@@ -1,4 +1,11 @@
 structure A = Absyn
+open Symbol
+
+fun fix(A.FunctionDec(fdA)::A.FunctionDec(fdB)::rest) = fix(A.FunctionDec(fdA@fdB)::rest)
+|fix(A.TypeDec(tdA)::A.TypeDec(tdB)::rest) = fix(A.TypeDec(tdA@tdB)::rest)
+|fix(a::rest)=a::fix(rest)
+|fix(l)=l
+
 %%
 %term
     EOF
@@ -13,13 +20,15 @@ structure A = Absyn
   | FUNCTION | VAR | TYPE
 
 %nonterm  exp of A.exp | program of A.exp | arithmeticExp of A.exp | lvalue of A.var
-  | assignment of A.AssignExp | arrayCreation of A.ArrayExp | fundec of A.fundec 
-  | tyfields of A.field | vardec of A.VarDec| ty of A.ty 
-  | tydec of A.TypeDec | expseq of A.SeqExp | dec of A.dec | decs of A.dec list 
-  | funargs of A.field list
-  | functionCall of A.CallExp | booleanExp | recflds of (A.symbol * A.exp * A.pos) list
-  | recordCreation of A.RecordExp | comparison of A.oper 
-  | subscriptLvalue of A.SubscriptVar | fieldLvalue of A.FieldVar
+  | assignment of A.exp | arrayCreation of A.exp 
+  | fundec of A.fundec 
+  | tyfields of A.field list | vardec of A.dec | ty of A.ty 
+  | tydec of A.dec
+ | expseq of (A.exp * pos) list | dec of A.dec | decs of A.dec list 
+  | funargs of A.exp list
+  | functionCall of A.exp | booleanExp of A.exp | recflds of (symbol * A.exp * A.pos) list
+  | recordCreation of A.exp | comparison of A.exp 
+  | subscriptLvalue of A.var | fieldLvalue of A.var
 
 %pos int
 %verbose
@@ -52,107 +61,99 @@ DO OF NIL
 %value STRING ("")
 
 %%
-
-                (* This is a skeleton grammar file, meant to illustrate what kind of
-                 * declarations are necessary above the %% mark.  Students are expected
-                 *  to replace the two dummy productions below with an actual grammar.
-                 *)
-
-program	: exp				(print "R0 program : exp\n")
-
+program	: exp				(print "R0 program : exp\n"; exp)
 
 exp: 	INT		(print "R1 exp : INT\n"; A.IntExp(INT))
    |  STRING  (print "R2 exp : STRING\n"; A.StringExp(STRING, STRINGleft))
    |  NIL   (print "R3 exp : NIL\n"; A.NilExp)
    |  lvalue (print "R4 exp : lvalue\n"; A.VarExp(lvalue))
-   |  arithmeticExp (print "R5 exp : arithmeticExp\n"; A.())
-   |  booleanExp (print "R6 exp : booleanExp\n")
-   |  comparison (print "R7 exp : comparison\n")
+  (* Reduce from another category, operations *)
+   |  arithmeticExp (print "R5 exp : arithmeticExp\n"; arithmeticExp) 
+   |  booleanExp (print "R6 exp : booleanExp\n"; booleanExp)
+   |  comparison (print "R7 exp : comparison\n"; comparison)
   (*  valueless expression *)
-   |  functionCall (print "R8 exp : functionCall\n")
-   |  assignment (print "R9 exp : assignment\n")
-   | IF exp THEN exp ELSE exp (print "R10 exp : IF exp THEN exp ELSE exp\n")
-   | IF exp THEN exp  (print "R11 exp : IF exp THEN exp\n")
-   | WHILE exp DO exp (print "R12 exp : WHILE exp DO exp\n")
-   | FOR ID ASSIGN exp TO exp DO exp  (print "R13 exp : FOR ID ASSIGN exp TO exp DO exp\n") 
-   | BREAK  (print "R14 exp : BREAK\n")
+   |  functionCall (print "R8 exp : functionCall\n"; functionCall)
+   |  assignment (print "R9 exp : assignment\n"; assignment)
+   | IF exp THEN exp ELSE exp (print "R10 exp : IF exp THEN exp ELSE exp\n"; A.IfExp({test=exp1, then'=exp2, else'=SOME(exp3),  pos= IFleft}))
+   | IF exp THEN exp  (print "R11 exp : IF exp THEN exp\n"; A.IfExp({test=exp1, then'=exp2, else'=NONE, pos=IFleft}))
+   | WHILE exp DO exp (print "R12 exp : WHILE exp DO exp\n"; A.WhileExp({test=exp1, body=exp2, pos=WHILEleft}))
+   | FOR ID ASSIGN exp TO exp DO exp  (print "R13 exp : FOR ID ASSIGN exp TO exp DO exp\n";A.ForExp({var=symbol ID, escape=ref false, lo=exp1, hi=exp2, body=exp3, pos=FORleft})) 
+   | BREAK  (print "R14 exp : BREAK\n"; A.BreakExp(BREAKleft))
   (* done *)
-   | LET decs IN expseq END (print "R15 exp : LET decs IN expseq END\n")
+   | LET decs IN expseq END (print "R15 exp : LET decs IN expseq END\n"; A.LetExp({decs=decs, body=A.SeqExp(expseq), pos=LETleft}))
    (* Sequencing *)
-   | LPAREN expseq RPAREN (print "R16 exp : LPAREN expseq RPAREN\n")
-   | LPAREN RPAREN (print "R16.5 exp: () unit \n")
-   | arrayCreation (print "R17 exp : arrayCreation\n")
-   | recordCreation (print "R18 exp : recordCreation\n")
+   | LPAREN expseq RPAREN (print "R16 exp : LPAREN expseq RPAREN\n"; A.SeqExp(expseq)) 
+   | LPAREN RPAREN (print "R16.5 exp: () unit \n"; A.SeqExp([]))
+   | arrayCreation (print "R17 exp : arrayCreation\n"; arrayCreation)
+   | recordCreation (print "R18 exp : recordCreation\n"; recordCreation)
 
-recordCreation: ID LBRACE recflds RBRACE (print "R19 recordCreation: ID LBRACE recflds RBRACE\n"; A.RecordExp())
-      | ID LBRACE RBRACE      (print "R19.5 recordCreation: ID LBRACE RBRACE\n"; A.RecordExp())
+recordCreation: ID LBRACE recflds RBRACE (print "R19 recordCreation: ID LBRACE recflds RBRACE\n"; A.RecordExp({fields=recflds, typ=symbol(ID), pos=IDleft}))
+      | ID LBRACE RBRACE      (print "R19.5 recordCreation: ID LBRACE RBRACE\n"; A.RecordExp({fields=[], typ=symbol(ID), pos=IDleft}))
 
-recflds: ID EQ exp  (print "R20 recflds: ID EQ exp\n")
-       | ID EQ exp COMMA recflds (print "R21 recflds: ID EQ exp COLON recflds\n")
+recflds: ID EQ exp  (print "R20 recflds: ID EQ exp\n"; (symbol(ID), exp, IDleft)::nil )
+       | ID EQ exp COMMA recflds (print "R21 recflds: ID EQ exp COLON recflds\n"; (symbol(ID), exp, IDleft)::recflds )
  
-functionCall: ID LPAREN RPAREN (print ("R22 functionCall: ID="^ID^" LPAREN RPAREN\n"))
-            | ID LPAREN funargs RPAREN (print ("R23 functionCall: ID="^ID^" LPAREN funargs RPAREN\n"))
+functionCall: ID LPAREN RPAREN (print ("R22 functionCall: ID="^ID^" LPAREN RPAREN\n"); A.CallExp({func=symbol(ID), args=[], pos=IDleft}))
+            | ID LPAREN funargs RPAREN (print ("R23 functionCall: ID="^ID^" LPAREN funargs RPAREN\n"); A.CallExp({func=symbol(ID), args=funargs, pos=IDleft}))
 
-funargs: exp (print "R24 funargs: exp\n")
-       | exp COMMA funargs (print "R25 funargs: exp COMMA funargs\n")
+funargs: exp (print "R24 funargs: exp\n"; exp::nil)
+       | exp COMMA funargs (print "R25 funargs: exp COMMA funargs\n"; exp::funargs)
 
-decs: dec (print "R26 decs: dec\n")
-    | decs dec  (print "R27 decs: decs dec\n")
+decs: dec (print "R26 decs: dec\n"; dec::nil)
+    | decs dec (print "R27 decs: decs dec\n"; fix(decs@[dec]))
+(* *)
+expseq: exp SEMICOLON expseq (print "R28 expseq: exp SEMICOLON expseq\n"; (exp, expleft)::expseq)
+      | exp (print "R29 expseq: exp\n"; (exp, expleft)::nil)
 
-expseq: exp SEMICOLON expseq (print "R28 expseq: exp SEMICOLON expseq\n")
-      | exp (print "R29 expseq: exp\n")
+dec: tydec (print "R30 dec: tydec\n"; tydec)
+   | vardec (print "R31 dec: vardec\n"; vardec)
+   | fundec (print "R32 dec: fundec\n"; A.FunctionDec([fundec]))
 
-dec: tydec (print "R30 dec: tydec\n")
-   | vardec (print "R31 dec: vardec\n")
-   | fundec (print "R32 dec: fundec\n")
+tydec: TYPE ID EQ ty  (print "R33 tydec: TYPE ID EQ ty\n"; A.TypeDec([{name=symbol ID, ty=ty, pos=TYPEleft}]))
+ty: ID  (print "R34 ty: ID\n"; A.NameTy(symbol(ID),IDleft))
+  | LBRACE tyfields RBRACE  (print "R35 ty: LBRACE tyfields RBRACE\n";A.RecordTy(tyfields))
+  | LBRACE RBRACE (print "R36 ty: LBRACE RBRACE\n"; A.RecordTy([]))
+  | ARRAY OF ID (print "R37 ty: ARRAY OF ID\n"; A.ArrayTy(symbol(ID),ARRAYleft))
 
-tydec: TYPE ID EQ ty  (print "R33 tydec: TYPE ID EQ ty\n")
-ty: ID  (print "R34 ty: ID\n")
-  | LBRACE tyfields RBRACE  (print "R35 ty: LBRACE tyfields RBRACE\n")
-  | LBRACE RBRACE (print "R36 ty: LBRACE RBRACE\n")
-  | ARRAY OF ID (print "R37 ty: ARRAY OF ID\n")
+tyfields: ID COLON ID (print "R38 tyfields: ID COLON ID\n"; [{name=symbol ID1, escape=ref false, typ=symbol ID2, pos=ID1left}])
+        | ID COLON ID COMMA tyfields  (print "R39 tyfields: ID COLON ID COMMA tyfields\n"; {name=symbol ID1, escape=ref false, typ=symbol ID2, pos=ID1left}::tyfields)
 
-tyfields: ID COLON ID (print "R38 tyfields: ID COLON ID\n")
-        | ID COLON ID COMMA tyfields  (print "R39 tyfields: ID COLON ID COMMA tyfields\n")
-
-
-vardec: VAR ID ASSIGN exp (print "R40 vardec: VAR ID ASSIGN exp\n")
-      | VAR ID COLON ID ASSIGN exp  (print "R41 vardec: VAR ID COLON ID ASSIGN exp\n")
-
-fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp (print ("R42 fundec: FUNCTION ID="^ID^" LPAREN tyfields RPAREN EQ exp\n"))
-      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  (print ("R43 fundec: FUNCTION ID="^ID^" LPAREN tyfields RPAREN COLON ID EQ exp\n"))
-      | FUNCTION ID LPAREN RPAREN EQ exp (print "R42.2 fundec: FUNCTION ID LPAREN RPAREN EQ exp \n")
-      | FUNCTION ID LPAREN RPAREN COLON ID EQ exp (print "R43.2 fundec: FUNCTION ID LPAREN RPAREN COLON ID EQ exp\n")
-
-arrayCreation: ID LBRACK exp RBRACK OF exp (print "R44 arrayCreation: ID LBRACK exp RBRACK OF exp\n" )
-assignment: lvalue ASSIGN exp (print "R45 assignment: lvalue ASSIGN exp\n")
+vardec: VAR ID ASSIGN exp (print "R40 vardec: VAR ID ASSIGN exp\n"; A.VarDec({name=symbol ID, escape=ref false, typ=NONE, init=exp, pos=VARleft}))
+      | VAR ID COLON ID ASSIGN exp  (print "R41 vardec: VAR ID COLON ID ASSIGN exp\n"; A.VarDec({name=symbol ID1, escape=ref false, typ=SOME (symbol ID2, ID2left), init=exp, pos=VARleft}))
 
 
-(* lvalue: ID (print "R46 lvalue: ID\n")
-      | lvalue LBRACK exp RBRACK (print "R47 lvalue: lvalue LBRACK exp RBRACK\n")
-      | lvalue DOT ID (print "R48 lvalue: lvalue DOT ID\n")  *)
-lvalue: ID (print ("R46 lvalue: ID =" ^ID^ " \n"))
-      | subscriptLvalue (print "R46.1 lvalue: subscriptLvalue\n")
-      | fieldLvalue (print "R46.2 lvalue: subscriptLvalue\n")
 
-subscriptLvalue: ID LBRACK exp RBRACK  (print ("R47 subscriptLvalue:  ID = " ^ ID ^ "LBRACK exp RBRACK\n"))
-               | subscriptLvalue LBRACK exp RBRACK (print "R47.2 subscriptLvalue: subscriptLvalue LBRACK exp RBRACK\n\n")
-               | fieldLvalue LBRACK exp RBRACK(print "R47.3 subscriptLvalue: fieldLvalue LBRACK exp RBRACK\n")
+fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp (print ("R42 fundec: FUNCTION ID="^ID^" LPAREN tyfields RPAREN EQ exp\n"); {name=symbol ID,params=tyfields,result=NONE,body=exp,pos=FUNCTIONleft})
+      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  (print ("R43 fundec: FUNCTION ID="^ID^" LPAREN tyfields RPAREN COLON ID EQ exp\n"); {name=symbol ID1,params=tyfields,result=SOME(symbol ID2, ID2left),body=exp,pos=FUNCTIONleft})
+      | FUNCTION ID LPAREN RPAREN EQ exp (print "R42.2 fundec: FUNCTION ID LPAREN RPAREN EQ exp \n"; {name=symbol ID,params=[],result=NONE,body=exp,pos=FUNCTIONleft})
+      | FUNCTION ID LPAREN RPAREN COLON ID EQ exp (print "R43.2 fundec: FUNCTION ID LPAREN RPAREN COLON ID EQ exp\n"; {name=symbol ID1,params=[],result=SOME(symbol ID2, ID2left),body=exp,pos=FUNCTIONleft})
 
-fieldLvalue: ID DOT ID (print ("R48 fieldLvalue: ID=" ^ ID1 ^" DOT ID=" ^ID2^ " \n"))
-           | fieldLvalue DOT ID (print ("R48.2 fieldLvalue : fieldLvalue DOT ID="^ID^ "\n"))
-           | subscriptLvalue DOT ID(print ("R48.3 fieldLvalue:subscriptLvalue DOT ID="^ID^"\n"))
+arrayCreation: ID LBRACK exp RBRACK OF exp (print "R44 arrayCreation: ID LBRACK exp RBRACK OF exp\n"; A.ArrayExp({typ=symbol ID, size=exp1, init=exp2, pos=IDleft}))
+assignment: lvalue ASSIGN exp (print "R45 assignment: lvalue ASSIGN exp\n"; A.AssignExp({var=lvalue, exp=exp, pos=lvalueleft}))
 
-comparison: exp EQ exp (print "R49 comparison: exp EQ exp\n")
-          | exp NEQ exp (print "R50 comparison: exp NEQ exp\n")
-          | exp GT exp  (print "R51 comparison: exp GT exp\n")
-          | exp LT exp (print "R52 comparison: exp LT exp\n")
-          | exp GE exp   (print "R53 comparison: exp GE exp\n")
-          | exp LE exp   (print "R54 comparison: exp LE exp\n")
-booleanExp: exp AND exp  (print "R55 booleanExp: exp AND exp\n")
-          | exp OR exp  (print "R56 booleanExp: exp OR exp\n")
-arithmeticExp: exp PLUS exp (print "R57 arithmeticExp: exp PLUS exp\n"; A.OpExp(exp, PlusOp, exp, A.pos))
-             | exp MINUS exp (print "R58 arithmeticExp: exp MINUS exp\n")
-             | exp TIMES exp  (print "R59 arithmeticExp: exp TIMES exp\n")
-             | exp DIVIDE exp (print "R60 arithmeticExp: exp DIVIDE exp\n")
-             | MINUS exp %prec UMINUS (print "R61 arithmeticExp: MINUS exp %prec UMINUS \n")
+
+lvalue: ID (print ("R46 lvalue: ID =" ^ID^ " \n"); A.SimpleVar(symbol ID1, ID1left))
+      | subscriptLvalue (print "R46.1 lvalue: subscriptLvalue\n"; subscriptLvalue)
+      | fieldLvalue (print "R46.2 lvalue: subscriptLvalue\n"; fieldLvalue)
+
+subscriptLvalue: ID LBRACK exp RBRACK  (print ("R47 subscriptLvalue:  ID = " ^ ID ^ "LBRACK exp RBRACK\n"); A.SubscriptVar(A.SimpleVar(symbol ID1, ID1left), exp, IDleft))
+               | subscriptLvalue LBRACK exp RBRACK (print "R47.2 subscriptLvalue: subscriptLvalue LBRACK exp RBRACK\n\n"; A.SubscriptVar(subscriptLvalue, exp, subscriptLvalueleft))
+               | fieldLvalue LBRACK exp RBRACK(print "R47.3 subscriptLvalue: fieldLvalue LBRACK exp RBRACK\n"; A.SubscriptVar(fieldLvalue, exp, fieldLvalueleft))
+
+fieldLvalue: ID DOT ID (print ("R48 fieldLvalue: ID=" ^ ID1 ^" DOT ID=" ^ID2^ " \n"); A.FieldVar(A.SimpleVar(symbol ID1, ID1left), symbol ID2, ID1left))
+           | fieldLvalue DOT ID (print ("R48.2 fieldLvalue : fieldLvalue DOT ID="^ID^ "\n"); A.FieldVar(fieldLvalue, symbol ID, fieldLvalueleft))
+           | subscriptLvalue DOT ID(print ("R48.3 fieldLvalue:subscriptLvalue DOT ID="^ID^"\n"); A.FieldVar(subscriptLvalue, symbol ID, subscriptLvalueleft))
+
+comparison: exp EQ exp (print "R49 comparison: exp EQ exp\n"; A.OpExp({left=exp1, oper=A.EqOp, right=exp2, pos=exp1left}))
+          | exp NEQ exp (print "R50 comparison: exp NEQ exp\n"; A.OpExp({left=exp1, oper=A.NeqOp, right=exp2, pos=exp1left}))
+          | exp GT exp  (print "R51 comparison: exp GT exp\n"; A.OpExp({left=exp1, oper=A.GtOp, right=exp2, pos=exp1left}))
+          | exp LT exp (print "R52 comparison: exp LT exp\n"; A.OpExp({left=exp1, oper=A.LtOp, right=exp2, pos=exp1left}))
+          | exp GE exp   (print "R53 comparison: exp GE exp\n"; A.OpExp({left=exp1, oper=A.GeOp, right=exp2, pos=exp1left}))
+          | exp LE exp   (print "R54 comparison: exp LE exp\n"; A.OpExp({left=exp1, oper=A.LeOp, right=exp2, pos=exp1left}))
+booleanExp: exp AND exp  (print "R55 booleanExp: exp AND exp\n"; A.IfExp({test=exp1, then'=exp2, else'=SOME(A.IntExp(0)), pos=exp1left}))
+          | exp OR exp  (print "R56 booleanExp: exp OR exp\n"; A.IfExp({test=exp1, then'=A.IntExp(1), else'=SOME(exp2), pos=exp1left}))
+arithmeticExp: exp PLUS exp (print "R57 arithmeticExp: exp PLUS exp\n"; A.OpExp({left=exp1, oper=A.PlusOp, right=exp2, pos=exp1left}))
+             | exp MINUS exp (print "R58 arithmeticExp: exp MINUS exp\n"; A.OpExp({left=exp1, oper=A.MinusOp, right=exp2, pos=exp1left}))
+             | exp TIMES exp  (print "R59 arithmeticExp: exp TIMES exp\n"; A.OpExp({left=exp1, oper=A.TimesOp, right=exp2, pos=exp1left}))
+             | exp DIVIDE exp (print "R60 arithmeticExp: exp DIVIDE exp\n"; A.OpExp({left=exp1, oper=A.DivideOp, right=exp2, pos=exp1left}))
+             | MINUS exp %prec UMINUS (print "R61 arithmeticExp: MINUS exp %prec UMINUS \n"; A.OpExp({left=A.IntExp(0), oper=A.MinusOp, right=exp, pos=MINUSleft}))
