@@ -13,8 +13,15 @@
     - All grammars we wrote followed Appel's descriptions
 
 
-## Error Handling
-    - 
+## Error
+    - Now whenever there's an invalid syntax (tokens can be parsed, but the sequence of syntax does not make sense), the parser will report an error like
+    ```
+    uncaught exception Error
+    raised at: parse.sml:17.48-17.62
+             ../compiler/TopLevel/interact/interact.sml:56.51-56.55
+    ```
+    And the parse will stop.
+    We asked Drew and he thinks it is a reasonable behavior.
 
 ## Other
     - We set `escape` to all false whenever this field occurs in the AST, as a placeholder before semantic analysis
