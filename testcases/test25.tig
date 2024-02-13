@@ -2,6 +2,6 @@
 let 
 	var d:=0
 in
-	d.f 
+	d.f
 end
 

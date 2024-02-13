@@ -1,9 +1,12 @@
+type svalue = Tokens.svalue
+type pos = int
+type ('a,'b) token = ('a,'b) Tokens.token
+type lexresult = (svalue,pos) token
 
+(* type pos = int
+type lexresult = Tokens.token *)
 
 (* Define a global variable *)
-type pos = int
-type lexresult = Tokens.token
-
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 fun err(p1,p2) = ErrorMsg.error p1
@@ -86,11 +89,13 @@ fun eof() =
     end
 
 %%
+%header (functor TigerLexFun(structure Tokens: Tiger_TOKENS));
 %s COMMENT STRING;
 alpha=[A-Za-z];
 digit=[0-9];
 ascii = 00digit|01-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
 formatChars = [ \t\012\r\n];
+
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
 <INITIAL, COMMENT>{formatChars}+      => (continue());
