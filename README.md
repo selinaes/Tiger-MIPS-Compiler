@@ -2,7 +2,7 @@
 
 ```sml
 CM.make "sources.cm";
-Parse.parse "../testcases/test1.tig";
+Parse.parse "../testcases/empty-let-in.tig";
 ```
 
 ## Lexer
