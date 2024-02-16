@@ -19,7 +19,7 @@ fun readAllFiles (dir : string) : string list =
 fun par f = 
         let 
             val _ = print ("Parsing ./testcases/" ^ f ^ "\n");
-            val v = Parse.parse ("../testcases/" ^ f)
+            val v = Parse.parse ("../testcases/" ^ f);
             val fName = "../testcases/result/" ^ f;
             val outputStream = TextIO.openOut fName;
         in 
