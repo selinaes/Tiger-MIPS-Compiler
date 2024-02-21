@@ -84,7 +84,6 @@ fun eof() =
             ();
         Comment.reset ();
         StringBuilder.reset ();
-        ErrorMsg.reset ();
         Tokens.EOF(pos,pos)
     end
 
@@ -94,11 +93,12 @@ fun eof() =
 alpha=[A-Za-z];
 digit=[0-9];
 ascii = 00digit|01-9{digit}|1{digit}{digit}|2[0-4]{digit}|25[0-5];
+ws = [ \t\012\r];
 formatChars = [ \t\012\r\n];
 
 %%
 <INITIAL, COMMENT>\n      => (newLine yypos; continue());
-<INITIAL, COMMENT>{formatChars}+      => (continue());
+<INITIAL, COMMENT>{ws}+      => (continue());
 
 <INITIAL>type    => (Tokens.TYPE(yypos,yypos+4));
 <INITIAL>var     => (Tokens.VAR(yypos,yypos+3));
@@ -147,7 +147,7 @@ formatChars = [ \t\012\r\n];
 <INITIAL>\"   => (YYBEGIN STRING; StringBuilder.enterStrState(yypos); continue());
 <STRING>\\\\    => (StringBuilder.concat "\\"; continue());
 <STRING>\\\"    => (StringBuilder.concat "\""; continue());
-<STRING>\\n    => (StringBuilder.concat yytext; newLine yypos; continue());
+<STRING>\\n    => (StringBuilder.concat "\n"; continue());
 <STRING>\\t    => (StringBuilder.concat yytext; continue());
 <STRING>[ ]+    => (StringBuilder.concat yytext; continue());
 <STRING>\\{ascii} => (StringBuilder.appendChar (toChar yytext); continue());
@@ -156,7 +156,8 @@ formatChars = [ \t\012\r\n];
 <STRING>\\.    => (ErrorMsg.error yypos ("Unrecongized escaped chars : " ^ yytext); continue());
 
 <STRING>.   => (StringBuilder.concat yytext; continue());
-<STRING>{formatChars}+ => (continue());
+<STRING>\n   => (ErrorMsg.error yypos ("newline in string without \\\\ "); newLine yypos; continue());
+<STRING>{ws}+ => (continue());
 
 <INITIAL>"/*"   => (Comment.incrementLoop(); YYBEGIN COMMENT; continue());
 <COMMENT>"/*"   => (Comment.incrementLoop(); continue());
