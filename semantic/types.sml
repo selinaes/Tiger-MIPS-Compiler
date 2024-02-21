@@ -13,13 +13,15 @@ struct
   | UNIT
   | IMPOSSIBLE (* bottom of the lattice *)
 
+
+
+(* unit to any other is false, impossible to any other is true *)
   fun equals (RECORD(_, unique1), Record(_, unique2)) = unique1 = unique2
     | equals (RECORD(_, _), NIL) = true
     | equals (NIL, RECORD(_, _)) = true
     | equals (ARRAY(_, unique1), ARRAY(_, unique2)) = unique1 = unique2
     | equals (ARRAY(_, _), NIL) = true
     | equals (NIL, ARRAY(_, _)) = true
-    | equals (NAME(_, ref1), NAME(_, ref2)) = ref1 = ref2
     | equals (NIL, NIL) = true
     | equals (INT, INT) = true
     | equals (STRING, STRING) = true
