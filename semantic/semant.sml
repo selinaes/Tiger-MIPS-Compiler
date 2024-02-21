@@ -21,6 +21,7 @@ struct
 
     fun checkUnit ({exp,ty=T.UNIT},pos) = ()
     | checkUnit (_,pos) = Error.error pos "Error: non-unit provided at pos: " ^ (Int.toString pos)
+
     fun checkstr({exp,ty=T.STRING},pos) = ()
     | checkstr(_,pos) = Error.error pos "Error: non-string provided at pos: " ^ (Int.toString pos)
     
@@ -38,17 +39,18 @@ struct
     | checkTwoEqTypes(_,_,pos) = Error.error pos "Error: comparing two different types at pos: " ^ (Int.toString pos)
         
     fun transExp(venv,tenv) =
-
-        let fun trop (A.OpExp(left,oper=A.PlusOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
+        let 
+        fun trop (A.OpExp(left,oper=A.PlusOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.MinusOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.TimesOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.DivideOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.EqOp,right,pos)) = (checkTwoEqTypes(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.NeqOp,right,pos)) = (checkTwoEqTypes(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.LtOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos,{exp=(),ty=Types.INT}))
+            |   trop (A.OpExp(left,oper=A.LtOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.LeOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.GtOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
             |   trop (A.OpExp(left,oper=A.GeOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
+
          and trvar (A.SimpleVar(id,pos)) = 
                 case S.look(venv,id) of 
                     SOME(E.VarEntry{ty}) =>
@@ -129,11 +131,13 @@ struct
                         {exp=(),ty=T.RECORD(typedFields, unique)}
                     end
                 | _ => (Error.error pos "Error: undefined record type at pos: " ^ (Int.toString pos); {exp=(),ty=Types.IMPOSSIBLE})
+
         and trseq (A.SeqExp exps) = (
             case exps
             of [] => {exp=(),ty=Types.UNIT}
             | [exp] => trexp exp
-            | exp::exps => (trexp exp; trseq(A.SeqExp exps)) )
+            | exp::rest => (trexp exp; trseq(A.SeqExp rest)) )
+
         and trassign (A.AssignExp{var,exp,pos}) =
          let val (v,vty) = trvar var
                 val (e,ety) = trexp exp
@@ -142,8 +146,8 @@ struct
                then (exp = (); ty = Types.UNIT)
                else (Error.error pos "Error: type mismatch at pos: " ^ (Int.toString pos); {exp=(),ty=Types.UNIT})
             end
-        and trif (A.IfExp{test,then',else',pos}) = 
-        case else' of 
+
+        and trif (A.IfExp{test,then',else',pos}) = case else' of 
             NONE => (checkint(trexp test,pos); 
                         checkUnit(trexp then'))
             | SOME(else') => 
@@ -156,6 +160,7 @@ struct
                     then (exp = (); ty = tht)
                     else (Error.error pos "Error: type mismatch at pos: " ^ (Int.toString pos); {exp=(),ty=Types.UNIT})
                 end
+
         and trwhile (A.WhileExp{test,body,pos}) = 
             (checkint(trexp test,pos); 
             LoopCounter.enter();
@@ -164,7 +169,6 @@ struct
             {exp=(),ty=Types.UNIT})
             
         and trfor (A.ForExp{var,lo,hi,body,pos}) = 
-               
                let val venv' = S.enter(venv,var,E.VarEntry{ty=Types.INT})
                 in
                     checkint(trexp lo,pos);
@@ -181,6 +185,7 @@ struct
             in
                 transExp(venv',tenv') body
             end
+
         and trarray (A.ArrayExp{typ,size,init,pos}) = 
             let
                 val {exp=initExp, ty=initTy} = trexp init
@@ -215,6 +220,7 @@ struct
         | trexp (A.LetExp{decs,body,pos}) = trlet(A.LetExp{decs=decs,body=body,pos=pos})
         | trexp (A.ArrayExp{typ,size,init,pos}) = trarray(A.ArrayExp{typ=typ,size=size,init=init,pos=pos})
         | trexp (A.BreakExp pos) = trbreak(A.BreakExp pos)
+
         in
             trexp
         end
