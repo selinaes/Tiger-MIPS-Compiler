@@ -10,13 +10,13 @@ let
 
 in
     while x3 < 7 do
-        ()
+        ();
     let
         function z(x1:int):int =
-            for x2 := x1 to 8 do
-                 x2 + 1
-            
+            for x4 := x1 to 8 do
+                 x4 + x2
+       
     in
-        ()
+        z(1);
     end
 end

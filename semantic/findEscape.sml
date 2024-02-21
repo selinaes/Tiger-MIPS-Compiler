@@ -5,11 +5,12 @@ struct
   type depth = int
   type escEnv = (depth * bool ref) Symbol.table
 
-  (* Escape meaning = exit current scope, don't erase this variable, bc used outside *)
+  (* Escape meaning = exit current scope, don't erase this variable, bc used outside 
+    Accessed outside their definition scope *)
   fun markEscape (env: escEnv, depth: depth, sym: Symbol.symbol) = 
       case Symbol.look(env, sym) of
         SOME (d, escape) =>
-          if depth > d then escape := true else ()
+            if depth > d then escape := true else ()
       | NONE => ()
 
   fun traverseVar (env:escEnv, d:depth, s:Absyn.var): unit = 
@@ -20,7 +21,7 @@ struct
   and traverseExp(env:escEnv, d:depth, s:Absyn.exp): unit =
       case s of
         VarExp v => traverseVar(env, d, v)
-      | LetExp {decs, body, pos} => traverseExp(traverseDecs(env, d + 1, decs), d + 1, body)
+      | LetExp {decs, body, pos} => traverseExp(traverseDecs(env, d, decs), d, body)
       | CallExp {func, args, pos} => List.app (fn arg => traverseExp(env, d, arg)) args
       | OpExp {left, oper, right, pos} => (traverseExp(env, d, left); traverseExp(env, d, right))
       | AssignExp {var, exp, pos} => (traverseVar(env, d, var); traverseExp(env, d, exp))
@@ -28,20 +29,20 @@ struct
         let
           val env' = Symbol.enter(env, var, (d, escape))
         in
-          traverseExp(env', d + 1, lo);
-          traverseExp(env', d + 1, hi);
-          traverseExp(env', d + 1, body)
+          traverseExp(env', d, lo);
+          traverseExp(env', d, hi);
+          traverseExp(env', d, body)
         end
       | RecordExp {fields, typ, pos} => 
         (List.app (fn (sym, exp, pos) => (markEscape(env, d, sym); traverseExp(env, d, exp))) fields)
       | SeqExp exps => List.app (fn (e, pos) => traverseExp(env, d, e)) exps
       | IfExp {test, then', else', pos} => 
-        (traverseExp(env, d+1, test);
-          traverseExp(env, d+1, then'); 
+        (traverseExp(env, d, test);
+          traverseExp(env, d, then'); 
           case else' of
-            SOME e => traverseExp(env, d+1, e)
+            SOME e => traverseExp(env, d, e)
           | NONE => ())
-      | WhileExp {test, body, pos} => (traverseExp(env, d+1, test); traverseExp(env, d+1, body))
+      | WhileExp {test, body, pos} => (traverseExp(env, d, test); traverseExp(env, d, body))
       | ArrayExp {typ, size, init, pos} => (traverseExp(env, d, size); traverseExp(env, d, init))
       | _ => ()
 

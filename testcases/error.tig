@@ -1,4 +1,8 @@
-let 
+let
     arr1
+    "hahah \
+    \ddd"
+    "abc\nabc"
 in
+    ?
 end
