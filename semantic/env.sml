@@ -1,17 +1,16 @@
 structure Env :> ENV =
 
 struct
-
     type access = unit
-    type ty = Types.ty
+    (* type ty = Types.ty *)
     datatype enventry = 
-        VarEntry of {ty: ty}
-    | FunEntry of {formals: ty list, result:ty}
-    val base_tenv : ty Symbol.table (* predefined types*) = 
+        VarEntry of {ty: Types.ty}
+    | FunEntry of {formals: Types.ty list, result: Types.ty} 
+    val base_tenv : Types.ty Symbol.table (* predefined types*) = 
         let
             val baseTypes = [(Symbol.symbol "int", Types.INT), (Symbol.symbol "string", Types.STRING)]
         in
-            foldr (fn ((s, t), acc) => Symbol.enter(s, t, acc)) Symbol.empty baseTypes
+            foldr (fn ((s, t), acc) => Symbol.enter(acc, s, t)) Symbol.empty baseTypes
         end
 
     val base_venv : enventry Symbol.table (* predefinedfunctions*)  = 
@@ -29,6 +28,6 @@ struct
                     (Symbol.symbol "exit", FunEntry{formals=[Types.INT], result=Types.UNIT})
                 ]
         in
-            foldr (fn ((s, t), acc) => Symbol.enter(s, t, acc)) Symbol.empty baseFunctions
+            foldr (fn ((s, t), acc) => Symbol.enter(acc, s, t)) Symbol.empty baseFunctions
         end
 end;

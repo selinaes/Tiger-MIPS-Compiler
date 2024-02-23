@@ -3,10 +3,9 @@ structure Translate = struct type exp = unit end
 signature SEMANTIC =
 
 sig 
-    type expty = {exp: Translate.exp, ty: Types.ty}
-
-    type venv = Env.enventry Symbol.table 
-    type tenv = ty Symbol.table
+    type expty
+    type venv
+    type tenv
     
     val transVar: venv * tenv * Absyn.var -> expty
     val transExp: venv * tenv * Absyn.exp -> expty

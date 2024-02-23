@@ -14,4 +14,9 @@ findEscape.sig
 findEscape.sml
 tiger.lex
 tiger.grm
+env.sig
+env.sml
+types.sml
+semant.sml
+semant.sig
 

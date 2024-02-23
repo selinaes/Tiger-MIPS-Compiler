@@ -7,186 +7,170 @@ struct
     structure T = Types
     structure Error = ErrorMsg
 
+    type expty = {exp: Translate.exp, ty: Types.ty}
+    type venv = Env.enventry Symbol.table 
+    type tenv = Types.ty Symbol.table
+
     structure LoopCounter = struct
         val count = ref 0
         fun enter() = (count := !count + 1; !count)
         fun exit() = (count := !count - 1; !count)
         fun reset() = (count := 0)
     end
+
+    fun symToType (tenv, sym, pos) : T.ty= 
+        case S.look(tenv,sym) of
+        SOME(ty) => ty
+        | NONE => (Error.error pos ("Error: undefined type name"); 
+        T.INT)
     
     fun checkint ({exp,ty=T.INT},pos) = ()
-    | checkint (_,pos) = Error.error pos "Error: non-integer provided at pos: " ^ (Int.toString pos)
+    | checkint (_,pos) = Error.error pos ("Error: non-integer provided")
     
     fun checkTwoInts (left, right,pos) = (checkint(left, pos); checkint(right, pos))
 
     fun checkUnit ({exp,ty=T.UNIT},pos) = ()
-    | checkUnit (_,pos) = Error.error pos "Error: non-unit provided at pos: " ^ (Int.toString pos)
+    | checkUnit (_,pos) = Error.error pos ("Error: non-unit provided")
 
     fun checkstr({exp,ty=T.STRING},pos) = ()
-    | checkstr(_,pos) = Error.error pos "Error: non-string provided at pos: " ^ (Int.toString pos)
+    | checkstr(_,pos) = Error.error pos ("Error: non-string provided")
     
     fun checkTwoIntsOrStrs ({exp=_, ty=T.INT}, {exp=_, ty=T.INT}, pos) = ()
-    | checkTwoIntsOrStrs({exp=_, ty=T.STRING}, {exp=_, ty=T.STRING}, pos)     = ()
-    | checkTwoIntsOrStrs(_,_,pos) = Error.error pos "Error: non-integer or non-string provided at pos: " ^ (Int.toString pos) ^ "using comparison operator"
+    | checkTwoIntsOrStrs({exp=_, ty=T.STRING}, {exp=_, ty=T.STRING}, pos) = ()
+    | checkTwoIntsOrStrs(_,_,pos) = Error.error pos ("Error: non-integer or non-string provided using comparison operator")
 
     fun checkTwoEqTypes ({exp=_, ty=T.INT}, {exp=_, ty=T.INT}, pos) = ()
     | checkTwoEqTypes ({exp=_, ty=T.STRING}, {exp=_, ty=T.STRING}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.RECORD(_,unique1)}, {exp=_, ty=T.RECORD(_,unique2)}, pos) = if unique1 = unique2 then () else Error.error pos "Error: comparing two different records at pos: " ^ (Int.toString pos)
-    | checkTwoEqTypes ({exp=_, ty=T.NIL}, {exp=_, ty=T.RECORD}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.RECORD}, {exp=_, ty=T.NIL}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.ARRAY(_,unique1)}, {exp=_, ty=T.ARRAY(_,unique2)}, pos) = if unique1 = unique2 then () else Error.error pos "Error: comparing two different arrays at pos: " ^ (Int.toString pos)
+    | checkTwoEqTypes ({exp=_, ty=T.RECORD(_,unique1)}, {exp=_, ty=T.RECORD(_,unique2)}, pos) = if unique1 = unique2 then () else Error.error pos ("Error: comparing two different records at pos: " ^ (Int.toString pos))
+    | checkTwoEqTypes ({exp=_, ty=T.NIL}, {exp=_, ty=T.RECORD(_)}, pos) = ()
+    | checkTwoEqTypes ({exp=_, ty=T.RECORD(_)}, {exp=_, ty=T.NIL}, pos) = ()
+    | checkTwoEqTypes ({exp=_, ty=T.ARRAY(_,unique1)}, {exp=_, ty=T.ARRAY(_,unique2)}, pos) = if unique1 = unique2 then () else Error.error pos ("Error: comparing two different arrays at pos: " ^ (Int.toString pos))
     | checkTwoEqTypes ({exp=_, ty=T.NIL}, {exp=_, ty=T.NIL}, pos) = ()
-    | checkTwoEqTypes(_,_,pos) = Error.error pos "Error: comparing two different types at pos: " ^ (Int.toString pos)
-        
-    fun transExp(venv,tenv) =
-        let 
-        fun trop (A.OpExp(left,oper=A.PlusOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.MinusOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.TimesOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.DivideOp,right,pos)) = (checkTwoInts(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.EqOp,right,pos)) = (checkTwoEqTypes(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.NeqOp,right,pos)) = (checkTwoEqTypes(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.LtOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.LeOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.GtOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
-            |   trop (A.OpExp(left,oper=A.GeOp,right,pos)) = (checkTwoIntsOrStrs(trexp left,trexp right,pos),{exp=(),ty=Types.INT})
+    | checkTwoEqTypes(_,_,pos) = Error.error pos ("Error: comparing two different types" )
 
-         and trvar (A.SimpleVar(id,pos)) = 
-                case S.look(venv,id) of 
-                    SOME(E.VarEntry{ty}) =>
-                        {exp=(), ty=ty}
-                    | NONE => (error pos ("undefined variable "^ S.name id);
-                                exp=(), ty=T.INT)
-            | trvar (A.FieldVar(v,id,pos)) =  
-                case trvar v of
-                    {exp = vexp, ty = T.RECORD symbolLst} =>
-                        let
-                            fun findFieldById (id, lst) =
-                                case lst of
-                                    [] => NONE
-                                    | (fieldId, fieldTy) :: rest =>
-                                        if id.name = fieldId.name then
-                                            SOME fieldTy
-                                        else
-                                            findFieldById id rest
-                        in
-                            case findFieldById (id, symbolLst) of
-                                SOME fieldTy =>
-                                    {exp = A.FieldVar(vexp, id, pos), ty = fieldTy}
-                                | NONE =>
-                                    (error pos ("undefined field " ^ S.name id ^ " in record");
-                                    {exp = A.FieldVar(vexp, id, pos), ty = Types.INT})
-                        end
-                    | _ =>
-                        (error pos "accessing fields of a non-record type";
-                        { exp = A.FieldVar(trvar v).exp, ty = Types.INT })
-            | trvar (A.SubscriptVar(v,exp,pos)) =  
-                case trvar v of
-                    {exp = vexp, ty = T.ARRAY elementTy} =>
-                        let
-                            val index = trexp exp
-                        in
-                            case index.ty of
-                                T.INT =>
-                                    {exp = A.SubscriptVar (vexp, index.exp, pos),
-                                    ty = elementTy}
-                                | _ =>
-                                    (error pos "array index must be an integer";
-                                    { exp = A.SubscriptVar (vexp, indexExpResult.exp, pos),
-                                    ty = T.INT })
-                        end
-                | _ =>
-                        (error pos "subscripting non-array type";
-                        { exp = A.SubscriptVar (trvar v).exp, ty = Types.INT })
+    fun transExp(venv,tenv,exp): expty =
+        let 
+        fun trop (left,A.PlusOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.MinusOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.TimesOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.DivideOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.EqOp,right,pos) = (checkTwoEqTypes(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.NeqOp,right,pos) = (checkTwoEqTypes(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.LtOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.LeOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.GtOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.GeOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            (* | trop _ = {exp=(),ty=Types.INT} *)
         
-        and trcall (A.CallExp{func,args,pos}) = 
+        and trcall (func,args,pos) = 
             case S.look(venv,func) of 
                 SOME(E.FunEntry{formals,result}) => 
                     let fun checkArgs([],[]) = true
+                        | checkArgs([],_) = (Error.error pos ("Error: too many arguments"); false)
+                        | checkArgs(_,[]) = (Error.error pos ("Error: too few arguments"); false)
                         | checkArgs (formal::formals, arg::args) = 
-                            if T.equals(formal,arg) 
+                            if T.matchType(formal,arg) 
                             then checkArgs(formals,args)
-                            else Error.error pos "Error: argument type mismatch at pos: " ^ (Int.toString pos)
+                            else (Error.error pos "Error: argument type mismatch"; false)
                     in
-                        if checkArgs(formals,args)
+                        if checkArgs(formals, map (fn a => #ty (trexp a)) args)
                         then {exp=(),ty=result}
                         else {exp=(),ty=Types.IMPOSSIBLE}
                     end
-                | _ => (Error.error pos "Error: undefined function at pos: " ^ (Int.toString pos); {exp=(),ty=Types.IMPOSSIBLE})
+                | _ => (Error.error pos ("Error: undefined function"); {exp=(),ty=Types.IMPOSSIBLE})
         
-        and trrecord (A.RecordExp{fields,typ,pos}) = 
+        and trrecord (fields,typ,pos) = 
+        (*  field: (symbol * exp * pos)
+        A.RecordExp of {fields: (symbol * exp * pos) list,
+			typ: symbol, pos: pos}
+        T.RECORD of (Symbol.symbol * ty) list * unique
+            table -> record typ -> symTyList
+            symTyList contains field sym, (symTyList s1.sym = field f1.sym) symTyList s1.ty ?= field f1.exp ty?*)
             case S.look(tenv,typ) of
-                SOME(T.RECORD(typedFields, unique)) =>
-                    let
-                        fun checkField (field, (name, ty)) =
-                            case List.find (fn {name=name',escape,typ,pos} => name = name') fields of
-                                SOME {exp, ty=fieldTy} =>
-                                    if T.equals(ty, fieldTy) 
-                                    then ()
-                                    else Error.error pos "Error: type mismatch at pos: " ^ (Int.toString pos)
+                SOME(T.RECORD(symTyList, unique)) =>
+                    let 
+                        fun checkField (sym, exp, pos) =
+                            case List.find (fn (tsym,tty) => tsym = sym) symTyList of
+                                SOME (tsym,tty) =>
+                                    let
+                                        val {exp=vexp, ty} = trexp(exp)
+                                    in
+                                        if T.matchType(tty, ty) 
+                                        then ()
+                                        else Error.error pos ("Error: field type mismatch")
+                                    end
                                 | NONE =>
-                                    Error.error pos "Error: missing field at pos: " ^ (Int.toString pos)
-                    in
-                        List.app checkField typedFields;
-                        {exp=(),ty=T.RECORD(typedFields, unique)}
+                                    Error.error pos ("Error: missing field at pos")
+                in
+                        List.app checkField fields;
+                        if length fields = length symTyList
+                        then
+                            {exp=(),ty=T.RECORD(symTyList, unique)}
+                        else
+                            (Error.error pos ("Error: field number mismatch, expe"); {exp=(),ty=Types.IMPOSSIBLE})
+                        
                     end
-                | _ => (Error.error pos "Error: undefined record type at pos: " ^ (Int.toString pos); {exp=(),ty=Types.IMPOSSIBLE})
+                | _ => (Error.error pos ("Error: undefined record type"); {exp=(),ty=Types.IMPOSSIBLE})
 
-        and trseq (A.SeqExp exps) = (
+        and trseq (exps) = (
             case exps
             of [] => {exp=(),ty=Types.UNIT}
-            | [exp] => trexp exp
-            | exp::rest => (trexp exp; trseq(A.SeqExp rest)) )
+            | [(exp,pos)] => trexp exp
+            | (exp,pos)::rest => (trexp exp; trseq(rest)) )
 
-        and trassign (A.AssignExp{var,exp,pos}) =
-         let val (v,vty) = trvar var
-                val (e,ety) = trexp exp
+        and trassign (var,exp,pos) =
+         let val {exp=v,ty=vty} = transVar(venv, tenv, var)
+                val {exp=e,ty=ety} = trexp exp
             in
-               if T.equals(vty,ety) 
-               then (exp = (); ty = Types.UNIT)
-               else (Error.error pos "Error: type mismatch at pos: " ^ (Int.toString pos); {exp=(),ty=Types.UNIT})
+               if T.matchType(vty,ety) 
+               then ({exp = (), ty = Types.UNIT})
+               else (Error.error pos ("Error: type mismatch"); {exp=(),ty=Types.UNIT})
             end
 
-        and trif (A.IfExp{test,then',else',pos}) = case else' of 
-            NONE => (checkint(trexp test,pos); 
-                        checkUnit(trexp then'))
+        and trif (test,then',else',pos) = case else' of 
+            NONE => 
+                let 
+                    val {exp, ty} = trexp then'
+                in
+                    checkint(trexp test, pos);
+                    {exp=(),ty=ty}
+                end
             | SOME(else') => 
-                let val (t,ty) = trexp test
-                    val (th,tht) = trexp then'
-                    val (el,elt) = trexp else'
+                let val {exp=t,ty} = trexp test
+                    val {exp=th,ty=tht} = trexp then'
+                    val {exp=el,ty=elt} = trexp else'
                 in
                     checkint(trexp test,pos);
-                    if T.equals(tht,elt)
-                    then (exp = (); ty = tht)
-                    else (Error.error pos "Error: type mismatch at pos: " ^ (Int.toString pos); {exp=(),ty=Types.UNIT})
+                    {exp=(),ty=T.findLUB(tht,elt)}
                 end
 
-        and trwhile (A.WhileExp{test,body,pos}) = 
+        and trwhile (test,body,pos) = 
             (checkint(trexp test,pos); 
             LoopCounter.enter();
-            checkUnit(trexp body);
-            LoopCounter.exit()
+            checkUnit(trexp body, pos);
+            LoopCounter.exit();
             {exp=(),ty=Types.UNIT})
             
-        and trfor (A.ForExp{var,lo,hi,body,pos}) = 
+        and trfor (var,escape,lo,hi,body,pos) = 
                let val venv' = S.enter(venv,var,E.VarEntry{ty=Types.INT})
                 in
                     checkint(trexp lo,pos);
                     checkint(trexp hi,pos);
                     LoopCounter.enter();
-                    checkUnit(transExp (venv',tenv,body));
+                    checkUnit(transExp (venv',tenv,body), pos);
                     LoopCounter.exit();
                     {exp=(),ty=Types.UNIT}
                  end
 
         
-        and trlet (A.LetExp{decs,body,pos}) = 
-            let val (venv=venv',tenv=tenv') = foldl (fn {v',t'} => transDec (v', t', decs)) (venv, tenv) decs
+        and trlet (decs,body,pos) = 
+            let 
+                val {venv=venv',tenv=tenv'} = foldl (fn (dec, {venv=v',tenv=t'}) => transDec (v', t', dec)) {venv=venv, tenv=tenv} decs
             in
-                transExp(venv',tenv') body
+                transExp(venv',tenv',body)
             end
 
-        and trarray (A.ArrayExp{typ,size,init,pos}) = 
+        and trarray (typ,size,init,pos) = 
             let
                 val {exp=initExp, ty=initTy} = trexp init
                 val size' = trexp size
@@ -194,53 +178,103 @@ struct
                 checkint(size',pos);
                 case S.look(tenv,typ) of
                     SOME(T.ARRAY(ty, unique)) =>
-                        if T.equals(ty,initTy)
+                        if T.matchType(ty,initTy)
                         then {exp=(),ty=T.ARRAY(ty,unique)}
-                        else (Error.error pos "Error: type mismatch at pos: " ^ (Int.toString pos); {exp=(),ty=Types.IMPOSSIBLE})
-                    | _ => (Error.error pos "Error: undefined array type at pos: " ^ (Int.toString pos); {exp=(),ty=Types.IMPOSSIBLE})
+                        else (Error.error pos ("Error: type mismatch"); {exp=(),ty=Types.IMPOSSIBLE})
+                    | _ => (Error.error pos ("Error: undefined array type"); {exp=(),ty=Types.IMPOSSIBLE})
             end
         
-        and trbreak (A.BreakExp pos) = 
-            if LoopCounter.count() > 0
+        and trbreak (pos) = 
+            if !LoopCounter.count > 0
             then {exp=(),ty=Types.UNIT}
-            else (Error.error pos "Error: break outside loop at pos: " ^ (Int.toString pos); {exp=(),ty=Types.IMPOSSIBLE})
-            
-        and trexp (A.OpExp{left, oper, right,pos}) = trop(left, oper,right,pos)
-        | trexp (A.VarExp v) = trvar v
-        | trexp (A.NilExp) = {exp=(),ty=Types.NIL}
-        | trexp (A.IntExp i) = {exp=(),ty=Types.INT}
-        | trexp (A.StringExp s) = {exp=(),ty=Types.STRING}
-        | trexp (A.CallExp{func,args,pos}) = trcall(A.CallExp{func=func,args=args,pos=pos})
-        | trexp (A.RecordExp{fields,typ,pos} ) = trrecord(A.RecordExp{fields=fields,typ=typ,pos=pos})
-        | trexp (A.SeqExp exps) = trseq(A.SeqExp exps)
-        | trexp (A.AssignExp{var,exp,pos}) = trassign(A.AssignExp{var=var,exp=exp,pos=pos})
-        | trexp (A.IfExp{test,then',else',pos}) = trif(A.IfExp{test=test,then'=then',else'=else',pos=pos})
-        | trexp (A.WhileExp{test,body,pos}) = trwhile(A.WhileExp{test=test,body=body,pos=pos})
-        | trexp (A.ForExp{var,lo,hi,body,pos}) = trfor(A.ForExp{var=var,lo=lo,hi=hi,body=body,pos=pos})
-        | trexp (A.LetExp{decs,body,pos}) = trlet(A.LetExp{decs=decs,body=body,pos=pos})
-        | trexp (A.ArrayExp{typ,size,init,pos}) = trarray(A.ArrayExp{typ=typ,size=size,init=init,pos=pos})
-        | trexp (A.BreakExp pos) = trbreak(A.BreakExp pos)
+            else (Error.error pos ("Error: break outside loop");
+             {exp=(),ty=Types.IMPOSSIBLE})
 
+        and trexp exp = 
+            case exp of 
+                A.OpExp{left,oper,right,pos} => trop(left,oper,right,pos)
+                | A.VarExp v => transVar (venv, tenv, v)
+                | A.NilExp => {exp=(),ty=Types.NIL}
+                | A.IntExp i => {exp=(),ty=Types.INT}
+                | A.StringExp s => {exp=(),ty=Types.STRING}
+                | A.CallExp{func,args,pos} => trcall(func,args,pos)
+                | A.RecordExp{fields,typ,pos} => trrecord(fields,typ,pos)
+                | A.SeqExp exps => trseq(exps)
+                | A.AssignExp{var,exp,pos} => trassign(var,exp,pos)
+                | A.IfExp{test,then',else',pos} => trif(test,then',else',pos)
+                | A.WhileExp{test,body,pos} => trwhile(test,body,pos)
+                | A.ForExp{var,escape,lo,hi,body,pos} => trfor(var,escape,lo,hi,body,pos)
+                | A.LetExp{decs,body,pos} => trlet(decs,body,pos)
+                | A.ArrayExp{typ,size,init,pos} => trarray(typ,size,init,pos)
+                | A.BreakExp pos => trbreak(pos)
         in
-            trexp
+            trexp exp
         end
+            
+    and transVar(venv,tenv,A.SimpleVar(id,pos)): expty = 
+                (case S.look(venv,id) of 
+                    SOME(E.VarEntry{ty}) =>
+                        {exp=(), ty=ty}
+                    | _ => (Error.error pos ("Error:undefined variable "^ S.name id);
+                                {exp=(), ty=T.INT}))
+        | transVar(venv,tenv,A.FieldVar(v,id,pos))  = 
+                (case transVar (venv, tenv,v) of
+                    {exp = vexp, ty = T.RECORD (symbolLst, _)} =>
+                        let
+                            fun findFieldById (id, lst) =
+                                case lst of
+                                    [] => NONE
+                                    | (fieldId, fieldTy) :: rest =>
+                                        if id = fieldId then
+                                            SOME fieldTy
+                                        else
+                                            findFieldById (id, rest)
+                        in
+                            case findFieldById (id, symbolLst) of
+                                SOME fieldTy =>
+                                    {exp = (), ty = fieldTy}
+                                | NONE =>
+                                    (Error.error pos ("Error:undefined field " ^ S.name id ^ " in record");
+                                    {exp = (), ty = T.INT})
+                        end
+                    | _ =>
+                        (Error.error pos "Error:accessing fields of a non-record type";
+                        {exp = (), ty = T.INT}))
+        | transVar (venv, tenv, A.SubscriptVar(v,exp,pos)) =  
+                (case transVar (venv, tenv,v) of
+                    {exp = vexp, ty = T.ARRAY (elementTy,_)} =>
+                        let
+                            val index = transExp (venv, tenv, exp)
+                        in
+                            case #ty index of
+                                T.INT =>
+                                    {exp = (),
+                                    ty = elementTy}
+                                | _ =>
+                                    (Error.error pos "Error:array index must be an integer";
+                                    { exp = (),
+                                    ty = T.INT })
+                        end
+                | _ =>
+                    (Error.error pos "Error:subscripting non-array type";
+                    {exp = (), ty = T.INT}))
 
-    fun transTy (tenv, absynTy): ty = 
+    and transTy (tenv, absynTy): T.ty = 
         case absynTy of
             A.NameTy(sym,pos) => 
-                case S.look(tenv,sym) of
+                (case S.look(tenv,sym) of
                     SOME(ty) => ty
-                    | NONE => (Error.error pos "Error: undefined NameTy at pos: " ^ (Int.toString pos); Types.INT)
+                    | NONE => (Error.error pos "Error: undefined NameTy"; Types.INT))
             | A.RecordTy(fields) =>
                 let
                     val unique = ref ()
                     val symTyList = map (fn {name,escape,typ,pos} =>
                         case S.look(tenv,typ) of
                             SOME(ty) => (name,ty)
-                            | NONE => (Error.error pos "Error: undefined RecordTy field type at pos: " ^ (Int.toString pos); (name,Types.INT))
+                            | NONE => (Error.error pos "Error: undefined RecordTy field type"; (name,Types.INT))
                     ) fields
                 in
-                    Types.RECORD(typedFields,unique)
+                    Types.RECORD(symTyList,unique)
                 end
             | A.ArrayTy(sym,pos) =>
                 let
@@ -248,43 +282,40 @@ struct
                     val elem_ty = 
                         case S.look(tenv,sym) of
                             SOME(ty) => ty
-                            | NONE => (Error.error pos "Error: undefined ArrayTy at pos: " ^ (Int.toString pos); Types.INT)
+                            | NONE => (Error.error pos "Error: undefined ArrayTy"; Types.INT)
                 in
                     Types.ARRAY(elem_ty,unique)
                 end
                
-            | _ => T.INT (* default, should not happen *)
             
                 
     
-    fun transDec (venv, tenv, A.VarDec{name,escape,typ,init,pos}) = 
-        case typ of 
+    and transDec (venv, tenv, A.VarDec{name,escape,typ,init,pos}) = 
+        (case typ of 
             NONE => 
                 let 
                     val {exp=_,ty} = transExp(venv,tenv,init)
-                    val ty' = transTy(tenv,ty)
                 in 
                     {tenv=tenv,
-                    venv=S.enter(venv,name,E.VarEntry{ty=ty'})}
+                    venv=S.enter(venv,name,E.VarEntry{ty=ty})}
                 end
-        | SOME(typ) =>
+        | SOME(sym,pos) =>
             let
                 val {exp=initExp,ty=calcTy} = transExp(venv,tenv,init)
-                val ty' = transTy(tenv,typ)
+                val typ = symToType (tenv, sym, pos)
             in
-                if not(T.equals(ty',calcTy))
-                then (Error.error pos "Error: type mismatch at pos: " ^ (Int.toString pos); 
-                    {venv=venv,tenv=tenv}
-                )
+                if not(T.matchType(typ,calcTy))
+                then (Error.error pos "Error: type mismatch"; 
+                    {venv=venv,tenv=tenv})
                 else {
-                    venv=S.enter(venv,name,E.VarEntry{ty=ty'}),
+                    venv=S.enter(venv,name,E.VarEntry{ty=typ}),
                     tenv=tenv
                 }
-            end
+            end)
         (* Nonrecursive TypeDec *)
         | transDec (venv,tenv,A.TypeDec tydecList) =
             let
-                fun transTyDec (tenv, {name,ty,pos}) =
+                fun transTyDec ({name,ty,pos}, tenv) =
                     let
                         val ty' = transTy(tenv,ty)
                     in
@@ -298,40 +329,43 @@ struct
         (* Nonrecursive FuncDec *)
         | transDec(venv,tenv, A.FunctionDec fundecList) =
             let
-                fun transFunDec ({name,params,body,pos,result}) =
+                fun transFunDec ({name,params,result,body,pos}: A.fundec,venv): venv =
                     let val result_ty = case result of
-                                    None => T.UNIT
-                                  | SOME(rt,pos) => transTy(tenv,rt);
-                        fun transparam{name,escape,typ,pos} =
-                            {name=name, ty=transTy(tenv,typ)}
+                                    NONE => T.UNIT
+                                  | SOME(rt,pos) => symToType (tenv, rt, pos)
+                                   
+                        fun transparam ({name,escape,typ,pos}:A.field) =
+                            {name=name, ty=symToType (tenv,typ, pos)}
                         val params' = map transparam params
                         val venv' = S.enter(venv,name,
                                     E.FunEntry{formals= map #ty params',
                                             result=result_ty})
                         fun enterparam ({name,ty},venv) =
                                     S.enter(venv,name, E.VarEntry{ty=ty})
-                        val venv'' = fold enterparam params' venv'
+                        val venv'' = foldl enterparam venv' params' 
                         val {exp=_,ty=calcTy} = transExp(venv'',tenv, body)
                     in 
-                        if not(T.equals(result_ty,calcTy))(* check bodyType = declared return type *)
-                        then (Error.error pos "Error: function bodyType mismatched returnType at pos: " ^ (Int.toString pos); 
-                            {venv=venv,tenv=tenv}
+                        if not(T.matchType(result_ty,calcTy))(* check bodyType = declared return type *)
+                        then (Error.error pos "Error: function bodyType mismatched returnType"; 
+                            venv
                         )
-                        else {venv=venv',tenv=tenv}
+                        else venv'
                     end
             in
-                {venv=venv,
-                tenv=fold transFunDec tenv fundecList}
+                {venv=foldl transFunDec venv fundecList,
+                tenv=tenv}
             end
+
+
             
 
 
 
 
     fun transProg exp = 
-        let val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv) exp
+        let val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, exp)
         in
-            if T.equals(ty,Types.UNIT)
+            if T.matchType(Types.UNIT, ty)
             then ()
             else Error.error 0 "Error: top-level expression does not have type unit"
         end
