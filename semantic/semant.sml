@@ -354,6 +354,7 @@ struct
                 (* Nonrecursive TypeDec *)
         | transDec (venv,tenv,A.TypeDec tydecList) =
             let    
+            (* type a = b; type b = int; var c:a := 2*)
                 val allTyName = map (fn {name,ty,pos} => name) tydecList
                 fun transTyDec ({name,ty,pos}, tenv) =
                     let
