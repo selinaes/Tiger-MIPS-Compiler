@@ -34,8 +34,12 @@ fun runTest 0 = print "DONE\n"
 
 fun runAllTests () = 
         let val fs = readAllFiles "../testcases";
+        val exlusiveFolder = ["result", "semantResults"];
+            fun contains (x, []) = false
+            | contains (x, y::ys) = if x = y then true else contains (x, ys)
         in
-            app (fn f => par f) fs
+        
+            app (fn f => par f) (List.filter (fn f => (not (contains (f, exlusiveFolder)))) fs)
         end;
         
 

@@ -42,7 +42,8 @@ NONE,
         OpExp(EqOp,
          VarExp(
           SimpleVar(buffer)),
-         StringExp("\n"))),
+         StringExp("
+"))),
        AssignExp(
         SimpleVar(buffer),
         CallExp(getchar,[]))))]],
@@ -234,7 +235,8 @@ NONE,
       SimpleVar(l)),
      NilExp),
     CallExp(print,[
-     StringExp("\n")]),
+     StringExp("
+")]),
     SeqExp[
      CallExp(printint,[
       VarExp(

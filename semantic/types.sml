@@ -109,4 +109,15 @@ end
                     | A.ArrayTy(absynTySym,pos) => [(absynTySym, absynTySym)]
     in
 
+    fun transTy (tenv, A.NameTy nameTy) = 
+
     end *)
+
+
+(* type list = { d : int, n: list} 
+    Record () -> (d, int) :: (n, list) :: [] * unique
+
+    val a = {d: 1, n: {d: 2, n: nil}}
+    val b = {d: 1, n: nil}
+   type:  a = b -> true
+ *)
