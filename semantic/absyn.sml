@@ -32,22 +32,7 @@ and dec = FunctionDec of fundec list
 		     init: exp,
 		     pos: pos}
         | TypeDec of {name: symbol, ty: ty, pos: pos} list
-
-(*
-        type b = string
-        ...dec..
-        type a = b  TypeDec a = NameTY b
-        type b = c TypeDec b = NameTY c
-        type c = int 
-
-        {
-                (a , RECORD(() => b)) => makeRec result
-                (b , RECORD(() => c))
-                (c , int) 
-                
-        }
-
-*)
+        
 and ty = NameTy of symbol * pos
        | RecordTy of field list
        | ArrayTy of symbol * pos

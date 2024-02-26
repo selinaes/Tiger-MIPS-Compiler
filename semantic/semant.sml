@@ -41,24 +41,19 @@ struct
 
     fun checkTwoEqTypes ({exp=_, ty=T.INT}, {exp=_, ty=T.INT}, pos) = ()
     | checkTwoEqTypes ({exp=_, ty=T.STRING}, {exp=_, ty=T.STRING}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.RECORD(_,unique1)}, {exp=_, ty=T.RECORD(_,unique2)}, pos) = if unique1 = unique2 then () else Error.error pos ("Error: comparing two different records at pos: " ^ (Int.toString pos))
+    | checkTwoEqTypes ({exp=_, ty=T.RECORD(f1)}, {exp=_, ty=T.RECORD(f2)}, pos) = 
+        let val (_, unique1) = f1()
+            val (_, unique2) = f2()
+        in
+            if unique1 = unique2 
+            then () 
+            else Error.error pos ("Error: comparing two different records at pos: " ^ (Int.toString pos))
+        end
     | checkTwoEqTypes ({exp=_, ty=T.NIL}, {exp=_, ty=T.RECORD(_)}, pos) = ()
     | checkTwoEqTypes ({exp=_, ty=T.RECORD(_)}, {exp=_, ty=T.NIL}, pos) = ()
     | checkTwoEqTypes ({exp=_, ty=T.ARRAY(_,unique1)}, {exp=_, ty=T.ARRAY(_,unique2)}, pos) = if unique1 = unique2 then () else Error.error pos ("Error: comparing two different arrays at pos: " ^ (Int.toString pos))
     | checkTwoEqTypes ({exp=_, ty=T.NIL}, {exp=_, ty=T.NIL}, pos) = ()
     | checkTwoEqTypes(_,_,pos) = Error.error pos ("Error: comparing two different types" )
-
-
-    fun makeRec (name, fields:A.field list) = 
-        let val symTyList: (S.symbol * T.ty) list = []
-
-        in
-        if xxx 
-        app () fields
-        then addToFieldList(fieldName, RECORD (fn () => (makeRec recordName)))
-        else ();
-        fn () => (symTyList, unique)
-        end
 
     fun transExp(venv,tenv,exp): expty =
         let 
@@ -102,8 +97,9 @@ struct
             table -> record typ -> symTyList
             symTyList contains field sym, (symTyList s1.sym = field f1.sym) symTyList s1.ty ?= field f1.exp ty?*)
             case S.look(tenv,typ) of
-                SOME(T.RECORD(symTyList, unique)) =>
+                SOME(T.RECORD(f1)) =>
                     let 
+                        val (symTyList, unique) = f1()
                         fun checkField (sym, exp, pos) =
                             case List.find (fn (tsym,tty) => tsym = sym) symTyList of
                                 SOME (tsym,tty) =>
@@ -120,7 +116,7 @@ struct
                         List.app checkField fields;
                         if length fields = length symTyList
                         then
-                            {exp=(),ty=T.RECORD(symTyList, unique)}
+                            {exp=(),ty=T.RECORD(fn () => (symTyList, unique))}
                         else
                             (Error.error pos ("Error: field number mismatch, expe"); {exp=(),ty=Types.IMPOSSIBLE})
                         
@@ -234,8 +230,9 @@ struct
                                 {exp=(), ty=T.INT}))
         | transVar(venv,tenv,A.FieldVar(v,id,pos))  = 
                 (case transVar (venv, tenv,v) of
-                    {exp = vexp, ty = T.RECORD (symbolLst, _)} =>
+                    {exp = vexp, ty = T.RECORD (f)} =>
                         let
+                            val (symbolLst, _) = f()
                             fun findFieldById (id, lst) =
                                 case lst of
                                     [] => NONE
@@ -270,65 +267,10 @@ struct
                                     { exp = (),
                                     ty = T.INT })
                         end
-                | _ =>
-                    (Error.error pos "Error:subscripting non-array type";
-                    {exp = (), ty = T.INT}))
+                    | {exp = vexp, ty = thety} =>
+                        (Error.error pos ("Error:subscripting non-array type" ^ (T.toString thety));
+                        {exp = (), ty = T.INT}))
 
-
-    
-   (* (* absynName = a, absynTy = b *)
-    and transTy (tenv, absynName, absynTy, allTyName): T.ty = 
-        let 
-            val absynTySymLst =
-                let 
-                    val absynTy = getTypeByName(absynName)
-                in
-                    case absynTy of
-                        A.NameTy(absynTySym,pos) => [(absynTySym, absynTySym)]
-                        | A.RecordTy(fields) => 
-                            map (fn {name,escape,typ,pos} => (name, typ)) fields
-                        | A.ArrayTy(absynTySym,pos) => [(absynTySym, absynTySym)]
-                end
-            fun getTypeByName (absynName: Symbol.symbol) = (*ABSYN.TY*)
-                case (find (fn {name,ty,pos} => n = name) tydecList) of
-                    SOME {name,ty,pos} => ty
-                    | NONE => Error.error pos "Error: undefined type name"
-            
-        in
-        end *)
-    (* case absynTy of
-                    A.NameTy(absynTySym,pos) => 
-                       (case S.look(tenv,absynTySym) of
-                            SOME(ty) => ty
-                            | NONE => (Error.error pos "Error: undefined NameTy"; Types.INT))
-                    | A.RecordTy(fields) =>
-                        let
-                            val unique = ref ()
-                            val symTyList = map (fn {name,escape,typ,pos} =>
-                                case S.look(tenv,typ) of
-                                    SOME(ty) => (name,ty)
-                                    | NONE => (Error.error pos "Error: undefined RecordTy field type"; (name,Types.INT))
-                            ) fields
-                        in
-                            Types.RECORD(symTyList,unique)
-                        end
-                    | A.ArrayTy(absynTySym,pos) =>
-                        let
-                            val unique = ref ()
-                            val elem_ty = 
-                                case S.look(tenv,absynTySym) of
-                                    SOME(ty) => ty
-                                    | NONE => (Error.error pos "Error: undefined ArrayTy"; Types.INT)
-                        in
-                            Types.ARRAY(elem_ty,unique)
-                        end  *)
-                        
-
-        
-                       
-            
-                
-    
     and transDec (venv, tenv, A.VarDec{name,escape,typ,init,pos}) = 
         (case typ of 
             NONE => 
@@ -354,52 +296,82 @@ struct
                 (* Nonrecursive TypeDec *)
         | transDec (venv,tenv,A.TypeDec tydecList) =
             let    
-            (* type a = b; type b = int; var c:a := 2*)
                 val allTyName = map (fn {name,ty,pos} => name) tydecList
+                val uniqueMap = ref []
+                fun makeRec (fieldlist): unit -> (Symbol.symbol * T.ty) list * T.unique =
+                    let
+                        val unique = ref ()
+                        fun processFieldList ([]) : (S.symbol * T.ty)list = []
+                          | processFieldList ({name,escape,typ,pos} :: rest) = 
+                            let
+                                val ty = evalType(typ, [], pos)
+                            in
+                                (name,ty)::processFieldList(rest)
+                            end
+                    in
+                        fn () => (processFieldList(fieldlist), unique)
+                    end
+                and evalType(name: S.symbol, visited: S.symbol list, pos): T.ty = 
+                    if (List.exists (fn n => name = n) allTyName)
+                    then
+                        if (List.exists (fn n => name = n) visited)
+                        then
+                           ( Error.error pos "Error: cycle"; T.IMPOSSIBLE)
+                        else 
+                            let val ty = #ty (valOf (List.find (fn {name=tyname,ty,pos} => tyname = name) tydecList))
+                            in
+                                case ty of
+                                    A.NameTy(sym, pos) => evalType(sym, name::visited, pos)
+                                    | A.ArrayTy(sym, pos) => evalType(sym, name::visited, pos)
+                                    | A.RecordTy(fieldlist) => T.RECORD(makeRec(fieldlist))
+                            end
+                    else (* not in group*)
+                        case S.look(tenv, name) of
+                            SOME(ty) => ty
+                            | NONE => (Error.error pos "Error: undefined type name"; T.IMPOSSIBLE)
+                and transTy (tenv,absynTy): T.ty = 
+                    case absynTy of
+                        A.NameTy(absynTySym,pos) => 
+                            (case S.look(tenv,absynTySym) of
+                                SOME(ty) => ty
+                                | NONE => (Error.error pos "Error: undefined NameTy"; Types.INT))
+                        | A.RecordTy(fields) => T.RECORD(makeRec(fields))
+                        | A.ArrayTy(absynTySym,pos) =>
+                            let
+                                val unique = ref ()
+                                val elem_ty = 
+                                    case S.look(tenv,absynTySym) of
+                                        SOME(ty) => ty
+                                        | NONE => (Error.error pos "Error: undefined ArrayTy"; Types.INT)
+                            in
+                                Types.ARRAY(elem_ty,unique)
+                            end          
                 fun transTyDec ({name,ty,pos}, tenv) =
                     let
-                        val ty' = makeRec name
+                        val ty' = transTy(tenv, ty)
+                                    
                     in
+                    (* TODO *)
+                        (* case ty' of
+                            T.RECORD(f) => f()
+                            | _ => (); *)
                         S.enter(tenv,name,ty')
                     end
+                 (* see if name is in this group or not*)
+                   (* if not in this group: look in tenv -> done*)
+                (* otherwise
+                   in visited?  cycle-->error
+                   not in visited? what kind of declaration?
+                       name -> recurse (and add to visited)
+                    Array -> recurse (and add to visited), but then return Array of those
+                    Record -> make Record *)
                 (* Example of 1 tydec in 1 TypeDec (mutgroup) *)    
-                (* "type a = b", name=a, ty=A.nameTy(b) is: makeRec(a) => RECORD(fn() => ([(b* (fn()->makeRec b))] *unique)) *)
-                (* "type x = {y:b,z:string}", tyname=x, ty=A.recordT () is: makeRec(x) => RECORD (fn() => ([(y, (fn () -> makeRec b)), (z, string)] , unique)) *)
+                (* "type a = b type b = int" is: makeRec(a) => RECORD(fn() => ([(b* (fn()->makeRec b))] *unique)) *)
+                (* " type x = {y:b,z:string, r:s}", tyname=x,cordT () is: makeRec(x) => RECORD (fn() => ([(y, (fn () -> makeRec b)), (z, string)] , unique)) *)
                 (* "type c = int" is: makeRec(c) => RECORD (fn() => ([(c,int)] * unique))*)
-                (* var a:c := 3*)
-                fun makeRec (absynName) =
-                    let
-                        val fieldList: (Symbol.symbol * ty) list = ref []
-                        fun addToFieldList (fieldname, ty) = 
-                                fieldList := (fieldname, ty) :: !fieldList
-                        
-                        (* getTypeByName(a)=b, getTypeByName(x)={y=b,...}*)
-                        fun getTypeByName (absynName: Symbol.symbol) = (*ABSYN.TY*)
-                            case (find (fn {name,ty,pos} => absynName = name) tydecList) of
-                                SOME {name,ty,pos} => ty
-                                | NONE => (Error.error pos "Error: undefined type name"; Types.INT)
-                        val absynTySymLst =
-                            let 
-                                val absynTy = getTypeByName(absynName)
-                            in
-                                case absynTy of
-                                    A.NameTy(absynTySym,pos) => [(absynTySym, absynTySym)]
-                                    | A.RecordTy(fields) => 
-                                        map (fn {name,escape,typ,pos} => (name, typ)) fields
-                                    | A.ArrayTy(absynTySym,pos) => [(absynTySym, absynTySym)]
-                            end
-                        fun findFieldAndAdd (absynTySym, absynTyTy) = case (find (fn foundty => foundty = absynTyTy) allTyName) of
-                            (* found mutually recurse *)
-                            SOME foundty => (addToFieldList(absynTySym, RECORD (fn () => (makeRec foundty)))) (* b: record(b) *)
-                            (* found in outside tenv *)
-                            | NONE =>  
-                                case S.look(tenv,absynTySym) of
-                                    SOME(foundty) => addToFieldList(absynTySym, foundty)
-                                    |NONE => Error.error pos "Error: undefined type name"
-                        val () = app findFieldAndAdd absynTySymLst
-                    in
-                        fn () => (fieldList, unique)
-                    end  
+
+                
+                    
             in
                 {venv=venv,
                 tenv=foldl transTyDec tenv tydecList}
