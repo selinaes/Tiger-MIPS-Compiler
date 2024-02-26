@@ -39,3 +39,5 @@ fun runAllTests () =
         
 
 runAllTests ();
+(* par "error-inte.tig";
+par "ref_test.tig"; *)

@@ -48,5 +48,8 @@ withtype field = {name: symbol, escape: bool ref,
 		   body: exp,
 		   pos: pos}
      (* TypeDec of {name: symbol, ty: ty, pos: pos} *)
+        (* fun varToString (SimpleVar (s, _)) = Symbol.name s
+        | varToString (FieldVar (v, s, _)) = varToString v ^ "." ^ Symbol.name s
+        | varToString (SubscriptVar (v, e, _)) = varToString v ^ "[" ^ expToString e ^ "]" *)
 end
         

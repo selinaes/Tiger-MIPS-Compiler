@@ -21,7 +21,7 @@ struct
     fun symToType (tenv, sym, pos) : T.ty= 
         case S.look(tenv,sym) of
         SOME(ty) => ty
-        | NONE => (Error.error pos ("Error: undefined type name"); 
+        | NONE => (Error.error pos ("Error: undefined type: " ^ S.name sym);
         T.INT)
     
     fun checkint ({exp,ty=T.INT},pos) = ()
@@ -190,7 +190,9 @@ struct
                 case S.look(tenv,typ) of
                     SOME(T.ARRAY(ty, unique)) =>
                         if T.matchType(ty,initTy)
-                        then {exp=(),ty=T.ARRAY(ty,unique)}
+                        then 
+                        (* (print ((S.name typ) ^" " ^  (T.toString ty)^ "\n"); *)
+                        {exp=(),ty=T.ARRAY(ty,unique)}
                         else (Error.error pos ("Error: type mismatch"); {exp=(),ty=Types.IMPOSSIBLE})
                     | _ => (Error.error pos ("Error: undefined array type"); {exp=(),ty=Types.IMPOSSIBLE})
             end
@@ -229,8 +231,8 @@ struct
                     | _ => (Error.error pos ("Error:undefined variable "^ S.name id);
                                 {exp=(), ty=T.INT}))
         | transVar(venv,tenv,A.FieldVar(v,id,pos))  = 
-                (case transVar (venv, tenv,v) of
-                    {exp = vexp, ty = T.RECORD (f)} =>
+                (case transVar (venv, tenv, v) of
+                    {exp = vexp, ty = T.RECORD(f)} =>
                         let
                             val (symbolLst, _) = f()
                             fun findFieldById (id, lst) =
@@ -253,7 +255,7 @@ struct
                         (Error.error pos "Error:accessing fields of a non-record type";
                         {exp = (), ty = T.INT}))
         | transVar (venv, tenv, A.SubscriptVar(v,exp,pos)) =  
-                (case transVar (venv, tenv,v) of
+                (case transVar (venv, tenv, v) of
                     {exp = vexp, ty = T.ARRAY (elementTy,_)} =>
                         let
                             val index = transExp (venv, tenv, exp)
@@ -268,11 +270,12 @@ struct
                                     ty = T.INT })
                         end
                     | {exp = vexp, ty = thety} =>
-                        (Error.error pos ("Error:subscripting non-array type" ^ (T.toString thety));
+                        (Error.error pos ("Error:subscripting non-array type" ^ (T.toString thety) );
                         {exp = (), ty = T.INT}))
 
     and transDec (venv, tenv, A.VarDec{name,escape,typ,init,pos}) = 
         (case typ of 
+        (* TODO: check nil *)
             NONE => 
                 let 
                     val {exp=_,ty} = transExp(venv,tenv,init)
@@ -297,15 +300,27 @@ struct
         | transDec (venv,tenv,A.TypeDec tydecList) =
             let    
                 val allTyName = map (fn {name,ty,pos} => name) tydecList
-                val uniqueMap = ref []
+                val uniqueMap: unit ref S.table ref = ref S.empty
+                (* keep track of the refs within the same dec group *)
+                fun getOrDefault(sym) = 
+                    case S.look(!uniqueMap, sym) of
+                        SOME(u) => u
+                        | NONE => 
+                            let val unique = ref () 
+                            in  
+                            (* print ("getOrDefault: old ref" ^ S.name sym); *)
+                                uniqueMap := S.enter(!uniqueMap, sym, unique);
+                                unique
+                            end
                 fun makeRec (fieldlist): unit -> (Symbol.symbol * T.ty) list * T.unique =
                     let
                         val unique = ref ()
-                        fun processFieldList ([]) : (S.symbol * T.ty)list = []
+                        fun processFieldList ([]) : (S.symbol * T.ty) list = []
                           | processFieldList ({name,escape,typ,pos} :: rest) = 
                             let
                                 val ty = evalType(typ, [], pos)
                             in
+                                (* print ("makerec" ^"name: " ^ S.name name ^ " ty: " ^ T.toString ty ^ "\n"); *)
                                 (name,ty)::processFieldList(rest)
                             end
                     in
@@ -319,43 +334,38 @@ struct
                            ( Error.error pos "Error: cycle"; T.IMPOSSIBLE)
                         else 
                             let val ty = #ty (valOf (List.find (fn {name=tyname,ty,pos} => tyname = name) tydecList))
+                                (* val () = print ("name: " ^ S.name name ^ " ty: " ^ T.toString ty ^ "\n") *)
                             in
                                 case ty of
                                     A.NameTy(sym, pos) => evalType(sym, name::visited, pos)
-                                    | A.ArrayTy(sym, pos) => evalType(sym, name::visited, pos)
+                                    | A.ArrayTy(sym, pos) => 
+                                        let
+                                        val t = evalType(sym, name::visited, pos)
+                                        in 
+                                        (* print ("array name: " ^ S.name name ^ " ty: " ^ T.toString t ^ "\n"); *)
+                                        T.ARRAY(t, getOrDefault(name))
+                                        end
                                     | A.RecordTy(fieldlist) => T.RECORD(makeRec(fieldlist))
                             end
                     else (* not in group*)
                         case S.look(tenv, name) of
                             SOME(ty) => ty
-                            | NONE => (Error.error pos "Error: undefined type name"; T.IMPOSSIBLE)
-                and transTy (tenv,absynTy): T.ty = 
-                    case absynTy of
-                        A.NameTy(absynTySym,pos) => 
-                            (case S.look(tenv,absynTySym) of
-                                SOME(ty) => ty
-                                | NONE => (Error.error pos "Error: undefined NameTy"; Types.INT))
-                        | A.RecordTy(fields) => T.RECORD(makeRec(fields))
-                        | A.ArrayTy(absynTySym,pos) =>
-                            let
-                                val unique = ref ()
-                                val elem_ty = 
-                                    case S.look(tenv,absynTySym) of
-                                        SOME(ty) => ty
-                                        | NONE => (Error.error pos "Error: undefined ArrayTy"; Types.INT)
-                            in
-                                Types.ARRAY(elem_ty,unique)
-                            end          
+                            | NONE => (Error.error pos ("Error: undefined type: " ^ S.name name); T.IMPOSSIBLE)
                 fun transTyDec ({name,ty,pos}, tenv) =
                     let
-                        val ty' = transTy(tenv, ty)
+                        val ty' = evalType(name, [], pos)
                                     
                     in
-                    (* TODO *)
-                        (* case ty' of
-                            T.RECORD(f) => f()
-                            | _ => (); *)
-                        S.enter(tenv,name,ty')
+                    (* TODO: records with inte *)
+                        case ty' of
+                            T.RECORD(f) =>
+                                let 
+                                    val (fields, unique) = f() 
+                                    in
+                                   ()
+                                end 
+                            | _ => (); 
+                         S.enter(tenv,name,ty')
                     end
                  (* see if name is in this group or not*)
                    (* if not in this group: look in tenv -> done*)
@@ -369,9 +379,6 @@ struct
                 (* "type a = b type b = int" is: makeRec(a) => RECORD(fn() => ([(b* (fn()->makeRec b))] *unique)) *)
                 (* " type x = {y:b,z:string, r:s}", tyname=x,cordT () is: makeRec(x) => RECORD (fn() => ([(y, (fn () -> makeRec b)), (z, string)] , unique)) *)
                 (* "type c = int" is: makeRec(c) => RECORD (fn() => ([(c,int)] * unique))*)
-
-                
-                    
             in
                 {venv=venv,
                 tenv=foldl transTyDec tenv tydecList}
@@ -406,11 +413,6 @@ struct
                 {venv=foldl transFunDec venv fundecList,
                 tenv=tenv}
             end
-
-
-            
-
-
 
 
     fun transProg exp = 
