@@ -1,0 +1,11 @@
+let 
+
+type a={field1:d}
+type m = {field2:a, field3:inte}
+type b=a
+type c=d
+type d=int
+var rec1 := a {field1=2}
+in
+    rec1.field1 = 3
+end

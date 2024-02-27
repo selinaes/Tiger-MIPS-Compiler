@@ -1,0 +1,9 @@
+let
+	type arrtype = {name:string, id:int}
+	type arrtyp2 = arrtype
+    var arr: arrtype := nil
+    var arr2:arrtyp2 := nil
+
+in
+	arr = arr2
+end

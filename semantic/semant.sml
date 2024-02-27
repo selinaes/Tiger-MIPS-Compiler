@@ -312,9 +312,9 @@ struct
                                 uniqueMap := S.enter(!uniqueMap, sym, unique);
                                 unique
                             end
-                fun makeRec (fieldlist): unit -> (Symbol.symbol * T.ty) list * T.unique =
+                fun makeRec (name, fieldlist): unit -> (Symbol.symbol * T.ty) list * T.unique =
                     let
-                        val unique = ref ()
+                        val unique = getOrDefault(name)
                         fun processFieldList ([]) : (S.symbol * T.ty) list = []
                           | processFieldList ({name,escape,typ,pos} :: rest) = 
                             let
@@ -345,7 +345,7 @@ struct
                                         (* print ("array name: " ^ S.name name ^ " ty: " ^ T.toString t ^ "\n"); *)
                                         T.ARRAY(t, getOrDefault(name))
                                         end
-                                    | A.RecordTy(fieldlist) => T.RECORD(makeRec(fieldlist))
+                                    | A.RecordTy(fieldlist) => T.RECORD(makeRec(name, fieldlist))
                             end
                     else (* not in group*)
                         case S.look(tenv, name) of

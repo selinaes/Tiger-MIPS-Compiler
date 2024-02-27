@@ -1,0 +1,27 @@
+LetExp([
+ TypeDec[
+  (a,
+   RecordTy[
+    (field1,false,d)]),
+  (m,
+   RecordTy[
+    (field2,false,a),
+    (field3,false,inte)]),
+  (b,
+   NameTy(a)),
+  (c,
+   NameTy(d)),
+  (d,
+   NameTy(int))],
+ VarDec(rec1,false,NONE,
+  RecordExp(a,[
+
+   (field1,
+    IntExp(2))]))],
+ SeqExp[
+  OpExp(EqOp,
+   VarExp(
+    FieldVar(
+     SimpleVar(rec1),
+     field1)),
+   IntExp(3))])
