@@ -4,4 +4,10 @@ lexer/tiger.lex.sml
 lexer/.DS_Store
 parser/.cm/
 semantic/.cm/
+
+*/.DS_Store
 */.cm/
+*/tiger.lex.sml
+*/tiger.grm.desc
+*/tiger.grm.sig
+*/tiger.grm.sml
