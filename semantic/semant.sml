@@ -22,7 +22,7 @@ struct
         case S.look(tenv,sym) of
         SOME(ty) => ty
         | NONE => (Error.error pos ("Error: undefined type: " ^ S.name sym);
-        T.INT)
+        T.IMPOSSIBLE)
     
     fun checkint ({exp,ty=T.INT},pos) = ()
     | checkint (_,pos) = Error.error pos ("Error: non-integer provided")
@@ -125,7 +125,7 @@ struct
             in
                if T.matchType(vty,ety) 
                then ({exp = (), ty = Types.UNIT})
-               else (Error.error pos ("Error: type mismatch"); {exp=(),ty=Types.UNIT})
+               else (Error.error pos ("Error: type mismatch"); {exp=(),ty=Types.IMPOSSIBLE})
             end
 
         and trif (test,then',else',pos) = case else' of 
@@ -220,7 +220,7 @@ struct
                     SOME(E.VarEntry{ty}) =>
                         {exp=(), ty=ty}
                     | _ => (Error.error pos ("Error: undefined variable "^ S.name id);
-                                {exp=(), ty=T.INT}))
+                                {exp=(), ty=T.IMPOSSIBLE}))
         | transVar(venv,tenv,A.FieldVar(v,id,pos))  = 
                 (case transVar (venv, tenv, v) of
                     {exp = vexp, ty = T.RECORD(f)} =>
@@ -240,11 +240,11 @@ struct
                                     {exp = (), ty = fieldTy}
                                 | NONE =>
                                     (Error.error pos ("Error: undefined field " ^ S.name id ^ " in record");
-                                    {exp = (), ty = T.INT})
+                                    {exp = (), ty = T.IMPOSSIBLE})
                         end
                     | _ =>
                         (Error.error pos "Error:accessing fields of a non-record type";
-                        {exp = (), ty = T.INT}))
+                        {exp = (), ty = T.IMPOSSIBLE}))
         | transVar (venv, tenv, A.SubscriptVar(v,exp,pos)) =  
                 (case transVar (venv, tenv, v) of
                     {exp = vexp, ty = T.ARRAY (elementTy,_)} =>
@@ -258,11 +258,11 @@ struct
                                 | _ =>
                                     (Error.error pos "Error:array index must be an integer";
                                     { exp = (),
-                                    ty = T.INT })
+                                    ty = T.IMPOSSIBLE })
                         end
                     | {exp = vexp, ty = thety} =>
                         (Error.error pos ("Error:subscripting non-array type: " ^ (T.toString thety) );
-                        {exp = (), ty = T.INT}))
+                        {exp = (), ty = T.IMPOSSIBLE}))
 
     and transDec (venv, tenv, A.VarDec{name,escape,typ,init,pos}) = 
         (case typ of 
