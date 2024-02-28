@@ -1,20 +1,20 @@
 LetExp([
- VarDec(N,false,NONE,
+ VarDec(N,true,NONE,
   IntExp(8)),
  TypeDec[
   (intArray,
    ArrayTy(int))],
- VarDec(row,false,NONE,
+ VarDec(row,true,NONE,
   ArrayExp(intArray,
    VarExp(
     SimpleVar(N)),
    IntExp(0))),
- VarDec(col,false,NONE,
+ VarDec(col,true,NONE,
   ArrayExp(intArray,
    VarExp(
     SimpleVar(N)),
    IntExp(0))),
- VarDec(diag1,false,NONE,
+ VarDec(diag1,true,NONE,
   ArrayExp(intArray,
    OpExp(MinusOp,
     OpExp(PlusOp,
@@ -24,7 +24,7 @@ LetExp([
       SimpleVar(N))),
     IntExp(1)),
    IntExp(0))),
- VarDec(diag2,false,NONE,
+ VarDec(diag2,true,NONE,
   ArrayExp(intArray,
    OpExp(MinusOp,
     OpExp(PlusOp,
@@ -66,9 +66,11 @@ j,false,
          StringExp(" O"),
          StringExp(" ."))])),
       CallExp(print,[
-       StringExp("\n")])]),
+       StringExp("
+")])]),
     CallExp(print,[
-     StringExp("\n")])]),
+     StringExp("
+")])]),
   (try,[
    (c,false,int)],
 NONE,

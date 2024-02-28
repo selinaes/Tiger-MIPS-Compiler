@@ -1,0 +1,9 @@
+let
+	type arrtype = array of int
+	type arrtyp2 = arrtype
+    var arr := arrtype [3] of 1
+    var arr2 := arrtyp2 [3] of 0
+
+in
+	arr = arr2
+end

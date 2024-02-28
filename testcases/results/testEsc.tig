@@ -1,0 +1,44 @@
+LetExp([
+ FunctionDec[
+  (x,[
+   (x1,true,int)],
+SOME(int),
+   LetExp([
+    FunctionDec[
+     (y,[],
+SOME(int),
+      OpExp(PlusOp,
+       IntExp(1),
+       VarExp(
+        SimpleVar(x1))))]],
+    SeqExp[
+     SeqExp[]]))],
+ VarDec(x2,true,SOME(int),
+  IntExp(3)),
+ VarDec(x3,false,SOME(int),
+  IntExp(3))],
+ SeqExp[
+  WhileExp(
+   OpExp(LtOp,
+    VarExp(
+     SimpleVar(x3)),
+    IntExp(7)),
+   SeqExp[]),
+  LetExp([
+   FunctionDec[
+    (z,[
+     (x1,false,int)],
+SOME(int),
+     ForExp(
+x4,false,
+      VarExp(
+       SimpleVar(x1)),
+      IntExp(8),
+      OpExp(PlusOp,
+       VarExp(
+        SimpleVar(x4)),
+       VarExp(
+        SimpleVar(x2)))))]],
+   SeqExp[
+    CallExp(z,[
+     IntExp(1)])])])
