@@ -87,7 +87,7 @@ struct
                             then {exp=(),ty=result}
                             else {exp=(),ty=Types.IMPOSSIBLE}
                     end
-                | _ => (Error.error pos ("Error: undefined function"); {exp=(),ty=Types.IMPOSSIBLE})
+                | _ => (Error.error pos ("Error: undefined function: " ^ S.name func); {exp=(),ty=Types.IMPOSSIBLE})
         
         and trrecord (fields,typ,pos) = 
         (*  field: (symbol * exp * pos)
@@ -144,7 +144,7 @@ struct
                     val {exp, ty} = trexp then'
                 in
                     checkint(trexp test, pos);
-                    {exp=(),ty=ty}
+                    {exp=(),ty=T.UNIT}
                 end
             | SOME(else') => 
                 let val {exp=t,ty} = trexp test
@@ -270,7 +270,7 @@ struct
                                     ty = T.INT })
                         end
                     | {exp = vexp, ty = thety} =>
-                        (Error.error pos ("Error:subscripting non-array type" ^ (T.toString thety) );
+                        (Error.error pos ("Error:subscripting non-array type: " ^ (T.toString thety) );
                         {exp = (), ty = T.INT}))
 
     and transDec (venv, tenv, A.VarDec{name,escape,typ,init,pos}) = 
@@ -278,10 +278,12 @@ struct
         (* TODO: check nil *)
             NONE => 
                 let 
-                    val {exp=_,ty} = transExp(venv,tenv,init)
+                    val {exp,ty} = transExp(venv,tenv,init)
                 in 
-                    {tenv=tenv,
-                    venv=S.enter(venv,name,E.VarEntry{ty=ty})}
+                    case ty of
+                        T.NIL => (Error.error pos "Error: nil cannot be used without type annotation"; {venv=venv,tenv=tenv})
+                        | _ =>  {tenv=tenv,
+                                venv=S.enter(venv,name,E.VarEntry{ty=ty})}
                 end
         | SOME(sym,pos) =>
             let
@@ -301,6 +303,7 @@ struct
             let    
                 val allTyName = map (fn {name,ty,pos} => name) tydecList
                 val uniqueMap: unit ref S.table ref = ref S.empty
+                val definedType: S.symbol list ref = ref []
                 (* keep track of the refs within the same dec group *)
                 fun getOrDefault(sym) = 
                     case S.look(!uniqueMap, sym) of
@@ -320,12 +323,23 @@ struct
                             let
                                 val ty = evalType(typ, [], pos)
                             in
-                                (* print ("makerec" ^"name: " ^ S.name name ^ " ty: " ^ T.toString ty ^ "\n"); *)
-                                (name,ty)::processFieldList(rest)
+                                (name, ty)::processFieldList(rest)
                             end
                     in
                         fn () => (processFieldList(fieldlist), unique)
                     end
+                 (* see if name is in this group or not*)
+                   (* if not in this group: look in tenv -> done*)
+                (* otherwise
+                   in visited?  cycle-->error
+                   not in visited? what kind of declaration?
+                       name -> recurse (and add to visited)
+                    Array -> recurse (and add to visited), but then return Array of those
+                    Record -> make Record *)
+                (* Example of 1 tydec in 1 TypeDec (mutgroup) *)    
+                (* "type a = b type b = int" is: makeRec(a) => RECORD(fn() => ([(b* (fn()->makeRec b))] *unique)) *)
+                (* " type x = {y:b,z:string, r:s}", tyname=x,cordT () is: makeRec(x) => RECORD (fn() => ([(y, (fn () -> makeRec b)), (z, string)] , unique)) *)
+                (* "type c = int" is: makeRec(c) => RECORD (fn() => ([(c,int)] * unique))*)
                 and evalType(name: S.symbol, visited: S.symbol list, pos): T.ty = 
                     if (List.exists (fn n => name = n) allTyName)
                     then
@@ -350,64 +364,86 @@ struct
                     else (* not in group*)
                         case S.look(tenv, name) of
                             SOME(ty) => ty
-                            | NONE => (Error.error pos ("Error: undefined type: " ^ S.name name); T.IMPOSSIBLE)
+                            | NONE => (Error.error pos ("Error: undefined type in record type: " ^ S.name name); T.IMPOSSIBLE)
+                    
                 fun transTyDec ({name,ty,pos}, tenv) =
                     let
                         val ty' = evalType(name, [], pos)
-                                    
                     in
-                    (* TODO: records with inte *)
-                        case ty' of
-                            T.RECORD(f) =>
-                                let 
-                                    val (fields, unique) = f() 
-                                    in
-                                   ()
-                                end 
-                            | _ => (); 
-                         S.enter(tenv,name,ty')
+                    (* check error-inte case, prevent undefined type in record *)
+                        case List.exists (fn (n) => n = name) (!definedType) of
+                            true => Error.error pos ("Error: redefined type: " ^ S.name name)
+                            |false =>   case ty' of
+                                        T.RECORD(f) => (f(); ())
+                                        | _ => (); 
+                                    definedType := name :: !definedType;
+                                    S.enter(tenv, name, ty')
+                                   
+
                     end
-                 (* see if name is in this group or not*)
-                   (* if not in this group: look in tenv -> done*)
-                (* otherwise
-                   in visited?  cycle-->error
-                   not in visited? what kind of declaration?
-                       name -> recurse (and add to visited)
-                    Array -> recurse (and add to visited), but then return Array of those
-                    Record -> make Record *)
-                (* Example of 1 tydec in 1 TypeDec (mutgroup) *)    
-                (* "type a = b type b = int" is: makeRec(a) => RECORD(fn() => ([(b* (fn()->makeRec b))] *unique)) *)
-                (* " type x = {y:b,z:string, r:s}", tyname=x,cordT () is: makeRec(x) => RECORD (fn() => ([(y, (fn () -> makeRec b)), (z, string)] , unique)) *)
-                (* "type c = int" is: makeRec(c) => RECORD (fn() => ([(c,int)] * unique))*)
+                
             in
                 {venv=venv,
                 tenv=foldl transTyDec tenv tydecList}
           end
 
         (* Nonrecursive FuncDec *)
+        (*makeFun, *)
         | transDec(venv,tenv, A.FunctionDec fundecList) =
             let
-                fun transFunDec ({name,params,result,body,pos}: A.fundec,venv): venv =
-                    let val result_ty = case result of
+                val allFunName = map (fn {name,params,result,body,pos} => name) fundecList
+                val definedFun: S.symbol list ref = ref []
+                fun addAllHeaderToEnv(fundecList): venv = 
+                    let
+                        fun addHeaderToEnv({name,params,result,body,pos}, venv: venv) = 
+                            let 
+                                val result_ty = case result of
                                     NONE => T.UNIT
                                   | SOME(rt,pos) => symToType (tenv, rt, pos)
-                                   
+                                fun transparam ({name,escape,typ,pos}: A.field) =
+                                    {name=name, ty=symToType (tenv, typ, pos)}
+                                val params' = map transparam params
+                                val venv' = S.enter(venv,name,
+                                            E.FunEntry{formals= map #ty params',
+                                                    result=result_ty})
+                            in
+                               
+                                venv' (*venv'' FunEntry, all params*)
+                            end
+                    in
+                        foldl addHeaderToEnv venv fundecList
+                    end
+                
+
+                (* temp_venv only contains signature of the function in a group, this is for recursive call validation checking only. *)
+                val temp_venv = addAllHeaderToEnv(fundecList) 
+                fun transFunDec ({name,params,result,body,pos}: A.fundec, venv): venv =
+                    let 
+                        val result_ty = case result of
+                                    NONE => T.UNIT
+                                  | SOME(rt,pos) => symToType (tenv, rt, pos)
+                       
+                        
                         fun transparam ({name,escape,typ,pos}:A.field) =
                             {name=name, ty=symToType (tenv,typ, pos)}
                         val params' = map transparam params
-                        val venv' = S.enter(venv,name,
-                                    E.FunEntry{formals= map #ty params',
-                                            result=result_ty})
                         fun enterparam ({name,ty},venv) =
                                     S.enter(venv,name, E.VarEntry{ty=ty})
-                        val venv'' = foldl enterparam venv' params' 
+                        val venv'' = foldl enterparam temp_venv params' 
                         val {exp=_,ty=calcTy} = transExp(venv'',tenv, body)
+                        (* val () = print (S.name name ^ "Result type:" ^ (T.toString result_ty) ^ "\n")
+                        val () = print (S.name name ^ "Body calculated type:" ^ (T.toString calcTy) ^ "\n")
+                        val () = print(Bool.toString (not (T.matchType(result_ty,calcTy))) ^ "\n") *)
                     in 
-                        if not(T.matchType(result_ty,calcTy))(* check bodyType = declared return type *)
-                        then (Error.error pos "Error: function bodyType mismatched returnType"; 
-                            venv
-                        )
-                        else venv'
+                        case List.exists (fn (n) => n = name) (!definedFun) of
+                            true => (Error.error pos ("Error: redefined function: " ^ S.name name); venv)
+                            | false => 
+                                if not (T.matchType(result_ty,calcTy))(* check bodyType = declared return type *)
+                                then (Error.error pos "Error: function bodyType mismatched returnType"; 
+                                    venv
+                                )
+                                else (definedFun := name :: !definedFun;
+                                    S.enter(venv,name,E.FunEntry{formals=map #ty params',result=result_ty}))
                     end
             in
                 {venv=foldl transFunDec venv fundecList,

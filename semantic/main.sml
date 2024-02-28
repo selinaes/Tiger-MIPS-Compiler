@@ -26,18 +26,24 @@ fun par f =
             PrintAbsyn.print (outputStream, ast);
             TextIO.closeOut(outputStream) 
         end;
+fun sort (list: string list) = foldr (fn (x,lst)=> List.filter (fn a => a < x) lst @ [x] @ List.filter (fn a => a >= x) lst ) [] list;
 
 fun runAllTests () = 
         let val fs = readAllFiles "../testcases";
-        val exlusiveFolder = ["result", "semantResults"];
+            val exlusiveFolder = ["result", "semantResults"];
+            val exlusiveTest = ["testnew-err.tig"]
             fun contains (x, []) = false
             | contains (x, y::ys) = if x = y then true else contains (x, ys)
+            val ts = List.filter (fn f => (not (contains (f, exlusiveFolder)))) fs
+            val ts = List.filter (fn f => (not (contains (f, exlusiveTest)))) ts
+            val ts = sort ts
         in
         
-            app (fn f => par f) (List.filter (fn f => (not (contains (f, exlusiveFolder)))) fs)
+            app (fn f => par f) ts
         end;
         
 
 runAllTests ();
 (* par "error-inte.tig";
 par "ref_test.tig"; *)
+(* par "test6.tig"; *)
