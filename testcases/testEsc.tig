@@ -1,3 +1,4 @@
+/* error: fun z sig not match, should not add to venv */
 let 
     function x(x1:int):int = 
     let
@@ -17,6 +18,6 @@ in
                  x4 + x2
        
     in
-        z(1);
+        z(1)
     end
 end

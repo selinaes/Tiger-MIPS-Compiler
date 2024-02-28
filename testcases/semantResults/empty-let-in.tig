@@ -1,4 +1,0 @@
-LetExp([
- VarDec(x,false,NONE,
-  IntExp(1))],
- SeqExp[])

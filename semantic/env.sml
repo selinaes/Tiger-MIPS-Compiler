@@ -25,7 +25,7 @@ struct
                     (Symbol.symbol "substring", FunEntry{formals=[Types.STRING, Types.INT, Types.INT], result=Types.STRING}),
                     (Symbol.symbol "concat", FunEntry{formals=[Types.STRING, Types.STRING], result=Types.STRING}),
                     (Symbol.symbol "not", FunEntry{formals=[Types.INT], result=Types.INT}),
-                    (Symbol.symbol "exit", FunEntry{formals=[Types.INT], result=Types.UNIT})
+                    (Symbol.symbol "exit", FunEntry{formals=[Types.INT], result=Types.IMPOSSIBLE})
                 ]
         in
             foldr (fn ((s, t), acc) => Symbol.enter(acc, s, t)) Symbol.empty baseFunctions

@@ -29,8 +29,10 @@ struct
     
     fun checkTwoInts (left, right,pos) = (checkint(left, pos); checkint(right, pos))
 
-    fun checkUnit ({exp,ty=T.UNIT},pos) = ()
-    | checkUnit (_,pos) = Error.error pos ("Error: non-unit provided")
+    fun checkUnit (expty: expty,pos) = 
+        if T.matchType(T.UNIT, #ty expty)
+        then ()
+        else Error.error pos ("Error: non-unit provided")
 
     fun checkstr({exp,ty=T.STRING},pos) = ()
     | checkstr(_,pos) = Error.error pos ("Error: non-string provided")
@@ -39,21 +41,10 @@ struct
     | checkTwoIntsOrStrs({exp=_, ty=T.STRING}, {exp=_, ty=T.STRING}, pos) = ()
     | checkTwoIntsOrStrs(_,_,pos) = Error.error pos ("Error: non-integer or non-string provided using comparison operator")
 
-    fun checkTwoEqTypes ({exp=_, ty=T.INT}, {exp=_, ty=T.INT}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.STRING}, {exp=_, ty=T.STRING}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.RECORD(f1)}, {exp=_, ty=T.RECORD(f2)}, pos) = 
-        let val (_, unique1) = f1()
-            val (_, unique2) = f2()
-        in
-            if unique1 = unique2 
-            then () 
-            else Error.error pos ("Error: comparing two different records at pos: " ^ (Int.toString pos))
-        end
-    | checkTwoEqTypes ({exp=_, ty=T.NIL}, {exp=_, ty=T.RECORD(_)}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.RECORD(_)}, {exp=_, ty=T.NIL}, pos) = ()
-    | checkTwoEqTypes ({exp=_, ty=T.ARRAY(_,unique1)}, {exp=_, ty=T.ARRAY(_,unique2)}, pos) = if unique1 = unique2 then () else Error.error pos ("Error: comparing two different arrays at pos: " ^ (Int.toString pos))
-    | checkTwoEqTypes ({exp=_, ty=T.NIL}, {exp=_, ty=T.NIL}, pos) = ()
-    | checkTwoEqTypes(_,_,pos) = Error.error pos ("Error: comparing two different types" )
+     fun checkTwoEqTypes ({exp=_, ty=t1}, {exp=_, ty=t2}, pos) = 
+        if T.matchType(t1,t2)
+        then ()    
+        else ErrorMsg.error pos ("Comparison of incompatible types. Comparing " ^ T.toString t1 ^ ", " ^ T.toString t2) ;
 
     fun transExp(venv,tenv,exp): expty =
         let 
@@ -61,13 +52,12 @@ struct
             |   trop (left,A.MinusOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
             |   trop (left,A.TimesOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
             |   trop (left,A.DivideOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
-            |   trop (left,A.EqOp,right,pos) = (checkTwoEqTypes(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
-            |   trop (left,A.NeqOp,right,pos) = (checkTwoEqTypes(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.EqOp,right,pos) = (checkTwoEqTypes(trexp left,trexp right, pos);{exp=(),ty=Types.INT})
+            |   trop (left,A.NeqOp,right,pos) = (checkTwoEqTypes(trexp left,trexp right, pos);{exp=(),ty=Types.INT})
             |   trop (left,A.LtOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
             |   trop (left,A.LeOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
             |   trop (left,A.GtOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
             |   trop (left,A.GeOp,right,pos) = (checkTwoIntsOrStrs(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
-            (* | trop _ = {exp=(),ty=Types.INT} *)
         
         and trcall (func,args,pos) = 
             case S.look(venv,func) of 
@@ -141,17 +131,18 @@ struct
         and trif (test,then',else',pos) = case else' of 
             NONE => 
                 let 
+                    val {exp=t,ty=testty} = trexp test
                     val {exp, ty} = trexp then'
                 in
-                    checkint(trexp test, pos);
-                    {exp=(),ty=T.UNIT}
+                    T.matchType(T.INT,testty);
+                    {exp=(),ty=T.UNIT} (* findLUB(unit, ty)*)
                 end
             | SOME(else') => 
-                let val {exp=t,ty} = trexp test
+                let val {exp=t,ty=testty} = trexp test
                     val {exp=th,ty=tht} = trexp then'
                     val {exp=el,ty=elt} = trexp else'
                 in
-                    checkint(trexp test,pos);
+                    T.matchType(T.INT,testty);
                     {exp=(),ty=T.findLUB(tht,elt)}
                 end
 
@@ -228,7 +219,7 @@ struct
                 (case S.look(venv,id) of 
                     SOME(E.VarEntry{ty}) =>
                         {exp=(), ty=ty}
-                    | _ => (Error.error pos ("Error:undefined variable "^ S.name id);
+                    | _ => (Error.error pos ("Error: undefined variable "^ S.name id);
                                 {exp=(), ty=T.INT}))
         | transVar(venv,tenv,A.FieldVar(v,id,pos))  = 
                 (case transVar (venv, tenv, v) of
@@ -248,7 +239,7 @@ struct
                                 SOME fieldTy =>
                                     {exp = (), ty = fieldTy}
                                 | NONE =>
-                                    (Error.error pos ("Error:undefined field " ^ S.name id ^ " in record");
+                                    (Error.error pos ("Error: undefined field " ^ S.name id ^ " in record");
                                     {exp = (), ty = T.INT})
                         end
                     | _ =>
@@ -423,7 +414,6 @@ struct
                                     NONE => T.UNIT
                                   | SOME(rt,pos) => symToType (tenv, rt, pos)
                        
-                        
                         fun transparam ({name,escape,typ,pos}:A.field) =
                             {name=name, ty=symToType (tenv,typ, pos)}
                         val params' = map transparam params

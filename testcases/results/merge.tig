@@ -3,7 +3,7 @@ LetExp([
   (any,
    RecordTy[
     (any,false,int)])],
- VarDec(buffer,false,NONE,
+ VarDec(buffer,true,NONE,
   CallExp(getchar,[])),
  FunctionDec[
   (readint,[

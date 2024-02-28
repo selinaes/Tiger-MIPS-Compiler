@@ -1,9 +1,0 @@
-LetExp([
- TypeDec[
-  (a,
-   NameTy(b)),
-  (b,
-   NameTy(c)),
-  (c,
-   NameTy(int))]],
- SeqExp[])

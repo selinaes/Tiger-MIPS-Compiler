@@ -1,7 +1,7 @@
 LetExp([
  FunctionDec[
   (x,[
-   (x1,false,int)],
+   (x1,true,int)],
 SOME(int),
    LetExp([
     FunctionDec[
@@ -13,7 +13,7 @@ SOME(int),
         SimpleVar(x1))))]],
     SeqExp[
      SeqExp[]]))],
- VarDec(x2,false,SOME(int),
+ VarDec(x2,true,SOME(int),
   IntExp(3)),
  VarDec(x3,false,SOME(int),
   IntExp(3))],
@@ -41,5 +41,4 @@ x4,false,
         SimpleVar(x2)))))]],
    SeqExp[
     CallExp(z,[
-     IntExp(1)]),
-    BreakExp])])
+     IntExp(1)])])])
