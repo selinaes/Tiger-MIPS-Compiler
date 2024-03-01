@@ -155,7 +155,7 @@ struct
             {exp=(),ty=Types.UNIT})
             
         and trfor (var,escape,lo,hi,body,pos) = 
-               let val venv' = S.enter(venv,var,E.VarEntry{ty=Types.INT})
+               let val venv' = S.enter(venv,var,E.VarEntry{access=TR.allocLocal(level, !escape),ty=Types.INT})
                 in
                     checkint(trexp lo,pos);
                     checkint(trexp hi,pos);
@@ -218,7 +218,7 @@ struct
             
     and transVar(venv,tenv,level, A.SimpleVar(id,pos)): expty = 
                 (case S.look(venv,id) of 
-                    SOME(E.VarEntry{ty}) =>
+                    SOME(E.VarEntry{access, ty}) =>
                         {exp=(), ty=ty}
                     | _ => (Error.error pos ("Error: undefined variable "^ S.name id);
                                 {exp=(), ty=T.IMPOSSIBLE}))
@@ -424,9 +424,9 @@ struct
                             {name=name, ty=symToType (tenv,typ, pos), escape=escape}
                         val params' = map transparam params
                         val level' = TR.newLevel(level, name, map #escape params')
-                        val formalsList = TR.formals level'
+                        val formalsList = TR.formals level' (* [sl, 1stformal, 2ndformal]*)
                         fun enterparam ({name,ty,escape}, (venv, index)) =
-                                S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, index), ty=ty})
+                                (S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, 1), ty=ty}), index + 1)
                         val (venv'', _) = foldl enterparam (temp_venv, 1) params' 
                         val {exp=_,ty=calcTy} = transExp(venv'',tenv, level', body)
                     in 
