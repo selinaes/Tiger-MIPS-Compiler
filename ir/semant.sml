@@ -6,6 +6,7 @@ struct
     structure E = Env
     structure T = Types
     structure Error = ErrorMsg
+    structure TR = Translate
 
     type expty = {exp: Translate.exp, ty: Types.ty}
     type venv = Env.enventry Symbol.table 
@@ -46,7 +47,7 @@ struct
         then ()    
         else ErrorMsg.error pos ("Comparison of incompatible types. Comparing " ^ T.toString t1 ^ ", " ^ T.toString t2) ;
 
-    fun transExp(venv,tenv,exp): expty =
+    fun transExp(venv,tenv,level,exp): expty =
         let 
         fun trop (left,A.PlusOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
             |   trop (left,A.MinusOp,right,pos) = (checkTwoInts(trexp left,trexp right,pos);{exp=(),ty=Types.INT})
@@ -61,7 +62,7 @@ struct
         
         and trcall (func,args,pos) = 
             case S.look(venv,func) of 
-                SOME(E.FunEntry{formals,result}) => 
+                SOME(E.FunEntry{level,label,formals,result}) => 
                     let fun checkArgs([],[]) = true
                         | checkArgs([],_) = (Error.error pos ("Error: too many arguments"); false)
                         | checkArgs(_,[]) = (Error.error pos ("Error: too few arguments"); false)
@@ -159,7 +160,7 @@ struct
                     checkint(trexp lo,pos);
                     checkint(trexp hi,pos);
                     LoopCounter.enter();
-                    checkUnit(transExp (venv',tenv,body), pos);
+                    checkUnit(transExp (venv',tenv,level,body), pos);
                     LoopCounter.exit();
                     {exp=(),ty=Types.UNIT}
                  end
@@ -169,7 +170,7 @@ struct
             let 
                 val {venv=venv',tenv=tenv'} = foldl (fn (dec, {venv=v',tenv=t'}) => transDec (v', t', dec)) {venv=venv, tenv=tenv} decs
             in
-                transExp(venv',tenv',body)
+                transExp(venv',tenv',level,body)
             end
 
         and trarray (typ,size,init,pos) = 
@@ -215,13 +216,13 @@ struct
             trexp exp
         end
             
-    and transVar(venv,tenv,A.SimpleVar(id,pos)): expty = 
+    and transVar(venv,tenv,level, A.SimpleVar(id,pos)): expty = 
                 (case S.look(venv,id) of 
                     SOME(E.VarEntry{ty}) =>
                         {exp=(), ty=ty}
                     | _ => (Error.error pos ("Error: undefined variable "^ S.name id);
                                 {exp=(), ty=T.IMPOSSIBLE}))
-        | transVar(venv,tenv,A.FieldVar(v,id,pos))  = 
+        | transVar(venv,tenv,level,A.FieldVar(v,id,pos))  = 
                 (case transVar (venv, tenv, v) of
                     {exp = vexp, ty = T.RECORD(f)} =>
                         let
@@ -245,11 +246,11 @@ struct
                     | _ =>
                         (Error.error pos "Error:accessing fields of a non-record type";
                         {exp = (), ty = T.IMPOSSIBLE}))
-        | transVar (venv, tenv, A.SubscriptVar(v,exp,pos)) =  
+        | transVar (venv, tenv, level, A.SubscriptVar(v,exp,pos)) =  
                 (case transVar (venv, tenv, v) of
                     {exp = vexp, ty = T.ARRAY (elementTy,_)} =>
                         let
-                            val index = transExp (venv, tenv, exp)
+                            val index = transExp (venv, tenv, level, exp)
                         in
                             case #ty index of
                                 T.INT =>
@@ -264,33 +265,34 @@ struct
                         (Error.error pos ("Error:subscripting non-array type: " ^ (T.toString thety) );
                         {exp = (), ty = T.IMPOSSIBLE}))
 
-    and transDec (venv, tenv, A.VarDec{name,escape,typ,init,pos}) = 
+    and transDec (venv, tenv, level, A.VarDec{name,escape,typ,init,pos}) = 
         (case typ of 
-        (* TODO: check nil *)
             NONE => 
                 let 
-                    val {exp,ty} = transExp(venv,tenv,init)
+                    val {exp,ty} = transExp(venv,tenv,level,init)
+                    val access = TR.allocLocal level !escape
                 in 
                     case ty of
                         T.NIL => (Error.error pos "Error: nil cannot be used without type annotation"; {venv=venv,tenv=tenv})
                         | _ =>  {tenv=tenv,
-                                venv=S.enter(venv,name,E.VarEntry{ty=ty})}
+                                venv=S.enter(venv,name,E.VarEntry{access=access, ty=ty})}
                 end
-        | SOME(sym,pos) =>
-            let
-                val {exp=initExp,ty=calcTy} = transExp(venv,tenv,init)
-                val typ = symToType (tenv, sym, pos)
-            in
-                if not(T.matchType(typ,calcTy))
-                then (Error.error pos "Error: type mismatch"; 
-                    {venv=venv,tenv=tenv})
-                else {
-                    venv=S.enter(venv,name,E.VarEntry{ty=typ}),
-                    tenv=tenv
-                }
-            end)
-                (* Nonrecursive TypeDec *)
-        | transDec (venv,tenv,A.TypeDec tydecList) =
+            | SOME(sym,pos) =>
+                let
+                    val {exp=initExp,ty=calcTy} = transExp(venv,tenv,level,init)
+                    val access = TR.allocLocal level !escape
+                    val typ = symToType (tenv, sym, pos)
+                in
+                    if not(T.matchType(typ,calcTy))
+                    then (Error.error pos "Error: type mismatch"; 
+                        {venv=venv,tenv=tenv})
+                    else {
+                        venv=S.enter(venv,name,E.VarEntry{access=access, ty=typ}),
+                        tenv=tenv
+                    }
+                end)
+        (* Nonrecursive TypeDec *)  
+        | transDec (venv,tenv,level,A.TypeDec tydecList) =
             let    
                 val allTyName = map (fn {name,ty,pos} => name) tydecList
                 val uniqueMap: unit ref S.table ref = ref S.empty
@@ -380,10 +382,12 @@ struct
 
         (* Nonrecursive FuncDec *)
         (*makeFun, *)
-        | transDec(venv,tenv, A.FunctionDec fundecList) =
+        | transDec(venv,tenv, level, A.FunctionDec fundecList) =
             let
+                
                 val allFunName = map (fn {name,params,result,body,pos} => name) fundecList
                 val definedFun: S.symbol list ref = ref []
+                (* this is to prepare a temp venv that only contains signature of the functions in a group *)
                 fun addAllHeaderToEnv(fundecList): venv = 
                     let
                         fun addHeaderToEnv({name,params,result,body,pos}, venv: venv) = 
@@ -392,10 +396,12 @@ struct
                                     NONE => T.UNIT
                                   | SOME(rt,pos) => symToType (tenv, rt, pos)
                                 fun transparam ({name,escape,typ,pos}: A.field) =
-                                    {name=name, ty=symToType (tenv, typ, pos)}
+                                {name=name, ty=symToType (tenv, typ, pos)}
                                 val params' = map transparam params
+                                 (* val level' = TR.newLevel(level, name, map #escape params') *)
+                                 (* level is is a dummy value for temp venv *)
                                 val venv' = S.enter(venv,name,
-                                            E.FunEntry{formals= map #ty params',
+                                            E.FunEntry{level=level,label=TE.newlabel(), formals= map #ty params',
                                                     result=result_ty})
                             in
                                
@@ -414,16 +420,15 @@ struct
                                     NONE => T.UNIT
                                   | SOME(rt,pos) => symToType (tenv, rt, pos)
                        
-                        fun transparam ({name,escape,typ,pos}:A.field) =
-                            {name=name, ty=symToType (tenv,typ, pos)}
+                        fun transparam ({name,escape,typ,pos}: A.field) =
+                            {name=name, ty=symToType (tenv,typ, pos), escape=escape}
                         val params' = map transparam params
-                        fun enterparam ({name,ty},venv) =
-                                    S.enter(venv,name, E.VarEntry{ty=ty})
-                        val venv'' = foldl enterparam temp_venv params' 
-                        val {exp=_,ty=calcTy} = transExp(venv'',tenv, body)
-                        (* val () = print (S.name name ^ "Result type:" ^ (T.toString result_ty) ^ "\n")
-                        val () = print (S.name name ^ "Body calculated type:" ^ (T.toString calcTy) ^ "\n")
-                        val () = print(Bool.toString (not (T.matchType(result_ty,calcTy))) ^ "\n") *)
+                        val level' = TR.newLevel(level, name, map #escape params')
+                        val formalsList = TR.formals level'
+                        fun enterparam ({name,ty,escape}, (venv, index)) =
+                                S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, index), ty=ty})
+                        val (venv'', _) = foldl enterparam (temp_venv, 1) params' 
+                        val {exp=_,ty=calcTy} = transExp(venv'',tenv, level', body)
                     in 
                         case List.exists (fn (n) => n = name) (!definedFun) of
                             true => (Error.error pos ("Error: redefined function: " ^ S.name name); venv)
@@ -433,7 +438,7 @@ struct
                                     venv
                                 )
                                 else (definedFun := name :: !definedFun;
-                                    S.enter(venv,name,E.FunEntry{formals=map #ty params',result=result_ty}))
+                                    S.enter(venv,name,E.FunEntry{level=level', label=TE.newlabel (), formals=map #ty params',result=result_ty}))
                     end
             in
                 {venv=foldl transFunDec venv fundecList,
@@ -442,7 +447,7 @@ struct
 
 
     fun transProg exp = 
-        let val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, exp)
+        let val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, TR.outermost, exp)
         in
             if T.matchType(Types.UNIT, ty)
             then ()
