@@ -3,9 +3,15 @@ structure MipsFrame : FRAME = struct
     (* name: tag of the frame, formals: functions arguments, stackSize: size of the frmae, 4 * #(formals + locals)) *)
     type frame = {name: Temp.label, formals: access list, stackSize: int ref}
 
+    val FP = Temp.newtemp()
+    val RV = Temp.newtemp()
+    
     val wordSize = 4
     val kDefaultRegSize = 4 (* MIPS has 4 registers for function arguments *)
-    
+
+    datatype frag = PROC of {body: Tree.stm, frame: frame} 
+                | STRING of Temp.label * string
+
     fun newFrame {name: Temp.label, formals: bool list} : frame = 
         let
             val curSize = ref 0
@@ -35,6 +41,13 @@ structure MipsFrame : FRAME = struct
             end
         else
             InReg(Temp.newtemp())
+
+    fun exp(InFrame offset) = Tree.MEM(Tree.BINOP(Tree.PLUS, Tree.TEMP FP, Tree.CONST offset))
+      | exp(InReg reg) = Tree.TEMP reg
+
+    fun procEntryExit1(frame,body) = body
+
+
 end
 
 structure Frame : FRAME = MipsFrame

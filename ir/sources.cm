@@ -17,6 +17,13 @@ tiger.grm
 env.sig
 env.sml
 types.sml
+temp.sig
+temp.sml
+tree.sml
+frame.sig
+frame.sml
+translate.sig
+translate.sml
 semant.sml
 semant.sig
 
