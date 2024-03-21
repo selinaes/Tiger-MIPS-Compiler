@@ -13,7 +13,7 @@ signature FRAME = sig
     (*Frame.allocLocal(f)(true) -> allocate a new localVar in frame f. T=escape, frame, F = to reg Temp*)
     val allocLocal : frame -> bool -> access 
     
-    val exp : access -> Tree.exp -> Tree.exp
+    val exp : access -> Tree.exp -> Tree.exp (* InFrame/InReg -> (cury)frame pointer -> IR MEM/TEMP *)
     val procEntryExit1 : frame * Tree.stm -> Tree.stm
     val externalCall: string * Tree.exp list -> Tree.exp
 

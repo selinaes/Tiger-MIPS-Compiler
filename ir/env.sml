@@ -5,9 +5,9 @@ struct
     (* type ty = Types.ty *)
     structure TR = Translate
     structure TE = Temp
-    datatype enventry = VarEntry of {access: Translate.access, ty: ty}  (* ty: ty *)
-    | FunEntry of {level: Translate.level, label: Temp.label,
-                    formals: ty list, result: ty}  (* formals: ty list, result: ty *)
+    datatype enventry =   VarEntry of {access: Translate.access, ty: ty}  (* ty: ty *)
+                        | FunEntry of {level: Translate.level, label: Temp.label,
+                                        formals: ty list, result: ty}  (* formals: ty list, result: ty *)
     val base_tenv : Types.ty Symbol.table (* predefined types*) = 
         let
             val baseTypes = [(Symbol.symbol "int", Types.INT), (Symbol.symbol "string", Types.STRING)]

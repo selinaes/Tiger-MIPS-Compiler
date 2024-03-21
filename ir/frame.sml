@@ -42,8 +42,8 @@ structure MipsFrame : FRAME = struct
         else
             InReg(Temp.newtemp())
 
-    fun exp(InFrame offset) = Tree.MEM(Tree.BINOP(Tree.PLUS, Tree.TEMP FP, Tree.CONST offset))
-      | exp(InReg reg) = Tree.TEMP reg
+    fun exp(InFrame offset) fp = Tree.MEM(Tree.BINOP(Tree.PLUS, fp, Tree.CONST offset))
+      | exp(InReg reg) fp = Tree.TEMP reg
 
     fun procEntryExit1(frame,body) = body
 
