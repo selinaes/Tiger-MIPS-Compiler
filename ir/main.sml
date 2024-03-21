@@ -20,11 +20,13 @@ fun par f =
             val ast = Parse.parse ("../testcases/" ^ f);
             val fName = "../testcases/results/" ^ f;
             val outputStream = TextIO.openOut fName; 
+            val _ = FindEscape.findEscape ast;
+            val frgaLst = Semant.transProg ast;
         in 
             (* Run the findEscape function on the test case *)
-            FindEscape.findEscape ast;
-            Semant.transProg ast;
-            PrintAbsyn.print (outputStream, ast);
+            
+            (* PrintAbsyn.print (outputStream, ast); *)
+            Printtree.printtree(frgaLst);
             TextIO.closeOut(outputStream) 
         end;
 

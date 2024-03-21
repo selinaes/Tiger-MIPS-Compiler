@@ -5,6 +5,7 @@ $/basis.cm
 $/ml-yacc-lib.cm
 absyn.sml
 prabsyn.sml
+printtree.sml
 errormsg.sml
 symbol.sml
 table.sig

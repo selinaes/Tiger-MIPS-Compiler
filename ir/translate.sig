@@ -15,7 +15,7 @@ sig
 
     val unEx: exp -> Tree.exp
     val unNx: exp -> Tree.stm
-    val unCx: exp -> (Temp.label * Temp.labels -> Tree.stm)
+    val unCx: exp -> (Temp.label * Temp.label -> Tree.stm)
 
     val simpleVar: access * level -> exp
     val fieldVar: exp * int -> exp
@@ -35,6 +35,6 @@ sig
     val recordIR: exp list -> exp
     val breakIR: Temp.label -> exp
     val callIR: Temp.label * exp list * level * level -> exp (** calling level and defined level *)
-    val binOpIR: Tr.binlop * exp * exp -> exp
-    val reOpIR: Tr.relop * exp * exp * Types.ty -> exp
+    val binOpIR: Tree.binop * exp * exp -> exp
+    val reOpIR: Tree.relop * exp * exp * Types.ty -> exp
 end

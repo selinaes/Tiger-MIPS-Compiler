@@ -129,7 +129,7 @@ struct
                             val front = List.take(exp, length exps - 1)
                             val expfront = map (fn ex => #exp (trexp ex)) front
                         in
-                            {exp=expfront@[#exp exptyLast],ty=#ty exptyLast}
+                            {exp=expfront@[#exp exptyLast],ty=(#ty exptyLast)}
                         end
 
 
@@ -139,7 +139,7 @@ struct
             in
                if T.matchType(vty,ety) 
                then ({exp = TS.assignIR(vloc,exp), ty = Types.UNIT})
-               else (Error.error pos ("Error: type mismatch"); {exp=(),ty=Types.IMPOSSIBLE})
+               else (Error.error pos ("Error: type mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
             end
 
         and trif (test, then', else', pos) = case else' of 
@@ -192,7 +192,7 @@ struct
         and trlet (decs,body,pos) = 
             let 
                 val {venv=venv',tenv=tenv',explist=explist'} = foldl (fn (dec, {venv=v',tenv=t',explist = e'}) => transDec (v', t', e', level, dec)) {venv=venv, tenv=tenv, explist=[]} decs
-                val {exp,ty} = transExp(venv',tenv',level,body)
+                val {exp,ty} = transExp(venv',tenv',level,body,doneLbl)
             in
                 {exp=TS.transLet(explist',body),ty=ty}
             end
@@ -209,8 +209,8 @@ struct
                         then 
                         (* (print ((S.name typ) ^" " ^  (T.toString ty)^ "\n"); *)
                         {exp=TS.arrayCreateIR(size', initExp),ty=T.ARRAY(ty,unique)}
-                        else (Error.error pos ("Error: type mismatch"); {exp=(),ty=Types.IMPOSSIBLE})
-                    | _ => (Error.error pos ("Error: undefined array type"); {exp=(),ty=Types.IMPOSSIBLE})
+                        else (Error.error pos ("Error: type mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
+                    | _ => (Error.error pos ("Error: undefined array type"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
             end
         
         and trbreak (pos) = 
@@ -223,9 +223,9 @@ struct
             case exp of 
                 A.OpExp{left,oper,right,pos} => trop(left,oper,right,pos)
                 | A.VarExp v => transVar (venv, tenv, v)
-                | A.NilExp => {exp=(),ty=Types.NIL}
-                | A.IntExp i => {exp=(),ty=Types.INT}
-                | A.StringExp s => {exp=(),ty=Types.STRING}
+                | A.NilExp => {exp=TS.nilIR(),ty=Types.NIL}
+                | A.IntExp i => {exp=TS.intIR(i),ty=Types.INT}
+                | A.StringExp s => {exp=TS.stringIR(s),ty=Types.STRING}
                 | A.CallExp{func,args,pos} => trcall(func,args,pos)
                 | A.RecordExp{fields,typ,pos} => trrecord(fields,typ,pos)
                 | A.SeqExp exps => trseq(exps)
@@ -245,7 +245,7 @@ struct
                     SOME(E.VarEntry{access, ty}) =>
                         {exp=TS.simpleVar(access,level), ty=ty}
                     | _ => (Error.error pos ("Error: undefined variable " ^ S.name id);
-                                {exp=(), ty=T.IMPOSSIBLE}))
+                                {exp=TS.dummy, ty=T.IMPOSSIBLE}))
         | transVar(venv,tenv,level,A.FieldVar(v,id,pos))  = 
                 (case transVar (venv, tenv, v) of
                     {exp = vexp, ty = T.RECORD(f)} =>
@@ -304,7 +304,7 @@ struct
                 end
             | SOME(sym,pos) =>
                 let
-                    val {exp=initExp,ty=calcTy} = transExp(venv,tenv,level,init,doneLbl
+                    val {exp=initExp,ty=calcTy} = transExp(venv,tenv,level,init,doneLbl)
                     val access = TS.allocLocal level !escape
                     val typ = symToType (tenv, sym, pos)
                 in
@@ -442,11 +442,12 @@ struct
                         fun enterparam ({name,ty,escape}, (venv, index)) =
                                 (S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, 1), ty=ty}), index + 1)
                         val (venv'', _) = foldl enterparam (temp_venv, 1) params' 
-                        val {exp=_,ty=calcTy} = transExp(venv'',tenv, level', body,doneLbl)
+                        val {exp=exp',ty=calcTy} = transExp(venv'',tenv, level', body,doneLbl)
                     in 
                         case List.exists (fn (n) => n = name) (!definedFun) of
                             true => (Error.error pos ("Error: redefined function: " ^ S.name name); venv)
                             | false => 
+                                TS.procEntryExit(level', exp');
                                 if not (T.matchType(result_ty,calcTy))(* check bodyType = declared return type *)
                                 then (Error.error pos "Error: function bodyType mismatched returnType"; 
                                     venv
@@ -468,7 +469,7 @@ struct
             val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, startLevel, exp, startLabel)
         in
             if T.matchType(Types.UNIT, ty)
-            then (TS.procEntryExit(startLevel, result); R.getResult())
+            then (TS.procEntryExit(startLevel, result); TS.getResult())
             else Error.error 0 "Error: top-level expression does not have type unit"
         end
 end

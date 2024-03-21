@@ -1,4 +1,5 @@
-structure MipsFrame : FRAME = struct
+structure MipsFrame : FRAME = 
+struct
     datatype access = InFrame of int | InReg of Temp.temp
     (* name: tag of the frame, formals: functions arguments, stackSize: size of the frmae, 4 * #(formals + locals)) *)
     type frame = {name: Temp.label, formals: access list, stackSize: int ref}
@@ -11,6 +12,18 @@ structure MipsFrame : FRAME = struct
 
     datatype frag = PROC of {body: Tree.stm, frame: frame} 
                 | STRING of Temp.label * string
+
+
+    fun printFrag(outputstream, []) = ()
+        | printFrag(outputstream, (PROC {body, frame}) :: frags) = 
+            (TextIO.output(outputstream, "PROC: " ^ Symbol.name (#name frame) ^ "\n");
+            Printtree.printtree(outputstream, body);
+            printFrag(outputstream, frags))
+            
+        | printFrag(outputstream, (STRING (label, str)) :: frags) = 
+            (TextIO.output(outputstream, "STRING: " ^ Symbol.name label ^ " " ^ str ^ "\n");
+            printFrag(outputstream, frags))
+            
 
     fun newFrame {name: Temp.label, formals: bool list} : frame = 
         let
@@ -28,8 +41,8 @@ structure MipsFrame : FRAME = struct
         end
 
 
-    fun name(frame): Temp.label = #name frame
-    fun formals(frame): access list = #formals frame
+    fun name(frame: frame): Temp.label = #name frame
+    fun formals(frame: frame): access list = #formals frame
     (*Frame.allocLocal(f)(true) -> allocate a new localVar in frame f. T=escape, frame, F = to reg Temp*)
     fun allocLocal ({name, formals, stackSize}: frame) (escape:bool) : access = 
         if escape then
@@ -48,6 +61,8 @@ structure MipsFrame : FRAME = struct
     fun procEntryExit1(frame,body) = body
 
 
+    fun externalCall(name: string, args: Tree.exp list): Tree.exp = 
+        Tree.CALL(Tree.NAME(Temp.namedlabel name), args)
 end
 
 structure Frame : FRAME = MipsFrame
