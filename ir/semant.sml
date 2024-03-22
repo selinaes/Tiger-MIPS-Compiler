@@ -423,13 +423,13 @@ struct
                                     NONE => T.UNIT
                                   | SOME(rt,pos) => symToType (tenv, rt, pos)
                                 fun transparam ({name,escape,typ,pos}: A.field) =
-                                {name=name, ty=symToType (tenv, typ, pos)}
+                                {name=name, ty=symToType (tenv, typ, pos), escape=escape}
                                 val params' = map transparam params
                                  (* val level' = TR.newLevel(level, name, map #escape params') *)
                                  (* level is is a dummy value for temp venv *)
                                 val venv' = S.enter(venv,name,
-                                            E.FunEntry{level=level,label=Temp.newlabel(), formals= map #ty params',
-                                                    result=result_ty})
+                                            E.FunEntry{level=TS.newLevel{parent=level, name=name, formals=(map (fn {ty,escape,...} => !escape) params')},
+                                                label=Temp.newlabel(), formals= map #ty params', result=result_ty})
                             in
                                 venv' (*venv'' FunEntry, all params*)
                             end
@@ -449,7 +449,12 @@ struct
                         fun transparam ({name,escape,typ,pos}: A.field) =
                             {name=name, ty=symToType (tenv,typ, pos), escape=escape}
                         val params' = map transparam params
-                        val level' = TS.newLevel{parent=level, name=name, formals=map (fn {ty,escape,...} => !escape) params'}
+                        val level' = (* TS.newLevel{parent=level, name=name, formals=map (fn {ty,escape,...} => !escape) params'} *)
+                                        (case S.look(temp_venv,name) of 
+                                            SOME(E.FunEntry{level=tempDefinedLevel,label,formals,result}) =>
+                                                tempDefinedLevel
+                                            | _ => (Error.error pos ("Error: Impossible case funDec unfound" ^ S.name name);
+                                                        TS.newLevel{parent=level, name=name, formals=[]}))
                         val formalsList = TS.formals level' (* [sl, 1stformal, 2ndformal]*)
                         fun enterparam ({name,ty,escape}, (venv, index)) =
                                 (S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, index), ty=ty}), index + 1)

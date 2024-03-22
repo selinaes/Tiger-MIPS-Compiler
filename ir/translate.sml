@@ -205,7 +205,7 @@ struct
         end
     | callIR(callLabel: Temp.label, args: exp list, LEVEL {parent, frame, unique}, callLevel: level): exp =
         let
-            val () = print("callIR: callLabel: " ^ (Symbol.name callLabel) ^ "\n")
+            (* val () = print("callIR: callLabel: " ^ (Symbol.name callLabel) ^ "\n") *)
             val foundLink = followLink(parent, callLevel)
             val exArgs: Tr.exp list = map unEx args
         in
