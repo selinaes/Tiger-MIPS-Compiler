@@ -21,12 +21,15 @@ fun par f =
             val fName = "../testcases/results/" ^ f;
             val outputStream = TextIO.openOut fName; 
             val _ = FindEscape.findEscape ast;
-            val frgaLst = Semant.transProg ast;
+            val fragLst = Semant.transProg ast;
         in 
+
+            TextIO.output(outputStream,"----------- AST -----------");
+            PrintAbsyn.print (outputStream, ast);
             (* Run the findEscape function on the test case *)
-            
-            (* PrintAbsyn.print (outputStream, ast); *)
-            Printtree.printtree(frgaLst);
+            TextIO.output(outputStream,"----------- IR -----------");
+            Frame.printFrag(outputStream, fragLst);
+            (* Printtree.printtree(outputStream, fragLst); *)
             TextIO.closeOut(outputStream) 
         end;
 
@@ -47,7 +50,8 @@ fun runAllTests () =
         end;
         
 
-runAllTests ();
+(* runAllTests (); *)
 (* par "error-inte.tig";
 par "ref_test.tig"; *)
 (* par "test6.tig"; *)
+par "merge.tig";

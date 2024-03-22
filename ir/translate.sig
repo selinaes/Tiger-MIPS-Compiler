@@ -3,9 +3,11 @@ signature TRANSLATE =
 sig
     type level
     type access (* not the same as Frame.access *)
-    val outermost : level
+    val outmost : level
     type exp
     val fragLst : Frame.frag list ref
+    val resetfragLst : unit -> unit
+    val dummy: exp
 
     val newLevel : {parent: level, name: Temp.label, formals: bool list} -> level 
     val formals: level -> access list
@@ -24,15 +26,15 @@ sig
     val ifThenIR: exp * exp  -> exp (*take in: if * then *)
     val ifThenElseIR: exp * exp * exp -> exp (* take in: if * then * else *)
     val whileIR: exp * exp * Temp.label -> exp
-    val forIR: exp * exp * exp * exp -> exp (* take in: vloc * lo * hi * body *)
+    val forIR: exp * exp * exp * exp * Temp.label -> exp (* take in: vloc * lo * hi * body *)
     val assignIR: exp * exp -> exp (* take in: vloc * assignmentExp *)
     val seqIR: exp list -> exp
     val nilIR: unit -> exp
     val letIR: exp list * exp -> exp (* takes in: declist * body *)
     val stringIR: string -> exp  (*mark*)
     val intIR: int -> exp
-    val arrayIR: exp * exp -> exp
-    val recordIR: exp list -> exp
+    val arrayCreateIR: exp * exp -> exp
+    val recordCreateIR: exp list -> exp
     val breakIR: Temp.label -> exp
     val callIR: Temp.label * exp list * level * level -> exp (** calling level and defined level *)
     val binOpIR: Tree.binop * exp * exp -> exp

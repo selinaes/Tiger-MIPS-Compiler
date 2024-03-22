@@ -5,9 +5,9 @@ struct
     (* type ty = Types.ty *)
     structure TR = Translate
     structure TE = Temp
-    datatype enventry =   VarEntry of {access: Translate.access, ty: ty}  (* ty: ty *)
+    datatype enventry =   VarEntry of {access: Translate.access, ty: Types.ty}  (* ty: ty *)
                         | FunEntry of {level: Translate.level, label: Temp.label,
-                                        formals: ty list, result: ty}  (* formals: ty list, result: ty *)
+                                        formals: Types.ty list, result: Types.ty}  (* formals: ty list, result: ty *)
     val base_tenv : Types.ty Symbol.table (* predefined types*) = 
         let
             val baseTypes = [(Symbol.symbol "int", Types.INT), (Symbol.symbol "string", Types.STRING)]
@@ -17,10 +17,14 @@ struct
 
     val base_venv : enventry Symbol.table (* predefinedfunctions*)  = 
         let 
+            val printlabel = TE.newlabel()
+            val () = print("printlabel: " ^ Symbol.name printlabel ^ "\n")
+            val getcharlabel = TE.newlabel()
+            val () = print("getcharlabel: " ^ Symbol.name getcharlabel ^ "\n")
             val baseFunctions = [
-                    (Symbol.symbol "print", FunEntry{level=TR.outmost, label=TE.newlabel(), formals=[Types.STRING], result=Types.UNIT}),
+                    (Symbol.symbol "print", FunEntry{level=TR.outmost, label=printlabel, formals=[Types.STRING], result=Types.UNIT}),
                     (Symbol.symbol "flush", FunEntry{level=TR.outmost, label=TE.newlabel(), formals=[], result=Types.UNIT}),
-                    (Symbol.symbol "getchar", FunEntry{level=TR.outmost, label=TE.newlabel(), formals=[], result=Types.STRING}),
+                    (Symbol.symbol "getchar", FunEntry{level=TR.outmost, label=getcharlabel, formals=[], result=Types.STRING}),
                     (Symbol.symbol "ord", FunEntry{level=TR.outmost, label=TE.newlabel(), formals=[Types.STRING], result=Types.INT}),
                     (Symbol.symbol "chr", FunEntry{level=TR.outmost, label=TE.newlabel(), formals=[Types.INT], result=Types.STRING}),
                     (Symbol.symbol "size", FunEntry{level=TR.outmost, label=TE.newlabel(), formals=[Types.STRING], result=Types.INT}),

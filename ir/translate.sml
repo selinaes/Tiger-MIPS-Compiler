@@ -4,7 +4,7 @@ struct
                  | Nx of Tree.stm (* any stm, can be SEQ *)
                  | Cx of Temp.label * Temp.label -> Tree.stm
     datatype level = OUTMOST | LEVEL of {parent : level, frame : Frame.frame, unique: unit ref}
-    val outermost = OUTMOST
+    val outmost = OUTMOST
     type access = level * Frame.access
     val fragLst: Frame.frag list ref = ref []
 
@@ -15,6 +15,9 @@ struct
     val dummy = Ex(Tr.CONST 0)
 
     fun getResult() = !fragLst
+
+    fun resetfragLst() = 
+        fragLst := []
     
     fun newLevel {parent: level, name: Temp.label, formals: bool list} : level =
         LEVEL {parent=parent, frame=Frame.newFrame({name = name, formals = true::formals}), unique=ref ()}
@@ -28,7 +31,7 @@ struct
     fun allocLocal OUTMOST (b:bool) : access = (Err.error 0 "cannot allocate at outmost frame. \n"; (OUTMOST, Frame.allocLocal (Frame.newFrame {name=Temp.newlabel(),formals=[]}) b))
     | allocLocal (LEVEL {parent, frame, unique}) (b:bool) : access = (LEVEL {parent=parent, frame=frame, unique=unique}, Frame.allocLocal frame b)
 
-    fun seq [s] = s 
+    fun seq [s] = s
         | seq (s::ss) = Tr.SEQ(s, seq ss)
         | seq [] = Tr.EXP(Tr.CONST 0) 
 
@@ -63,13 +66,13 @@ struct
 
 
 
-    fun followLink(OUTMOST, _ ): Tr.exp = 
-        (Err.impossible "followLink: does not find matched frame. "; Tr.CONST 0)
+    fun followLink(OUTMOST, _): Tr.exp = 
+        (Err.impossible  "followLink: does not find matched frame. definedLevel reach to outmost"; Tr.CONST 0)
     | followLink(_, OUTMOST): Tr.exp = 
-        (Err.impossible "followLink: does not find matched frame. "; Tr.CONST 0)
+        (Err.impossible "followLink: does not find matched frame. currentLevel reach to outmost"; Tr.CONST 0)
     | followLink(definedLevel, currentLevel): Tr.exp = 
-        let val LEVEL {parent=parentLevel, frame=frame, unique=unique} = currentLevel
-            val LEVEL {parent=parentLevel', frame=frame', unique=unique'} = definedLevel    
+        let val (LEVEL{parent=parentLevel, frame=frame, unique=unique}) = currentLevel
+            val (LEVEL{parent=parentLevel', frame=frame', unique=unique'}) = definedLevel    
         in
           if unique = unique'
                 then 
@@ -169,28 +172,8 @@ struct
                    Tr.LABEL breakLabel])
                    
         end
-
-
-    fun forIR(vloc:exp, lo: exp, hi: exp, body: exp): exp = 
-        let val lo' = unEx lo
-            val hi' = unEx hi
-            val body' = unNx body
-            val truelbl = Temp.newlabel() (*L2*)
-            val falselbl = Temp.newlabel() (*L3*)
-            val incrementlbl = Temp.newlabel() (*L1*)
-        in
-            Nx(seq[assignIR(vloc, lo'),
-                   Tr.CJUMP(Tr.LE, simpleVar(v, lev), hi', truelbl, falselbl),
-                   Tr.LABEL incrementlbl,
-                   assignIR(vloc, transBinOp(Tr.PLUS, simpleVar(v, lev), intIR 1)),
-                   Tr.LABEL truelbl,
-                   body',
-                   Tr.CJUMP(Tr.LT, simpleVar(v, lev), hi', incrementlbl, falselbl),
-                   Tr.LABEL falselbl])
-        end
-    
    
-    fun letIR([], body) = Ex body
+    fun letIR([], body): exp = body
         | letIR(declist: exp list, body: exp) = Ex(Tr.ESEQ(seq(map unNx declist), unEx body))
 
     (* Translate.exp list, handle each *)
@@ -201,30 +184,32 @@ struct
     fun nilIR(): exp = Ex(Tr.CONST 0)
 
 
-    fun assignIR(varloc: exp, assigned: exp) =
+    fun assignIR(varloc: exp, assigned: exp) : exp =
         let val var' = unEx varloc
             val assigned' = unEx assigned
         in
             Nx(Tr.MOVE(var', assigned'))
         end
 
+
+
     fun breakIR(label: Temp.label): exp = 
-        Nx(Tr.JUMP (Tr.Name label, [label]))
+        Nx(Tr.JUMP (Tr.NAME label, [label]))
 
 (* TODO: call on outmost frame, what should we do? *)
-    fun callIR(callLabel: Temp.label, args: exp list, OUTMOST, callLevel: level): exp =
+    fun callIR(callLabel: Temp.label, args: exp list, OUTMOST , callLevel: level): exp =
         let
-            val foundLink = followLink(parent, callLevel)
-            val exArgs: exp list = map (fn a => unEx a) args
+            val exArgs: Tr.exp list = map (fn a => unEx a) args
         in
-            Ex(Tr.CALL(Tr.Name callLabel, exArgs))
+            Ex(Tr.CALL(Tr.NAME callLabel, exArgs))
         end
-    | callIR(callLabel: Temp.label, args: exp list, LEVEL {parent, frame, unique}, callLevel: level): Ex =
+    | callIR(callLabel: Temp.label, args: exp list, LEVEL {parent, frame, unique}, callLevel: level): exp =
         let
+            val () = print("callIR: callLabel: " ^ (Symbol.name callLabel) ^ "\n")
             val foundLink = followLink(parent, callLevel)
-            val exArgs: exp list = map (fn a => unEx a) args
+            val exArgs: Tr.exp list = map unEx args
         in
-            Ex(Tr.CALL(Tr.Name callLabel, foundLink :: exArgs))
+            Ex(Tr.CALL(Tr.NAME callLabel, foundLink :: exArgs))
         end
 
 
@@ -242,23 +227,25 @@ struct
         in
             case (ty, relop) of 
                  (T.STRING, Tr.EQ) => Ex(Frame.externalCall("stringEqual", [left', right']))
-                | (T.String, Tr.NE) => Ex(Frame.externalCall("stringNe", [left', right']))
+                | (T.STRING, Tr.NE) => Ex(Frame.externalCall("stringNe", [left', right']))
                 | (T.STRING, Tr.LT) => Ex(Frame.externalCall("stringLt", [left', right']))
-                | (T.String, Tr.GT) => Ex(Frame.externalCall("stringGt", [left', right']))
+                | (T.STRING, Tr.GT) => Ex(Frame.externalCall("stringGt", [left', right']))
                 | (T.STRING, Tr.LE) => Ex(Frame.externalCall("stringLe", [left', right']))
-                | (T.String, Tr.GE) => Ex(Frame.externalCall("stringGe", [left', right']))
+                | (T.STRING, Tr.GE) => Ex(Frame.externalCall("stringGe", [left', right']))
                 | _ => Cx(fn (t, f) => Tr.CJUMP(relop, left', right', t, f))
         end
         
     (* todo: check str literal exist *)
     fun stringIR(str: string): exp = 
         let val lbl = Temp.newlabel()
-            fun findStrLiteral(lstLbl, lstStr): bool = 
-                str = lstStr
+            fun findStrLiteral (Frame.STRING(lstLbl, lstStr)): bool = (str = lstStr)
+              | findStrLiteral (Frame.PROC{body=body, frame=frame}): bool = false
+                
         in
-            case (List.find findStrLiteral fragLst) of
-                SOME x => Ex(Tr.NAME x)
-                | NONE => (fragLst := !fragLst @ Frame.STRING(lbl, str); Ex(Tr.NAME lbl))
+            case (List.find findStrLiteral (!fragLst)) of
+                SOME (Frame.STRING(lstLbl, lstStr)) => Ex(Tr.NAME lstLbl)
+                | NONE => (fragLst := !fragLst @ [Frame.STRING(lbl, str)]; Ex(Tr.NAME lbl))
+                | _ => (Err.error 0 "stringIR: impossible case, PROC found."; dummy) (* found proc *)
         end
     
     fun intIR(num: int): exp = Ex(Tr.CONST num)
@@ -270,24 +257,44 @@ struct
             Ex(Frame.externalCall("initArray", [size', init']))
         end
 
-    fun recCreateIR(fieldLsts: exp list): exp = 
+    fun recordCreateIR(fieldLsts: exp list): exp = 
         let val len = length fieldLsts
             val ans = Temp.newtemp()
-            val initExp' = map unEx initExps
+            val fieldLsts' = map unEx fieldLsts
             fun storeNextField(_, []) = seq []
-            | storeNextField(offset, fieldExp:r): exp = 
-                    seq(Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp), 
-                        storeNextField(offset + Frame.wordSize, r))
+              | storeNextField(offset, fieldExp::r): Tr.stm = 
+                    seq[Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp),
+                    storeNextField(offset + Frame.wordSize, r)]
         in
             (* Ex(Tr.ESEQ(foldl storeNextField recordSeq fieldLsts, Tr.TEMP recordPtr)) *)
-            Ex(Tr.ESEQ(seq(Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST (len * Frame.wordSize)])),
-                            storeNextField(0, initExp')), Tr.TEMP ans))
+            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST (len * Frame.wordSize)])),
+                            storeNextField(0, fieldLsts')], Tr.TEMP ans))
         end
 
-    fun procEntryExit {lvl, body} : unit = 
-        (case lvl of
+    fun forIR(vloc:exp, lo: exp, hi: exp, body: exp, falselbl): exp = 
+        let val vloc' = unEx vloc
+            val lo' = unEx lo
+            val hi' = unEx hi
+            val body' = unNx body
+            val truelbl = Temp.newlabel() (*L2*)
+            (* val falselbl = Temp.newlabel() L3 *)
+            val incrementlbl = Temp.newlabel() (*L1*)
+        in
+            Nx(seq[
+                    Tr.MOVE(vloc', lo'),
+                    Tr.CJUMP(Tr.LE, vloc', hi', truelbl, falselbl),
+                    Tr.LABEL incrementlbl,
+                    Tr.MOVE(vloc', Tr.BINOP(Tr.PLUS, vloc', Tr.CONST 1)),
+                    Tr.LABEL truelbl,
+                    body',
+                    Tr.CJUMP(Tr.LT, vloc', hi', incrementlbl, falselbl),
+                    Tr.LABEL falselbl])
+        end
+
+    fun procEntryExit {level, body} : unit = 
+        (case level of
             OUTMOST => Err.error 0 "cannot do procEntryExit at outmost frame. "
-          | LEVEL {parent, frame, unique} => fragLst := !fragLst @ Frame.PROC{body=unNx body, frame=frame})
+          | LEVEL {parent, frame, unique} => fragLst := !fragLst @ [Frame.PROC{body=unNx body, frame=frame}])
    
             
     

@@ -3,6 +3,7 @@ Group is
 $/smlnj-lib.cm
 $/basis.cm
 $/ml-yacc-lib.cm
+parse.sml
 absyn.sml
 prabsyn.sml
 printtree.sml
@@ -10,7 +11,6 @@ errormsg.sml
 symbol.sml
 table.sig
 table.sml
-parse.sml
 findEscape.sig
 findEscape.sml
 tiger.lex

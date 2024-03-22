@@ -1,4 +1,4 @@
-LetExp([
+----------- AST -----------LetExp([
  TypeDec[
   (a,
    NameTy(b)),
@@ -7,3 +7,6 @@ LetExp([
   (c,
    NameTy(int))]],
  SeqExp[])
+----------- IR -----------PROC: L10
+EXP(
+ CONST 0)

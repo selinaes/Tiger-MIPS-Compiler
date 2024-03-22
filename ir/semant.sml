@@ -42,28 +42,33 @@ struct
     | checkTwoIntsOrStrs({exp=_, ty=T.STRING}, {exp=_, ty=T.STRING}, pos) = ()
     | checkTwoIntsOrStrs(_,_,pos) = Error.error pos ("Error: non-integer or non-string provided using comparison operator")
 
-     fun checkTwoEqTypes ({exp=_, ty=t1}, {exp=_, ty=t2}, pos) = 
+    fun checkTwoEqTypes ({exp=_, ty=t1}, {exp=_, ty=t2}, pos) = 
         if T.matchType(t1,t2)
         then ()    
         else ErrorMsg.error pos ("Comparison of incompatible types. Comparing " ^ T.toString t1 ^ ", " ^ T.toString t2) ;
 
     fun transExp(venv,tenv,level,exp, doneLbl): expty =
         let 
-            val left' = trexp left
-            val right' = trexp right
-            val leftExp = #exp left'
-            val rightExp = #exp right'
-            fun trop (left,A.PlusOp,right,pos) = (checkTwoInts(left', right',pos); {exp=TS.binOpIR(Tree.PLUS, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.MinusOp,right,pos) = (checkTwoInts(left', right',pos); {exp=TS.binlop(Tree.MINUS, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.TimesOp,right,pos) = (checkTwoInts(left', right',pos); {exp=TS.binlop(Tree.MUL, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.DivideOp,right,pos) = (checkTwoInts(left', right',pos); {exp=TS.binlop(Tree.DIV, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.EqOp,right,pos) = (checkTwoEqTypes(left', right', pos); {exp=TS.relop(Tree.EQ, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.NeqOp,right,pos) = (checkTwoEqTypes(left', right', pos); {exp=TS.relop(Tree.NE, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.LtOp,right,pos) = (checkTwoIntsOrStrs(left', right', pos); {exp=TS.relop(Tree.LT, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.LeOp,right,pos) = (checkTwoIntsOrStrs(left', right', pos); {exp=TS.relop(Tree.LE, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.GtOp,right,pos) = (checkTwoIntsOrStrs(left', right', pos); {exp=TS.relop(Tree.GT, leftExp, rightExp),ty=Types.INT})
-                |   trop (left,A.GeOp,right,pos) = (checkTwoIntsOrStrs(left', right', pos); {exp=TS.relop(Tree.GE, leftExp, rightExp),ty=Types.INT})
-        
+            fun trop (left: A.exp, oper, right: A.exp, pos) = 
+                let
+                    val left' = trexp left
+                    val right' = trexp right
+                    val leftExp = #exp left'
+                    val rightExp = #exp right'
+                in
+                    case oper of 
+                        A.PlusOp => (checkTwoInts(left', right',pos); {exp=TS.binOpIR(Tree.PLUS, leftExp, rightExp),ty=Types.INT})
+                        | A.MinusOp => (checkTwoInts(left', right',pos); {exp=TS.binOpIR(Tree.MINUS, leftExp, rightExp),ty=Types.INT})
+                        | A.TimesOp => (checkTwoInts(left', right',pos); {exp=TS.binOpIR(Tree.MUL, leftExp, rightExp),ty=Types.INT})
+                        | A.DivideOp => (checkTwoInts(left', right',pos); {exp=TS.binOpIR(Tree.DIV, leftExp, rightExp),ty=Types.INT})
+                        | A.EqOp => (checkTwoEqTypes(left', right', pos); {exp=TS.reOpIR(Tree.EQ, leftExp, rightExp, #ty left'),ty=Types.INT})
+                        | A.NeqOp => (checkTwoEqTypes(left', right', pos); {exp=TS.reOpIR(Tree.NE, leftExp, rightExp, #ty left'),ty=Types.INT})
+                        | A.LtOp => (checkTwoIntsOrStrs(left', right', pos); {exp=TS.reOpIR(Tree.LT, leftExp, rightExp, #ty left'),ty=Types.INT})
+                        | A.LeOp => (checkTwoIntsOrStrs(left', right', pos); {exp=TS.reOpIR(Tree.LE, leftExp, rightExp, #ty left'),ty=Types.INT})
+                        | A.GtOp => (checkTwoIntsOrStrs(left', right', pos); {exp=TS.reOpIR(Tree.GT, leftExp, rightExp, #ty left'),ty=Types.INT})
+                        | A.GeOp => (checkTwoIntsOrStrs(left', right', pos); {exp=TS.reOpIR(Tree.GE, leftExp, rightExp, #ty left'),ty=Types.INT})
+                end
+
         and trcall (func,args,pos) = 
             case S.look(venv,func) of 
                 SOME(E.FunEntry{level=definedLevel,label,formals,result}) => 
@@ -80,7 +85,7 @@ struct
                         then (Error.error pos ("Error: argument number mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
                         else 
                             if checkArgs(formals, map (fn a => #ty a) args')
-                            then {exp=TS.callIR(label, map (fn a => #exp a) args', definedLevel, level),ty=result}
+                            then (print (Symbol.name func ^ "\n");{exp=TS.callIR(label, map (fn a => #exp a) args', definedLevel, level),ty=result})
                             else {exp=TS.dummy, ty=Types.IMPOSSIBLE}
                     end
                 | _ => (Error.error pos ("Error: undefined function: " ^ S.name func); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
@@ -112,33 +117,38 @@ struct
                         List.app checkField fields;
                         if length fields = length symTyList
                         then
-                            {exp=TS.recCreateIR(map (fn fld => #exp (trexp #2 fld)) fields), ty=T.RECORD(fn () => (symTyList, unique))}
+                            {exp=TS.recordCreateIR(map (fn fld => #exp (trexp (#2 fld))) fields), ty=T.RECORD(fn () => (symTyList, unique))}
                         else
                             (Error.error pos ("Error: field number mismatch, expe"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
                         
                     end
                 | _ => (Error.error pos ("Error: undefined record type"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
         
-        and trseq (exps) =  (* A.exp list -> {exp=TS.exp list,ty=last expr ty} *)
-            case exps of [] => {exp=[],ty=Types.UNIT}
-                    | [exp] => trexp exp (* only 1,return {exp,ty}, ty=exp's evaluated ty*)
+        and trseq (exps) =  (* (A.exp*pos) list -> {exp=TS.exp list,ty=last expr ty} *)
+            case exps of 
+                    [] => {exp=TS.seqIR([]),ty=Types.UNIT}
+                    (* | [(expr, pos)] => 
+                        let
+                            val {exp=resExp, ty=ty} = trexp expr (* only 1,return {exp,ty}, ty=exp's evaluated ty*)
+                        in
+                            {exp=TS.seqIR([resExp]),ty=ty}
+                        end *)
                     | exps => 
                         let
-                            val last = List.last exps
+                            val (last:A.exp, pos) = List.last exps
                             val exptyLast = trexp last
-                            val front = List.take(exp, length exps - 1)
-                            val expfront = map (fn ex => #exp (trexp ex)) front
+                            val expAll = map (fn (ex, pos) => #exp (trexp ex)) exps
                         in
-                            {exp=expfront@[#exp exptyLast],ty=(#ty exptyLast)}
+                            {exp=TS.seqIR(expAll),ty=(#ty exptyLast)}
                         end
 
 
         and trassign (var,exp,pos) =
-            let val {exp=vloc,ty=vty} = transVar(venv, tenv, var)
+            let val {exp=vloc,ty=vty} = transVar(venv, tenv, level, var, doneLbl)
                 val {exp=e,ty=ety} = trexp exp
             in
                if T.matchType(vty,ety) 
-               then ({exp = TS.assignIR(vloc,exp), ty = Types.UNIT})
+               then ({exp = TS.assignIR(vloc,e), ty = Types.UNIT})
                else (Error.error pos ("Error: type mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
             end
 
@@ -149,7 +159,7 @@ struct
                     val {exp=e, ty} = trexp then'
                 in
                     T.matchType(T.INT, testty);
-                    {exp=TS.transIfThen(t, e), ty=T.UNIT} (* equivlent to findLUB(unit, ty)*)
+                    {exp=TS.ifThenIR(t, e), ty=T.UNIT} (* equivlent to findLUB(unit, ty)*)
                 end
             | SOME(else') => 
                 let val {exp=t,ty=testty} = trexp test
@@ -164,11 +174,11 @@ struct
         let
             val breakpoint = Temp.newlabel()
             val test' = trexp test
-            val body' = trexp body
+            val body' = transExp(venv, tenv, level, body, breakpoint)
         in
-            (checkint(trexp test',pos); 
+            (checkint(test',pos); 
             LoopCounter.enter();
-            checkUnit(trexp body', pos);
+            checkUnit(body', pos);
             LoopCounter.exit();
             {exp=TS.whileIR(#exp test', #exp body', breakpoint),ty=Types.UNIT})
         end
@@ -176,25 +186,28 @@ struct
         and trfor (var,escape,lo,hi,body,pos) = 
                let
                     val breakpoint = Temp.newlabel()
-                    val varaccess = TS.allocLocal(level, !escape)
+                    val varaccess = TS.allocLocal (level) (!escape)
                     val venv' = S.enter(venv,var,E.VarEntry{access=varaccess,ty=Types.INT}) 
                     val varloc = TS.simpleVar(varaccess,level)
+                    val body' = transExp(venv', tenv, level, body, breakpoint)
+                    val lo' = trexp lo
+                    val hi' = trexp hi
                in
-                    checkint(trexp lo,pos);
-                    checkint(trexp hi,pos);
+                    checkint(lo',pos);
+                    checkint(hi',pos);
                     LoopCounter.enter();
-                    checkUnit(transExp(venv', tenv, level, body, breakpoint), pos);
+                    checkUnit(body', pos);
                     LoopCounter.exit();
-                    {exp=TS.transFor(varloc,lo,hi,body),ty=Types.UNIT}
+                    {exp=TS.forIR(varloc,#exp lo',#exp hi',#exp body',breakpoint),ty=Types.UNIT}
                end
 
         
-        and trlet (decs,body,pos) = 
+        and trlet (decs,body:A.exp,pos) = 
             let 
-                val {venv=venv',tenv=tenv',explist=explist'} = foldl (fn (dec, {venv=v',tenv=t',explist = e'}) => transDec (v', t', e', level, dec)) {venv=venv, tenv=tenv, explist=[]} decs
-                val {exp,ty} = transExp(venv',tenv',level,body,doneLbl)
+                val {venv=venv',tenv=tenv',explist=explist'} = foldl (fn (dec, {venv=v',tenv=t',explist = e'}) => transDec (v', t', e', level, dec,doneLbl)) {venv=venv, tenv=tenv, explist=[]} decs
+                val {exp=bodyexp,ty} = transExp(venv',tenv',level,body,doneLbl)
             in
-                {exp=TS.transLet(explist',body),ty=ty}
+                {exp=TS.letIR(explist',bodyexp),ty=ty}
             end
 
         and trarray (typ,size,init,pos) = 
@@ -208,7 +221,7 @@ struct
                         if T.matchType(ty,initTy)
                         then 
                         (* (print ((S.name typ) ^" " ^  (T.toString ty)^ "\n"); *)
-                        {exp=TS.arrayCreateIR(size', initExp),ty=T.ARRAY(ty,unique)}
+                        {exp=TS.arrayCreateIR(#exp size', initExp),ty=T.ARRAY(ty,unique)}
                         else (Error.error pos ("Error: type mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
                     | _ => (Error.error pos ("Error: undefined array type"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
             end
@@ -222,10 +235,10 @@ struct
         and trexp exp: expty = 
             case exp of 
                 A.OpExp{left,oper,right,pos} => trop(left,oper,right,pos)
-                | A.VarExp v => transVar (venv, tenv, v)
+                | A.VarExp v => transVar (venv, tenv, level, v, doneLbl)
                 | A.NilExp => {exp=TS.nilIR(),ty=Types.NIL}
                 | A.IntExp i => {exp=TS.intIR(i),ty=Types.INT}
-                | A.StringExp s => {exp=TS.stringIR(s),ty=Types.STRING}
+                | A.StringExp (s, pos) => {exp=TS.stringIR(s),ty=Types.STRING}
                 | A.CallExp{func,args,pos} => trcall(func,args,pos)
                 | A.RecordExp{fields,typ,pos} => trrecord(fields,typ,pos)
                 | A.SeqExp exps => trseq(exps)
@@ -240,14 +253,14 @@ struct
             trexp exp
         end
             
-    and transVar(venv,tenv,level, A.SimpleVar(id,pos)): expty = 
+    and transVar(venv,tenv,level, A.SimpleVar(id,pos), doneLbl): expty = 
                 (case S.look(venv,id) of 
                     SOME(E.VarEntry{access, ty}) =>
                         {exp=TS.simpleVar(access,level), ty=ty}
                     | _ => (Error.error pos ("Error: undefined variable " ^ S.name id);
                                 {exp=TS.dummy, ty=T.IMPOSSIBLE}))
-        | transVar(venv,tenv,level,A.FieldVar(v,id,pos))  = 
-                (case transVar (venv, tenv, v) of
+        | transVar(venv,tenv,level,A.FieldVar(v,id,pos), doneLbl)  = 
+                (case transVar (venv, tenv, level, v, doneLbl) of
                     {exp = vexp, ty = T.RECORD(f)} =>
                         let
                             val (symbolLst, _) = f()
@@ -265,13 +278,13 @@ struct
                                     {exp = (TS.fieldVar(vexp, offset)), ty = fieldTy}
                                 | NONE =>
                                     (Error.error pos ("Error: undefined field " ^ S.name id ^ " in record");
-                                    {exp = (), ty = T.IMPOSSIBLE})
+                                    {exp = TS.dummy, ty = T.IMPOSSIBLE})
                         end
                     | _ =>
                         (Error.error pos "Error:accessing fields of a non-record type";
-                        {exp = (), ty = T.IMPOSSIBLE}))
-        | transVar (venv, tenv, level, A.SubscriptVar(v,exp,pos)) =  
-                (case transVar (venv, tenv, v) of
+                        {exp = TS.dummy, ty = T.IMPOSSIBLE}))
+        | transVar (venv, tenv, level, A.SubscriptVar(v,exp,pos), doneLbl) =  
+                (case transVar (venv, tenv, level, v, doneLbl) of
                     {exp = vexp, ty = T.ARRAY (elementTy,_)} =>
                         let
                             val index = transExp (venv, tenv, level, exp, doneLbl)
@@ -282,35 +295,36 @@ struct
                                     ty = elementTy}
                                 | _ =>
                                     (Error.error pos "Error:array index must be an integer";
-                                    { exp = (),
+                                    {exp = TS.dummy,
                                     ty = T.IMPOSSIBLE })
                         end
                     | {exp = vexp, ty = thety} =>
                         (Error.error pos ("Error:subscripting non-array type: " ^ (T.toString thety) );
-                        {exp = (), ty = T.IMPOSSIBLE}))
+                        {exp = TS.dummy, ty = T.IMPOSSIBLE}))
 
-    and transDec (venv, tenv, explist, level, A.VarDec{name,escape,typ,init,pos}) = 
+    and transDec (venv, tenv, explist, level, A.VarDec{name,escape,typ,init,pos}, doneLbl) = 
         (case typ of 
             NONE => 
                 let 
                     val {exp,ty} = transExp(venv,tenv,level,init,doneLbl)
-                    val access = TS.allocLocal level !escape
+                    val access = TS.allocLocal (level) (!escape)
                 in 
                     case ty of
-                        T.NIL => (Error.error pos "Error: nil cannot be used without type annotation"; {venv=venv,tenv=tenv})
+                        T.NIL => (Error.error pos "Error: nil cannot be used without type annotation"; 
+                                {venv=venv,tenv=tenv, explist=explist})
                         | _ =>  {tenv=tenv,
-                                venv=S.enter(venv,name,E.VarEntry{access=access, ty=ty})
+                                venv=S.enter(venv,name,E.VarEntry{access=access, ty=ty}),
                                 explist=explist@[exp]}
                 end
             | SOME(sym,pos) =>
                 let
                     val {exp=initExp,ty=calcTy} = transExp(venv,tenv,level,init,doneLbl)
-                    val access = TS.allocLocal level !escape
+                    val access = TS.allocLocal (level) (!escape)
                     val typ = symToType (tenv, sym, pos)
                 in
                     if not(T.matchType(typ,calcTy))
                     then (Error.error pos "Error: type mismatch"; 
-                        {venv=venv,tenv=tenv,exp=TS.CONST 0})
+                        {venv=venv,tenv=tenv,explist=explist})
                     else {
                         venv=S.enter(venv,name,E.VarEntry{access=access, ty=typ}),
                         tenv=tenv,
@@ -318,7 +332,7 @@ struct
                     }
                 end)
         (* Nonrecursive TypeDec *)  
-        | transDec (venv,tenv, explist,level,A.TypeDec tydecList) =
+        | transDec (venv,tenv, explist,level,A.TypeDec tydecList, doneLbl) =
             let    
                 val allTyName = map (fn {name,ty,pos} => name) tydecList
                 val uniqueMap: unit ref S.table ref = ref S.empty
@@ -396,9 +410,8 @@ struct
           end
 
         (* Nonrecursive FuncDec *)
-        | transDec(venv,tenv, explist, level, A.FunctionDec fundecList) =
+        | transDec(venv,tenv, explist, level, A.FunctionDec fundecList, doneLbl) =
             let
-                
                 val allFunName = map (fn {name,params,result,body,pos} => name) fundecList
                 val definedFun: S.symbol list ref = ref []
                 (* this is to prepare a temp venv that only contains signature of the functions in a group *)
@@ -415,10 +428,9 @@ struct
                                  (* val level' = TR.newLevel(level, name, map #escape params') *)
                                  (* level is is a dummy value for temp venv *)
                                 val venv' = S.enter(venv,name,
-                                            E.FunEntry{level=level,label=TE.newlabel(), formals= map #ty params',
+                                            E.FunEntry{level=level,label=Temp.newlabel(), formals= map #ty params',
                                                     result=result_ty})
                             in
-                               
                                 venv' (*venv'' FunEntry, all params*)
                             end
                     in
@@ -437,23 +449,23 @@ struct
                         fun transparam ({name,escape,typ,pos}: A.field) =
                             {name=name, ty=symToType (tenv,typ, pos), escape=escape}
                         val params' = map transparam params
-                        val level' = TS.newLevel(level, name, map #escape params')
+                        val level' = TS.newLevel{parent=level, name=name, formals=map (fn {ty,escape,...} => !escape) params'}
                         val formalsList = TS.formals level' (* [sl, 1stformal, 2ndformal]*)
                         fun enterparam ({name,ty,escape}, (venv, index)) =
-                                (S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, 1), ty=ty}), index + 1)
+                                (S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, index), ty=ty}), index + 1)
                         val (venv'', _) = foldl enterparam (temp_venv, 1) params' 
-                        val {exp=exp',ty=calcTy} = transExp(venv'',tenv, level', body,doneLbl)
+                        val {exp=exp',ty=calcTy} = transExp(venv'',tenv, level', body, doneLbl)
                     in 
                         case List.exists (fn (n) => n = name) (!definedFun) of
                             true => (Error.error pos ("Error: redefined function: " ^ S.name name); venv)
                             | false => 
-                                TS.procEntryExit(level', exp');
+                                (TS.procEntryExit{level=level', body=exp'};
                                 if not (T.matchType(result_ty,calcTy))(* check bodyType = declared return type *)
                                 then (Error.error pos "Error: function bodyType mismatched returnType"; 
                                     venv
                                 )
                                 else (definedFun := name :: !definedFun;
-                                    S.enter(venv,name,E.FunEntry{level=level', label=TE.newlabel (), formals=map #ty params',result=result_ty}))
+                                    S.enter(venv,name,E.FunEntry{level=level', label=Temp.newlabel(), formals=map #ty params',result=result_ty})))
                     end
             in
                 {venv=foldl transFunDec venv fundecList,
@@ -464,13 +476,17 @@ struct
 
     fun transProg exp = 
         let 
+        
             val startLabel = Temp.newlabel()
-            val startLevel = TS.newLevel(TS.outermost, startLabel, [])
+            val startLevel = TS.newLevel{parent=TS.outmost, name=startLabel, formals=[]}
             val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, startLevel, exp, startLabel)
         in
+            (
+            TS.resetfragLst(); 
+            Temp.resetLabs();
             if T.matchType(Types.UNIT, ty)
-            then (TS.procEntryExit(startLevel, result); TS.getResult())
-            else Error.error 0 "Error: top-level expression does not have type unit"
+            then (TS.procEntryExit{level=startLevel, body=result}; TS.getResult())
+            else (Error.error 0 "Error: top-level expression does not have type unit"; TS.getResult()))
         end
 end
 
