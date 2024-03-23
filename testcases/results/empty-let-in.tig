@@ -1,4 +1,10 @@
-LetExp([
+----------- AST -----------LetExp([
  VarDec(x,false,NONE,
   IntExp(1))],
  SeqExp[])
+----------- IR -----------PROC: L0
+EXP(
+ ESEQ(
+  EXP(
+   CONST 1),
+  CONST 0))

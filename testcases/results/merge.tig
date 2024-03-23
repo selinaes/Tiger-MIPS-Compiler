@@ -1,4 +1,4 @@
-LetExp([
+----------- AST -----------LetExp([
  TypeDec[
   (any,
    RecordTy[
@@ -265,3 +265,40 @@ NONE,
      SimpleVar(list1)),
     VarExp(
      SimpleVar(list2))])])])
+----------- IR -----------PROC: L10
+EXP(
+ ESEQ(
+  SEQ(
+   EXP(
+    CALL(
+     NAME L1)),
+   SEQ(
+    EXP(
+     CALL(
+      NAME L46,
+       MEM(
+        TEMP t100))),
+    EXP(
+     ESEQ(
+      MOVE(
+       MEM(
+        BINOP(PLUS,
+         MEM(
+          TEMP t100),
+         CONST 0)),
+       CALL(
+        NAME L1)),
+      CALL(
+       NAME L46,
+        MEM(
+         TEMP t100)))))),
+  CALL(
+   NAME L85,
+    MEM(
+     TEMP t100),
+    CALL(
+     NAME L56,
+      MEM(
+       TEMP t100),
+      TEMP t234,
+      TEMP t235))))
