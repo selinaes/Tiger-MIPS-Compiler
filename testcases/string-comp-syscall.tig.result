@@ -1,0 +1,14 @@
+----------- AST -----------
+OpExp(GtOp,
+ StringExp("a"),
+ StringExp("b"))
+----------- IR -----------
+STRING: L1 a
+STRING: L2 b
+PROC: frame with name: L0
+EXP(
+ CALL(
+  NAME stringGt,
+   NAME L1,
+   NAME L2))
+----------- Proc List -----------

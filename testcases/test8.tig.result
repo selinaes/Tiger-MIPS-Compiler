@@ -1,0 +1,35 @@
+----------- AST -----------
+IfExp(
+ SeqExp[
+  OpExp(GtOp,
+   IntExp(10),
+   IntExp(20))],
+ IntExp(30),
+ IntExp(40))
+----------- IR -----------
+PROC: frame with name: L0
+EXP(
+ ESEQ(
+  SEQ(
+   CJUMP(GT,
+    CONST 10,
+    CONST 20,
+    L1,L2),
+   SEQ(
+    LABEL L1,
+    SEQ(
+     MOVE(
+      TEMP t101,
+      CONST 30),
+     SEQ(
+      JUMP(
+       NAME L3),
+      SEQ(
+       LABEL L2,
+       SEQ(
+        MOVE(
+         TEMP t101,
+         CONST 40),
+        LABEL L3)))))),
+  TEMP t101))
+----------- Proc List -----------

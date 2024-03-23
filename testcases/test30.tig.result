@@ -1,0 +1,65 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (a,
+   ArrayTy(int)),
+  (b,
+   NameTy(a))],
+ VarDec(arr1,false,SOME(a),
+  ArrayExp(b,
+   IntExp(10),
+   IntExp(0)))],
+ SeqExp[
+  VarExp(
+   SubscriptVar(
+    SimpleVar(arr1),
+    IntExp(2)))])
+----------- IR -----------
+PROC: frame with name: L0
+EXP(
+ ESEQ(
+  MOVE(
+   TEMP t101,
+   CALL(
+    NAME initArray,
+     CONST 10,
+     CONST 0)),
+  ESEQ(
+   SEQ(
+    MOVE(
+     TEMP t102,
+     CONST 2),
+    SEQ(
+     MOVE(
+      TEMP t103,
+      MEM(
+       BINOP(MINUS,
+        TEMP t101,
+        CONST 4))),
+     SEQ(
+      CJUMP(GE,
+       TEMP t102,
+       TEMP t103,
+       L1,L2),
+      SEQ(
+       LABEL L2,
+       SEQ(
+        CJUMP(LT,
+         TEMP t102,
+         CONST 0,
+         L1,L3),
+        SEQ(
+         LABEL L1,
+         SEQ(
+          EXP(
+           CALL(
+            NAME exit,
+             CONST 1)),
+          LABEL L3))))))),
+   MEM(
+    BINOP(PLUS,
+     TEMP t101,
+     BINOP(MUL,
+      CONST 2,
+      CONST 4))))))
+----------- Proc List -----------

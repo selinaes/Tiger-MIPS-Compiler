@@ -1,0 +1,30 @@
+----------- AST -----------
+LetExp([
+ FunctionDec[
+  (g,[
+   (a,false,int)],
+SOME(int),
+   VarExp(
+    SimpleVar(a)))],
+ TypeDec[
+  (t,
+   NameTy(int))],
+ FunctionDec[
+  (g,[
+   (a,false,int)],
+SOME(int),
+   VarExp(
+    SimpleVar(a)))]],
+ SeqExp[
+  IntExp(0)])
+----------- IR -----------
+PROC: frame with name: L1
+EXP(
+ TEMP t102)
+PROC: frame with name: L2
+EXP(
+ TEMP t104)
+PROC: frame with name: L0
+EXP(
+ CONST 0)
+----------- Proc List -----------

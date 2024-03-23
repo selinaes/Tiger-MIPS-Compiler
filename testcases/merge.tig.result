@@ -1,0 +1,870 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (any,
+   RecordTy[
+    (any,false,int)])],
+ VarDec(buffer,true,NONE,
+  CallExp(getchar,[])),
+ FunctionDec[
+  (readint,[
+   (any,false,any)],
+SOME(int),
+   LetExp([
+    VarDec(i,false,NONE,
+     IntExp(0)),
+    FunctionDec[
+     (isdigit,[
+      (s,false,string)],
+SOME(int),
+      IfExp(
+       OpExp(GeOp,
+        CallExp(ord,[
+         VarExp(
+          SimpleVar(buffer))]),
+        CallExp(ord,[
+         StringExp("0")])),
+       OpExp(LeOp,
+        CallExp(ord,[
+         VarExp(
+          SimpleVar(buffer))]),
+        CallExp(ord,[
+         StringExp("9")])),
+       IntExp(0))),
+     (skipto,[],
+NONE,
+      WhileExp(
+       IfExp(
+        OpExp(EqOp,
+         VarExp(
+          SimpleVar(buffer)),
+         StringExp(" ")),
+        IntExp(1),
+        OpExp(EqOp,
+         VarExp(
+          SimpleVar(buffer)),
+         StringExp("
+"))),
+       AssignExp(
+        SimpleVar(buffer),
+        CallExp(getchar,[]))))]],
+    SeqExp[
+     CallExp(skipto,[]),
+     AssignExp(
+      FieldVar(
+       SimpleVar(any),
+       any),
+      CallExp(isdigit,[
+       VarExp(
+        SimpleVar(buffer))])),
+     WhileExp(
+      CallExp(isdigit,[
+       VarExp(
+        SimpleVar(buffer))]),
+      SeqExp[
+       AssignExp(
+        SimpleVar(i),
+        OpExp(MinusOp,
+         OpExp(PlusOp,
+          OpExp(TimesOp,
+           VarExp(
+            SimpleVar(i)),
+           IntExp(10)),
+          CallExp(ord,[
+           VarExp(
+            SimpleVar(buffer))])),
+         CallExp(ord,[
+          StringExp("0")]))),
+       AssignExp(
+        SimpleVar(buffer),
+        CallExp(getchar,[]))]),
+     VarExp(
+      SimpleVar(i))]))],
+ TypeDec[
+  (list,
+   RecordTy[
+    (first,false,int),
+    (rest,false,list)])],
+ FunctionDec[
+  (readlist,[],
+SOME(list),
+   LetExp([
+    VarDec(any,false,NONE,
+     RecordExp(any,[
+
+      (any,
+       IntExp(0))])),
+    VarDec(i,false,NONE,
+     CallExp(readint,[
+      VarExp(
+       SimpleVar(any))]))],
+    SeqExp[
+     IfExp(
+      VarExp(
+       FieldVar(
+        SimpleVar(any),
+        any)),
+      RecordExp(list,[
+
+       (first,
+        VarExp(
+         SimpleVar(i))),
+       (rest,
+        CallExp(readlist,[]))]),
+      NilExp)])),
+  (merge,[
+   (a,false,list),
+   (b,false,list)],
+SOME(list),
+   IfExp(
+    OpExp(EqOp,
+     VarExp(
+      SimpleVar(a)),
+     NilExp),
+    VarExp(
+     SimpleVar(b)),
+    IfExp(
+     OpExp(EqOp,
+      VarExp(
+       SimpleVar(b)),
+      NilExp),
+     VarExp(
+      SimpleVar(a)),
+     IfExp(
+      OpExp(LtOp,
+       VarExp(
+        FieldVar(
+         SimpleVar(a),
+         first)),
+       VarExp(
+        FieldVar(
+         SimpleVar(b),
+         first))),
+      RecordExp(list,[
+
+       (first,
+        VarExp(
+         FieldVar(
+          SimpleVar(a),
+          first))),
+       (rest,
+        CallExp(merge,[
+         VarExp(
+          FieldVar(
+           SimpleVar(a),
+           rest)),
+         VarExp(
+          SimpleVar(b))]))]),
+      RecordExp(list,[
+
+       (first,
+        VarExp(
+         FieldVar(
+          SimpleVar(b),
+          first))),
+       (rest,
+        CallExp(merge,[
+         VarExp(
+          SimpleVar(a)),
+         VarExp(
+          FieldVar(
+           SimpleVar(b),
+           rest))]))]))))),
+  (printint,[
+   (i,false,int)],
+NONE,
+   LetExp([
+    FunctionDec[
+     (f,[
+      (i,false,int)],
+NONE,
+      IfExp(
+       OpExp(GtOp,
+        VarExp(
+         SimpleVar(i)),
+        IntExp(0)),
+       SeqExp[
+        CallExp(f,[
+         OpExp(DivideOp,
+          VarExp(
+           SimpleVar(i)),
+          IntExp(10))]),
+        CallExp(print,[
+         CallExp(chr,[
+          OpExp(PlusOp,
+           OpExp(MinusOp,
+            VarExp(
+             SimpleVar(i)),
+            OpExp(TimesOp,
+             OpExp(DivideOp,
+              VarExp(
+               SimpleVar(i)),
+              IntExp(10)),
+             IntExp(10))),
+           CallExp(ord,[
+            StringExp("0")]))])])]))]],
+    SeqExp[
+     IfExp(
+      OpExp(LtOp,
+       VarExp(
+        SimpleVar(i)),
+       IntExp(0)),
+      SeqExp[
+       CallExp(print,[
+        StringExp("-")]),
+       CallExp(f,[
+        OpExp(MinusOp,
+         IntExp(0),
+         VarExp(
+          SimpleVar(i)))])],
+      IfExp(
+       OpExp(GtOp,
+        VarExp(
+         SimpleVar(i)),
+        IntExp(0)),
+       CallExp(f,[
+        VarExp(
+         SimpleVar(i))]),
+       CallExp(print,[
+        StringExp("0")])))])),
+  (printlist,[
+   (l,false,list)],
+NONE,
+   IfExp(
+    OpExp(EqOp,
+     VarExp(
+      SimpleVar(l)),
+     NilExp),
+    CallExp(print,[
+     StringExp("
+")]),
+    SeqExp[
+     CallExp(printint,[
+      VarExp(
+       FieldVar(
+        SimpleVar(l),
+        first))]),
+     CallExp(print,[
+      StringExp(" ")]),
+     CallExp(printlist,[
+      VarExp(
+       FieldVar(
+        SimpleVar(l),
+        rest))])]))],
+ VarDec(list1,false,NONE,
+  CallExp(readlist,[])),
+ VarDec(list2,false,NONE,
+  SeqExp[
+   AssignExp(
+    SimpleVar(buffer),
+    CallExp(getchar,[])),
+   CallExp(readlist,[])])],
+ SeqExp[
+  CallExp(printlist,[
+   CallExp(merge,[
+    VarExp(
+     SimpleVar(list1)),
+    VarExp(
+     SimpleVar(list2))])])])
+----------- IR -----------
+STRING: L4 0
+STRING: L5 9
+PROC: frame with name: L2
+EXP(
+ ESEQ(
+  SEQ(
+   CJUMP(GE,
+    CALL(
+     NAME L3,
+      MEM(
+       BINOP(PLUS,
+        MEM(
+         MEM(
+          TEMP t100)),
+        CONST 0))),
+    CALL(
+     NAME L3,
+      NAME L4),
+    L8,L9),
+   SEQ(
+    LABEL L8,
+    SEQ(
+     MOVE(
+      TEMP t108,
+      ESEQ(
+       SEQ(
+        MOVE(
+         TEMP t107,
+         CONST 1),
+        SEQ(
+         CJUMP(LE,
+          CALL(
+           NAME L3,
+            MEM(
+             BINOP(PLUS,
+              MEM(
+               MEM(
+                TEMP t100)),
+              CONST 0))),
+          CALL(
+           NAME L3,
+            NAME L5),
+          L6,L7),
+         SEQ(
+          LABEL L7,
+          SEQ(
+           MOVE(
+            TEMP t107,
+            CONST 0),
+           LABEL L6)))),
+       TEMP t107)),
+     SEQ(
+      JUMP(
+       NAME L10),
+      SEQ(
+       LABEL L9,
+       SEQ(
+        MOVE(
+         TEMP t108,
+         CONST 0),
+        LABEL L10)))))),
+  TEMP t108))
+STRING: L12  
+STRING: L13 
+
+PROC: frame with name: L3
+SEQ(
+ JUMP(
+  NAME L18),
+ SEQ(
+  LABEL L17,
+  SEQ(
+   MOVE(
+    MEM(
+     BINOP(PLUS,
+      MEM(
+       MEM(
+        TEMP t100)),
+      CONST 0)),
+    CALL(
+     NAME L2)),
+   SEQ(
+    LABEL L18,
+    SEQ(
+     CJUMP(NE,
+      ESEQ(
+       SEQ(
+        CJUMP(NE,
+         CALL(
+          NAME stringEqual,
+           MEM(
+            BINOP(PLUS,
+             MEM(
+              MEM(
+               TEMP t100)),
+             CONST 0)),
+           NAME L12),
+         CONST 0,
+         L14,L15),
+        SEQ(
+         LABEL L14,
+         SEQ(
+          MOVE(
+           TEMP t109,
+           CONST 1),
+          SEQ(
+           JUMP(
+            NAME L16),
+           SEQ(
+            LABEL L15,
+            SEQ(
+             MOVE(
+              TEMP t109,
+              CALL(
+               NAME stringEqual,
+                MEM(
+                 BINOP(PLUS,
+                  MEM(
+                   MEM(
+                    TEMP t100)),
+                  CONST 0)),
+                NAME L13)),
+             LABEL L16)))))),
+       TEMP t109),
+      CONST 0,
+      L17,L11),
+     LABEL L11)))))
+PROC: frame with name: L1
+EXP(
+ ESEQ(
+  MOVE(
+   TEMP t103,
+   CONST 0),
+  ESEQ(
+   EXP(
+    CALL(
+     NAME L3,
+      TEMP t100)),
+   ESEQ(
+    MOVE(
+     MEM(
+      TEMP t102),
+     CALL(
+      NAME L2,
+       TEMP t100,
+       MEM(
+        BINOP(PLUS,
+         MEM(
+          TEMP t100),
+         CONST 0)))),
+    ESEQ(
+     SEQ(
+      JUMP(
+       NAME L21),
+      SEQ(
+       LABEL L20,
+       SEQ(
+        EXP(
+         ESEQ(
+          MOVE(
+           TEMP t103,
+           BINOP(MINUS,
+            BINOP(PLUS,
+             BINOP(MUL,
+              TEMP t103,
+              CONST 10),
+             CALL(
+              NAME L3,
+               MEM(
+                BINOP(PLUS,
+                 MEM(
+                  TEMP t100),
+                 CONST 0)))),
+            CALL(
+             NAME L3,
+              NAME L4))),
+          ESEQ(
+           MOVE(
+            MEM(
+             BINOP(PLUS,
+              MEM(
+               TEMP t100),
+              CONST 0)),
+            CALL(
+             NAME L2)),
+           CONST 0))),
+        SEQ(
+         LABEL L21,
+         SEQ(
+          CJUMP(NE,
+           CALL(
+            NAME L2,
+             TEMP t100,
+             MEM(
+              BINOP(PLUS,
+               MEM(
+                TEMP t100),
+               CONST 0))),
+           CONST 0,
+           L20,L19),
+          LABEL L19))))),
+     TEMP t103)))))
+PROC: frame with name: L22
+EXP(
+ ESEQ(
+  SEQ(
+   MOVE(
+    TEMP t119,
+    ESEQ(
+     SEQ(
+      MOVE(
+       TEMP t118,
+       CALL(
+        NAME malloc,
+         CONST 4)),
+      SEQ(
+       MOVE(
+        MEM(
+         BINOP(PLUS,
+          TEMP t118,
+          CONST 0)),
+        CONST 0),
+       EXP(
+        CONST 0))),
+     TEMP t118)),
+   MOVE(
+    TEMP t120,
+    CALL(
+     NAME L1,
+      MEM(
+       TEMP t100),
+      TEMP t119))),
+  ESEQ(
+   SEQ(
+    CJUMP(NE,
+     MEM(
+      TEMP t119),
+     CONST 0,
+     L26,L27),
+    SEQ(
+     LABEL L26,
+     SEQ(
+      MOVE(
+       TEMP t122,
+       ESEQ(
+        SEQ(
+         MOVE(
+          TEMP t121,
+          CALL(
+           NAME malloc,
+            CONST 8)),
+         SEQ(
+          MOVE(
+           MEM(
+            BINOP(PLUS,
+             TEMP t121,
+             CONST 0)),
+           TEMP t120),
+          SEQ(
+           MOVE(
+            MEM(
+             BINOP(PLUS,
+              TEMP t121,
+              CONST 4)),
+            CALL(
+             NAME L22,
+              MEM(
+               TEMP t100))),
+           EXP(
+            CONST 0)))),
+        TEMP t121)),
+      SEQ(
+       JUMP(
+        NAME L28),
+       SEQ(
+        LABEL L27,
+        SEQ(
+         MOVE(
+          TEMP t122,
+          CONST 0),
+         LABEL L28)))))),
+   TEMP t122)))
+PROC: frame with name: L23
+EXP(
+ ESEQ(
+  SEQ(
+   CJUMP(EQ,
+    TEMP t112,
+    CONST 0,
+    L35,L36),
+   SEQ(
+    LABEL L35,
+    SEQ(
+     MOVE(
+      TEMP t127,
+      TEMP t113),
+     SEQ(
+      JUMP(
+       NAME L37),
+      SEQ(
+       LABEL L36,
+       SEQ(
+        MOVE(
+         TEMP t127,
+         ESEQ(
+          SEQ(
+           CJUMP(EQ,
+            TEMP t113,
+            CONST 0,
+            L32,L33),
+           SEQ(
+            LABEL L32,
+            SEQ(
+             MOVE(
+              TEMP t126,
+              TEMP t112),
+             SEQ(
+              JUMP(
+               NAME L34),
+              SEQ(
+               LABEL L33,
+               SEQ(
+                MOVE(
+                 TEMP t126,
+                 ESEQ(
+                  SEQ(
+                   CJUMP(LT,
+                    MEM(
+                     TEMP t112),
+                    MEM(
+                     TEMP t113),
+                    L29,L30),
+                   SEQ(
+                    LABEL L29,
+                    SEQ(
+                     MOVE(
+                      TEMP t125,
+                      ESEQ(
+                       SEQ(
+                        MOVE(
+                         TEMP t123,
+                         CALL(
+                          NAME malloc,
+                           CONST 8)),
+                        SEQ(
+                         MOVE(
+                          MEM(
+                           BINOP(PLUS,
+                            TEMP t123,
+                            CONST 0)),
+                          MEM(
+                           TEMP t112)),
+                         SEQ(
+                          MOVE(
+                           MEM(
+                            BINOP(PLUS,
+                             TEMP t123,
+                             CONST 4)),
+                           CALL(
+                            NAME L23,
+                             MEM(
+                              TEMP t100),
+                             MEM(
+                              BINOP(PLUS,
+                               TEMP t112,
+                               CONST 4)),
+                             TEMP t113)),
+                          EXP(
+                           CONST 0)))),
+                       TEMP t123)),
+                     SEQ(
+                      JUMP(
+                       NAME L31),
+                      SEQ(
+                       LABEL L30,
+                       SEQ(
+                        MOVE(
+                         TEMP t125,
+                         ESEQ(
+                          SEQ(
+                           MOVE(
+                            TEMP t124,
+                            CALL(
+                             NAME malloc,
+                              CONST 8)),
+                           SEQ(
+                            MOVE(
+                             MEM(
+                              BINOP(PLUS,
+                               TEMP t124,
+                               CONST 0)),
+                             MEM(
+                              TEMP t113)),
+                            SEQ(
+                             MOVE(
+                              MEM(
+                               BINOP(PLUS,
+                                TEMP t124,
+                                CONST 4)),
+                              CALL(
+                               NAME L23,
+                                MEM(
+                                 TEMP t100),
+                                TEMP t112,
+                                MEM(
+                                 BINOP(PLUS,
+                                  TEMP t113,
+                                  CONST 4)))),
+                             EXP(
+                              CONST 0)))),
+                          TEMP t124)),
+                        LABEL L31)))))),
+                  TEMP t125)),
+                LABEL L34)))))),
+          TEMP t126)),
+        LABEL L37)))))),
+  TEMP t127))
+PROC: frame with name: L38
+SEQ(
+ CJUMP(GT,
+  TEMP t129,
+  CONST 0,
+  L39,L40),
+ SEQ(
+  LABEL L39,
+  SEQ(
+   EXP(
+    ESEQ(
+     EXP(
+      CALL(
+       NAME L38,
+        MEM(
+         TEMP t100),
+        BINOP(DIV,
+         TEMP t129,
+         CONST 10))),
+     CALL(
+      NAME L0,
+       CALL(
+        NAME L4,
+         BINOP(PLUS,
+          BINOP(MINUS,
+           TEMP t129,
+           BINOP(MUL,
+            BINOP(DIV,
+             TEMP t129,
+             CONST 10),
+            CONST 10)),
+          CALL(
+           NAME L3,
+            NAME L4)))))),
+   LABEL L40)))
+STRING: L41 -
+PROC: frame with name: L24
+EXP(
+ ESEQ(
+  SEQ(
+   CJUMP(LT,
+    TEMP t115,
+    CONST 0,
+    L45,L46),
+   SEQ(
+    LABEL L45,
+    SEQ(
+     MOVE(
+      TEMP t131,
+      ESEQ(
+       EXP(
+        CALL(
+         NAME L0,
+          NAME L41)),
+       CALL(
+        NAME L38,
+         TEMP t100,
+         BINOP(MINUS,
+          CONST 0,
+          TEMP t115)))),
+     SEQ(
+      JUMP(
+       NAME L47),
+      SEQ(
+       LABEL L46,
+       SEQ(
+        MOVE(
+         TEMP t131,
+         ESEQ(
+          SEQ(
+           CJUMP(GT,
+            TEMP t115,
+            CONST 0,
+            L42,L43),
+           SEQ(
+            LABEL L42,
+            SEQ(
+             MOVE(
+              TEMP t130,
+              CALL(
+               NAME L38,
+                TEMP t100,
+                TEMP t115)),
+             SEQ(
+              JUMP(
+               NAME L44),
+              SEQ(
+               LABEL L43,
+               SEQ(
+                MOVE(
+                 TEMP t130,
+                 CALL(
+                  NAME L0,
+                   NAME L4)),
+                LABEL L44)))))),
+          TEMP t130)),
+        LABEL L47)))))),
+  TEMP t131))
+PROC: frame with name: L25
+EXP(
+ ESEQ(
+  SEQ(
+   CJUMP(EQ,
+    TEMP t117,
+    CONST 0,
+    L48,L49),
+   SEQ(
+    LABEL L48,
+    SEQ(
+     MOVE(
+      TEMP t132,
+      CALL(
+       NAME L0,
+        NAME L13)),
+     SEQ(
+      JUMP(
+       NAME L50),
+      SEQ(
+       LABEL L49,
+       SEQ(
+        MOVE(
+         TEMP t132,
+         ESEQ(
+          EXP(
+           CALL(
+            NAME L24,
+             MEM(
+              TEMP t100),
+             MEM(
+              TEMP t117))),
+          ESEQ(
+           EXP(
+            CALL(
+             NAME L0,
+              NAME L12)),
+           CALL(
+            NAME L25,
+             MEM(
+              TEMP t100),
+             MEM(
+              BINOP(PLUS,
+               TEMP t117,
+               CONST 4)))))),
+        LABEL L50)))))),
+  TEMP t132))
+PROC: frame with name: L0
+EXP(
+ ESEQ(
+  SEQ(
+   MOVE(
+    MEM(
+     BINOP(PLUS,
+      TEMP t100,
+      CONST 0)),
+    CALL(
+     NAME L2)),
+   SEQ(
+    MOVE(
+     TEMP t133,
+     CALL(
+      NAME L22,
+       TEMP t100)),
+    MOVE(
+     TEMP t134,
+     ESEQ(
+      MOVE(
+       MEM(
+        BINOP(PLUS,
+         TEMP t100,
+         CONST 0)),
+       CALL(
+        NAME L2)),
+      CALL(
+       NAME L22,
+        TEMP t100))))),
+  CALL(
+   NAME L25,
+    TEMP t100,
+    CALL(
+     NAME L23,
+      TEMP t100,
+      TEMP t133,
+      TEMP t134))))
+----------- Proc List -----------

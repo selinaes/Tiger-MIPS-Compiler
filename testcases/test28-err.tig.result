@@ -1,0 +1,29 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (rectype1,
+   RecordTy[
+    (name,false,string),
+    (id,false,int)]),
+  (rectype2,
+   RecordTy[
+    (name,false,string),
+    (id,false,int)])],
+ VarDec(rec1,false,SOME(rectype1),
+  RecordExp(rectype2,[
+
+   (name,
+    StringExp("Name")),
+   (id,
+    IntExp(0))]))],
+ SeqExp[
+  VarExp(
+   SimpleVar(rec1))])
+----------- IR -----------
+STRING: L1 Name
+PROC: frame with name: L0
+EXP(
+ CALL(
+  NAME exit,
+   CONST 1))
+----------- Proc List -----------

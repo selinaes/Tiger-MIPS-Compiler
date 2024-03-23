@@ -1,0 +1,26 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (tree,
+   RecordTy[
+    (key,false,int),
+    (children,false,treelist)])],
+ VarDec(d,false,SOME(int),
+  IntExp(0)),
+ TypeDec[
+  (treelist,
+   RecordTy[
+    (hd,false,tree),
+    (tl,false,treelist)])]],
+ SeqExp[
+  VarExp(
+   SimpleVar(d))])
+----------- IR -----------
+PROC: frame with name: L0
+EXP(
+ ESEQ(
+  MOVE(
+   TEMP t101,
+   CONST 0),
+  TEMP t101))
+----------- Proc List -----------

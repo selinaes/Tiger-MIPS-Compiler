@@ -1,0 +1,21 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (arrtype1,
+   ArrayTy(int)),
+  (arrtype2,
+   ArrayTy(int))],
+ VarDec(arr1,false,SOME(arrtype1),
+  ArrayExp(arrtype2,
+   IntExp(10),
+   IntExp(0)))],
+ SeqExp[
+  VarExp(
+   SimpleVar(arr1))])
+----------- IR -----------
+PROC: frame with name: L0
+EXP(
+ CALL(
+  NAME exit,
+   CONST 1))
+----------- Proc List -----------
