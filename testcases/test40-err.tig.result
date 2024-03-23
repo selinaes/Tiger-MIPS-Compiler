@@ -1,0 +1,22 @@
+----------- AST -----------
+LetExp([
+ FunctionDec[
+  (g,[
+   (a,false,int)],
+NONE,
+   VarExp(
+    SimpleVar(a)))]],
+ SeqExp[
+  CallExp(g,[
+   IntExp(2)])])
+----------- IR -----------
+PROC: frame with name: L1
+EXP(
+ TEMP t102)
+PROC: frame with name: L0
+EXP(
+ CALL(
+  NAME L1,
+   TEMP t100,
+   CONST 2))
+----------- Proc List -----------

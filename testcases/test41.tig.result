@@ -1,0 +1,17 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (a,
+   NameTy(int))]],
+ SeqExp[
+  LetExp([
+   TypeDec[
+    (a,
+     NameTy(string))]],
+   SeqExp[
+    IntExp(0)])])
+----------- IR -----------
+PROC: frame with name: L0
+EXP(
+ CONST 0)
+----------- Proc List -----------

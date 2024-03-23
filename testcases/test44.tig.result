@@ -1,0 +1,26 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (rectype,
+   RecordTy[
+    (name,false,string),
+    (id,false,int)])],
+ VarDec(b,false,SOME(rectype),
+  NilExp)],
+ SeqExp[
+  AssignExp(
+   SimpleVar(b),
+   NilExp)])
+----------- IR -----------
+PROC: frame with name: L0
+EXP(
+ ESEQ(
+  MOVE(
+   TEMP t101,
+   CONST 0),
+  ESEQ(
+   MOVE(
+    TEMP t101,
+    CONST 0),
+   CONST 0)))
+----------- Proc List -----------

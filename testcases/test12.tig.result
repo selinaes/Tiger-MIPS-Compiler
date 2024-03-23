@@ -1,0 +1,61 @@
+----------- AST -----------
+LetExp([
+ VarDec(a,false,NONE,
+  IntExp(0))],
+ SeqExp[
+  ForExp(
+i,false,
+   IntExp(0),
+   IntExp(100),
+   SeqExp[
+    AssignExp(
+     SimpleVar(a),
+     OpExp(PlusOp,
+      VarExp(
+       SimpleVar(a)),
+      IntExp(1))),
+    SeqExp[]])])
+----------- IR -----------
+PROC: frame with name: L0
+EXP(
+ ESEQ(
+  MOVE(
+   TEMP t101,
+   CONST 0),
+  ESEQ(
+   SEQ(
+    MOVE(
+     TEMP t102,
+     CONST 0),
+    SEQ(
+     CJUMP(LE,
+      TEMP t102,
+      CONST 100,
+      L2,L1),
+     SEQ(
+      LABEL L3,
+      SEQ(
+       MOVE(
+        TEMP t102,
+        BINOP(PLUS,
+         TEMP t102,
+         CONST 1)),
+       SEQ(
+        LABEL L2,
+        SEQ(
+         EXP(
+          ESEQ(
+           MOVE(
+            TEMP t101,
+            BINOP(PLUS,
+             TEMP t101,
+             CONST 1)),
+           CONST 0)),
+         SEQ(
+          CJUMP(LT,
+           TEMP t102,
+           CONST 100,
+           L3,L1),
+          LABEL L1))))))),
+   CONST 0)))
+----------- Proc List -----------

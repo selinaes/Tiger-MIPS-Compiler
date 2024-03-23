@@ -1,0 +1,12 @@
+----------- AST -----------
+OpExp(PlusOp,
+ IntExp(3),
+ StringExp("var"))
+----------- IR -----------
+STRING: L1 var
+PROC: frame with name: L0
+EXP(
+ BINOP(PLUS,
+  CONST 3,
+  NAME L1))
+----------- Proc List -----------

@@ -1,0 +1,36 @@
+----------- AST -----------
+IfExp(
+ SeqExp[
+  OpExp(GtOp,
+   IntExp(5),
+   IntExp(4))],
+ IntExp(13),
+ StringExp(" "))
+----------- IR -----------
+STRING: L1  
+PROC: frame with name: L0
+EXP(
+ ESEQ(
+  SEQ(
+   CJUMP(GT,
+    CONST 5,
+    CONST 4,
+    L2,L3),
+   SEQ(
+    LABEL L2,
+    SEQ(
+     MOVE(
+      TEMP t101,
+      CONST 13),
+     SEQ(
+      JUMP(
+       NAME L4),
+      SEQ(
+       LABEL L3,
+       SEQ(
+        MOVE(
+         TEMP t101,
+         NAME L1),
+        LABEL L4)))))),
+  TEMP t101))
+----------- Proc List -----------

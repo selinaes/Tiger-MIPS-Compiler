@@ -1,5 +1,0 @@
------------ AST -----------StringExp("abc
-abc")
------------ IR -----------PROC: L0
-EXP(
- NAME L1)

@@ -1,0 +1,14 @@
+----------- AST -----------
+OpExp(GtOp,
+ IntExp(3),
+ StringExp("df"))
+----------- IR -----------
+STRING: L1 df
+PROC: frame with name: L0
+SEQ(
+ CJUMP(GT,
+  CONST 3,
+  NAME L1,
+  L2,L2),
+ LABEL L2)
+----------- Proc List -----------
