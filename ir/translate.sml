@@ -12,8 +12,9 @@ struct
     structure Tr = Tree
     structure T = Types
 
-    val dummy = Ex(Tr.CONST 0)
-
+    val dummyTree: Tr.exp = Frame.externalCall("exit", [Tr.CONST 1])
+    val dummy: exp = Ex(dummyTree)
+    
     fun getResult() = !fragLst
 
     fun resetfragLst() = 
@@ -67,25 +68,40 @@ struct
 
 
     fun followLink(OUTMOST, _): Tr.exp = 
-        (Err.impossible  "followLink: does not find matched frame. definedLevel reach to outmost"; Tr.CONST 0)
+        (Err.impossible  "followLink: does not find matched frame. definedLevel reach to outmost"; dummyTree)
     | followLink(_, OUTMOST): Tr.exp = 
-        (Err.impossible "followLink: does not find matched frame. currentLevel reach to outmost"; Tr.CONST 0)
+        (Err.impossible "followLink: does not find matched frame. currentLevel reach to outmost"; dummyTree)
     | followLink(definedLevel, currentLevel): Tr.exp = 
-        let val (LEVEL{parent=parentLevel, frame=frame, unique=unique}) = currentLevel
-            val (LEVEL{parent=parentLevel', frame=frame', unique=unique'}) = definedLevel    
+        let val (LEVEL{parent=_, frame=_, unique=unique'}) = definedLevel    
+            val (LEVEL{parent=parentLevel, frame=_, unique=unique}) = currentLevel
         in
           if unique = unique'
                 then 
-                    Tr.MEM(Tr.TEMP Frame.FP)
+                    Tr.TEMP Frame.FP
                 else
                     Tr.MEM(followLink(definedLevel, parentLevel))
         end
 
-              
+    
+(* TODO: call on outmost frame, what should we do? *)
+    fun callIR(callLabel: Temp.label, args: exp list, OUTMOST , callLevel: level): exp =
+        let
+            val exArgs: Tr.exp list = map (fn a => unEx a) args
+        in
+            Ex(Tr.CALL(Tr.NAME callLabel, exArgs))
+        end
+    | callIR(callLabel: Temp.label, args: exp list, LEVEL {parent, frame, unique}, callLevel: level): exp =
+        let
+            val foundLink = followLink(parent, callLevel)
+            val exArgs: Tr.exp list = map unEx args
+        in
+            Ex(Tr.CALL(Tr.NAME callLabel, foundLink :: exArgs))
+        end
+
     (* access contains defined level, usedLevel is OUTMOST? true -> error, false ->  *)
     (* access * level -> exp,which is a MEM/TEMP *)
-    fun simpleVar (_, OUTMOST) = (Err.impossible "simpleVar: used level cannot be OUTMOST. "; Ex(Tr.CONST 0))
-        | simpleVar ((OUTMOST, _): access, _) = (Err.impossible "simpleVar: defined level cannot be OUTMOST. "; Ex(Tr.CONST 0))    
+    fun simpleVar (_, OUTMOST) = (Err.impossible "simpleVar: used level cannot be OUTMOST. "; dummy)
+        | simpleVar ((OUTMOST, _): access, _) = (Err.impossible "simpleVar: defined level cannot be OUTMOST. "; dummy)    
         | simpleVar ((definedLevel, frameAccess), usedLevel) : exp = 
             Ex(Frame.exp frameAccess (followLink(definedLevel, usedLevel)))
 
@@ -147,7 +163,7 @@ struct
             val elbl = Temp.newlabel()
             val result = Temp.newtemp()
         in
-            Ex(Tr.ESEQ(seq[test (tlbl, elbl),
+            Ex(Tr.ESEQ(seq[test (tlbl, flbl),
                         Tr.LABEL tlbl,
                         Tr.MOVE(Tr.TEMP result, ir2'),
                         Tr.JUMP(Tr.NAME elbl, [elbl]),
@@ -196,21 +212,6 @@ struct
     fun breakIR(label: Temp.label): exp = 
         Nx(Tr.JUMP (Tr.NAME label, [label]))
 
-(* TODO: call on outmost frame, what should we do? *)
-    fun callIR(callLabel: Temp.label, args: exp list, OUTMOST , callLevel: level): exp =
-        let
-            val exArgs: Tr.exp list = map (fn a => unEx a) args
-        in
-            Ex(Tr.CALL(Tr.NAME callLabel, exArgs))
-        end
-    | callIR(callLabel: Temp.label, args: exp list, LEVEL {parent, frame, unique}, callLevel: level): exp =
-        let
-            (* val () = print("callIR: callLabel: " ^ (Symbol.name callLabel) ^ "\n") *)
-            val foundLink = followLink(parent, callLevel)
-            val exArgs: Tr.exp list = map unEx args
-        in
-            Ex(Tr.CALL(Tr.NAME callLabel, foundLink :: exArgs))
-        end
 
 
     fun binOpIR(binop: Tr.binop, left: exp, right: exp): exp = 
@@ -237,14 +238,21 @@ struct
         
     (* todo: check str literal exist *)
     fun stringIR(str: string): exp = 
-        let val lbl = Temp.newlabel()
+        let 
             fun findStrLiteral (Frame.STRING(lstLbl, lstStr)): bool = (str = lstStr)
               | findStrLiteral (Frame.PROC{body=body, frame=frame}): bool = false
                 
         in
             case (List.find findStrLiteral (!fragLst)) of
                 SOME (Frame.STRING(lstLbl, lstStr)) => Ex(Tr.NAME lstLbl)
-                | NONE => (fragLst := !fragLst @ [Frame.STRING(lbl, str)]; Ex(Tr.NAME lbl))
+                | NONE => 
+                    let
+                        val lbl = Temp.newlabel();
+                    in
+                        fragLst := !fragLst @ [Frame.STRING(lbl, str)]; 
+                        Ex(Tr.NAME lbl)
+                    end
+                    
                 | _ => (Err.error 0 "stringIR: impossible case, PROC found."; dummy) (* found proc *)
         end
     
@@ -297,5 +305,5 @@ struct
           | LEVEL {parent, frame, unique} => fragLst := !fragLst @ [Frame.PROC{body=unNx body, frame=frame}])
    
             
-    
+   
 end 

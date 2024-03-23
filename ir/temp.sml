@@ -4,7 +4,7 @@ struct
     type temp = int
     val temps = ref 100
     fun newtemp() = let val t = !temps  in temps := t+1; t end
-
+    fun resetTemp() = temps := 100
     structure Table = IntMapTable(type key = int
 				  fun getInt n = n)
 
@@ -17,7 +17,7 @@ local structure F = Format
       fun resetLocal x = x := 0
       val labs = ref 0
  in
-    fun resetLabs() = resetLocal labs
+    fun resetLabs() = (resetLocal labs; resetTemp())
     fun newlabel() = Symbol.symbol(F.format "L%d" [F.INT(postinc labs)])
     val namedlabel = Symbol.symbol
 end

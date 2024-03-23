@@ -16,7 +16,7 @@ struct
 
     fun printFrag(outputstream, []) = ()
         | printFrag(outputstream, (PROC {body, frame}) :: frags) = 
-            (TextIO.output(outputstream, "PROC: " ^ Symbol.name (#name frame) ^ "\n");
+            (TextIO.output(outputstream, "PROC: frame with name: " ^ Symbol.name (#name frame) ^ "\n");
             Printtree.printtree(outputstream, body);
             printFrag(outputstream, frags))
             

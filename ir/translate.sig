@@ -8,6 +8,7 @@ sig
     val fragLst : Frame.frag list ref
     val resetfragLst : unit -> unit
     val dummy: exp
+    val dummyTree: Tree.exp
 
     val newLevel : {parent: level, name: Temp.label, formals: bool list} -> level 
     val formals: level -> access list

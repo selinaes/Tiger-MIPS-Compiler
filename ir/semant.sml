@@ -85,7 +85,7 @@ struct
                         then (Error.error pos ("Error: argument number mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
                         else 
                             if checkArgs(formals, map (fn a => #ty a) args')
-                            then (print (Symbol.name func ^ "\n");{exp=TS.callIR(label, map (fn a => #exp a) args', definedLevel, level),ty=result})
+                            then {exp=TS.callIR(label, map (fn a => #exp a) args', definedLevel, level),ty=result}
                             else {exp=TS.dummy, ty=Types.IMPOSSIBLE}
                     end
                 | _ => (Error.error pos ("Error: undefined function: " ^ S.name func); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
@@ -127,17 +127,11 @@ struct
         and trseq (exps) =  (* (A.exp*pos) list -> {exp=TS.exp list,ty=last expr ty} *)
             case exps of 
                     [] => {exp=TS.seqIR([]),ty=Types.UNIT}
-                    (* | [(expr, pos)] => 
-                        let
-                            val {exp=resExp, ty=ty} = trexp expr (* only 1,return {exp,ty}, ty=exp's evaluated ty*)
-                        in
-                            {exp=TS.seqIR([resExp]),ty=ty}
-                        end *)
                     | exps => 
                         let
-                            val (last:A.exp, pos) = List.last exps
-                            val exptyLast = trexp last
-                            val expAll = map (fn (ex, pos) => #exp (trexp ex)) exps
+                            val trexpAll = map (fn (ex, pos) => trexp ex) exps
+                            val expAll = map #exp trexpAll
+                            val exptyLast = List.last trexpAll
                         in
                             {exp=TS.seqIR(expAll),ty=(#ty exptyLast)}
                         end
@@ -308,19 +302,21 @@ struct
                 let 
                     val {exp,ty} = transExp(venv,tenv,level,init,doneLbl)
                     val access = TS.allocLocal (level) (!escape)
+                    val assignExp = TS.assignIR(TS.simpleVar(access,level), exp)
                 in 
                     case ty of
                         T.NIL => (Error.error pos "Error: nil cannot be used without type annotation"; 
                                 {venv=venv,tenv=tenv, explist=explist})
                         | _ =>  {tenv=tenv,
                                 venv=S.enter(venv,name,E.VarEntry{access=access, ty=ty}),
-                                explist=explist@[exp]}
+                                explist=explist@[assignExp]}
                 end
             | SOME(sym,pos) =>
                 let
                     val {exp=initExp,ty=calcTy} = transExp(venv,tenv,level,init,doneLbl)
                     val access = TS.allocLocal (level) (!escape)
                     val typ = symToType (tenv, sym, pos)
+                    val assignExp = TS.assignIR(TS.simpleVar(access,level), initExp)
                 in
                     if not(T.matchType(typ,calcTy))
                     then (Error.error pos "Error: type mismatch"; 
@@ -328,7 +324,7 @@ struct
                     else {
                         venv=S.enter(venv,name,E.VarEntry{access=access, ty=typ}),
                         tenv=tenv,
-                        explist=explist@[initExp]
+                        explist=explist@[assignExp]
                     }
                 end)
         (* Nonrecursive TypeDec *)  
@@ -427,9 +423,10 @@ struct
                                 val params' = map transparam params
                                  (* val level' = TR.newLevel(level, name, map #escape params') *)
                                  (* level is is a dummy value for temp venv *)
+                                val funLabel = Temp.newlabel()
                                 val venv' = S.enter(venv,name,
-                                            E.FunEntry{level=TS.newLevel{parent=level, name=name, formals=(map (fn {ty,escape,...} => !escape) params')},
-                                                label=Temp.newlabel(), formals= map #ty params', result=result_ty})
+                                            E.FunEntry{level=TS.newLevel{parent=level, name=funLabel, formals=(map (fn {ty,escape,...} => !escape) params')},
+                                                label=funLabel, formals= map #ty params', result=result_ty})
                             in
                                 venv' (*venv'' FunEntry, all params*)
                             end
@@ -449,12 +446,11 @@ struct
                         fun transparam ({name,escape,typ,pos}: A.field) =
                             {name=name, ty=symToType (tenv,typ, pos), escape=escape}
                         val params' = map transparam params
-                        val level' = (* TS.newLevel{parent=level, name=name, formals=map (fn {ty,escape,...} => !escape) params'} *)
-                                        (case S.look(temp_venv,name) of 
+                        val (level',label') = (case S.look(temp_venv,name) of 
                                             SOME(E.FunEntry{level=tempDefinedLevel,label,formals,result}) =>
-                                                tempDefinedLevel
+                                                (tempDefinedLevel, label)
                                             | _ => (Error.error pos ("Error: Impossible case funDec unfound" ^ S.name name);
-                                                        TS.newLevel{parent=level, name=name, formals=[]}))
+                                                        (TS.newLevel{parent=level, name=name, formals=[]}, Temp.newlabel())))
                         val formalsList = TS.formals level' (* [sl, 1stformal, 2ndformal]*)
                         fun enterparam ({name,ty,escape}, (venv, index)) =
                                 (S.enter(venv,name, E.VarEntry{access=List.nth(formalsList, index), ty=ty}), index + 1)
@@ -470,7 +466,7 @@ struct
                                     venv
                                 )
                                 else (definedFun := name :: !definedFun;
-                                    S.enter(venv,name,E.FunEntry{level=level', label=Temp.newlabel(), formals=map #ty params',result=result_ty})))
+                                    S.enter(venv,name,E.FunEntry{level=level', label=label', formals=map #ty params',result=result_ty})))
                     end
             in
                 {venv=foldl transFunDec venv fundecList,
@@ -481,14 +477,15 @@ struct
 
     fun transProg exp = 
         let 
-        
+            val () = TS.resetfragLst()
+            val () = Temp.resetLabs()
+            val () = LoopCounter.reset()
             val startLabel = Temp.newlabel()
             val startLevel = TS.newLevel{parent=TS.outmost, name=startLabel, formals=[]}
             val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, startLevel, exp, startLabel)
         in
             (
-            TS.resetfragLst(); 
-            Temp.resetLabs();
+            (* print("reset after: " ^ (app (fn x => Frame.printFrag(TextIO.stdOut, x)) TS.getResult())); *)
             if T.matchType(Types.UNIT, ty)
             then (TS.procEntryExit{level=startLevel, body=result}; TS.getResult())
             else (Error.error 0 "Error: top-level expression does not have type unit"; TS.getResult()))
