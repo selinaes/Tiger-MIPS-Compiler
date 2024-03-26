@@ -130,7 +130,7 @@ struct
             val checkLowerBound = Tr.CJUMP(Tr.LT, Tr.TEMP indexTemp, Tr.CONST(0), outOfBound, validIndex)
         in
             Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP indexTemp, index'),
-                            Tr.MOVE(Tr.TEMP sizeTemp, Tr.MEM(Tr.BINOP(Tr.MINUS, arr', Tr.CONST(4)))),
+                            Tr.MOVE(Tr.TEMP sizeTemp, Tr.MEM(Tr.BINOP(Tr.PLUS, arr', Tr.CONST(~4)))),
                             checkUpperBound,
                             Tr.LABEL nextCheck,
                             checkLowerBound,
