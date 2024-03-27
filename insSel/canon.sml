@@ -156,7 +156,7 @@ struct
              | (SOME(b' as _::_), _) =>  (*true case, negate the condition *)
 		           most @ [T.CJUMP(T.notRel opr,x,y,f,t)]
 		                @ trace(table, b', rest)
-             | _ => let val f' = Temp.newlabel() (* neigher, create false label*)
+             | _ => let val f' = Temp.newlabel() (* neither, create false label*)
 		        in most @ [T.CJUMP(opr,x,y,t,f'), 
 				        T.LABEL f', T.JUMP(T.NAME f,[f])]
 			          @ getnext(table,rest)

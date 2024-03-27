@@ -79,7 +79,7 @@ struct
                 then 
                     Tr.TEMP Frame.FP
                 else
-                    Tr.MEM(followLink(definedLevel, parentLevel))
+                    Tr.MEM(followLink(definedParentLevel, parentLevel))
         end
 
     
@@ -264,6 +264,17 @@ struct
         in
             Ex(Frame.externalCall("initArray", [size', init']))
         end
+        (* let val len = length fieldLsts
+            val ans = Temp.newtemp()
+            val fieldLsts' = map unEx fieldLsts
+            fun storeNextField(_, []) = seq []
+              | storeNextField(offset, fieldExp::r): Tr.stm = 
+                    seq[Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp),
+                    storeNextField(offset + Frame.wordSize, r)]
+        in
+            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST (len * Frame.wordSize)])),
+                            storeNextField(0, fieldLsts')], Tr.TEMP ans))
+        end *)
 
     fun recordCreateIR(fieldLsts: exp list): exp = 
         let val len = length fieldLsts
@@ -299,10 +310,22 @@ struct
                     Tr.LABEL falselbl])
         end
 
-    fun procEntryExit {level, body} : unit = 
+    fun procEntryExit {level: level, body: exp} : unit = 
         (case level of
             OUTMOST => Err.error 0 "cannot do procEntryExit at outmost frame. "
-          | LEVEL {parent, frame, unique} => fragLst := !fragLst @ [Frame.PROC{body=unNx body, frame=frame}])
+          | LEVEL {parent, frame, unique} => 
+            let
+                (* val body' = Frame.procEntryExit1(frame, unNx body)
+                val body'' = Tr.MOVE(Tr.TEMP Frame.RV, unEx (Nx body')) *)
+
+                val body' = Tr.MOVE(Tr.TEMP (Frame.RV), unEx body)
+                (* Add Function Label *)
+                val body'' = Tr.SEQ(Tr.LABEL (Frame.name frame), body')
+                (* val body'' = Frame.procEntryExit1(frame, body') *)
+
+            in fragLst := !fragLst @ [Frame.PROC{body=body'', frame=frame}]
+            end
+        )
    
             
    

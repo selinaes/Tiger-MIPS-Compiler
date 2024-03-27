@@ -478,7 +478,7 @@ struct
     fun transProg exp = 
         let 
             val () = TS.resetfragLst()
-            val () = Temp.resetLabs()
+            (* val () = Temp.resetLabs() *)
             val () = LoopCounter.reset()
             val startLabel = Temp.newlabel()
             val startLevel = TS.newLevel{parent=TS.outmost, name=startLabel, formals=[]}

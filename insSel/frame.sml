@@ -58,7 +58,7 @@ struct
     datatype frag = PROC of {body: Tree.stm, frame: frame} 
                 | STRING of Temp.label * string
 
-    val tempMap: Temp.Table.table = 
+    val tempMap: register Temp.Table.table = 
         let 
             val baseRegs = [
                 (FP, "%fp"), (SP, "%sp"), (RA, "%ra"),(ZERO, "%zero"), (AT, "%at"),  (RV, "%rv"), (V1, "%v1"), 
@@ -70,6 +70,8 @@ struct
         in
              foldr (fn ((s, t), acc) => Temp.Table.enter(acc, s, t)) Temp.Table.empty baseRegs 
         end 
+
+    fun string(label, str) = Symbol.name label ^ " : .ascii "^ str ^ " \n"
 
     fun tempToString (t: Temp.temp): string = 
         case Temp.Table.look(tempMap, t) of 
@@ -124,9 +126,9 @@ struct
     fun procEntryExit1(frame,body) = body
 
     fun procEntryExit2(frame, body) = 
-        body @ [A.OPER{assem="", src =[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}]
+        body @ [Assem.OPER{assem="", src =[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}]
 
-    fun procEntryExit3(FRAME{name,params,locals}, body) = 
+    fun procEntryExit3({name,formals,stackSize}: frame, body) = 
         {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
         body = body,
         epilog = "END " ^ Symbol.name name ^ "\n"}

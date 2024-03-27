@@ -54,5 +54,18 @@ datatype stm = SEQ of stm * stm
       and relop = EQ | NE | LT | GT | LE | GE 
 	        | ULT | ULE | UGT | UGE
 
+  fun notRel(opr: relop) : relop = 
+    (case opr of
+      EQ => NE
+      | NE => EQ
+      | LT => GE
+      | GT => LE
+      | LE => GT
+      | GE => LT
+      | ULT => UGE
+      | ULE => UGT
+      | UGE => ULT
+      | UGT => ULE )
+
 end
 
