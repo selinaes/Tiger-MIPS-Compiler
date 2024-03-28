@@ -25,6 +25,7 @@ datatype stm = SEQ of stm * stm
 	        | ULT | ULE | UGT | UGE
 
   val notRel : relop -> relop
+  val binopToStr : binop -> string
   (* val commute: relop -> relop *)
 end
 
@@ -53,6 +54,17 @@ datatype stm = SEQ of stm * stm
 
       and relop = EQ | NE | LT | GT | LE | GE 
 	        | ULT | ULE | UGT | UGE
+
+  fun binopToStr PLUS = "PLUS"
+    | binopToStr MINUS = "MINUS"
+    | binopToStr MUL = "MUL"
+    | binopToStr DIV = "DIV"
+    | binopToStr AND = "AND"
+    | binopToStr OR = "OR"
+    | binopToStr LSHIFT = "LSHIFT"
+    | binopToStr RSHIFT = "RSHIFT"
+    | binopToStr ARSHIFT = "ARSHIFT"
+    | binopToStr XOR = "XOR"
 
   fun notRel(opr: relop) : relop = 
     (case opr of

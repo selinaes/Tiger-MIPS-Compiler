@@ -14,11 +14,11 @@ struct
         | binopTrAsmMap T.RSHIFT = "srl"
         | binopTrAsmMap T.ARSHIFT = "sra"
         
-    fun binopTrAsmImmMap T.PLUS = "addi"
+    (* fun binopTrAsmImmMap T.PLUS = "addi"
         | binopTrAsmImmMap T.AND = "andi"
         | binopTrAsmImmMap T.OR = "or"
-        | binopTrAsmImmMap _ = ErrorMsg.impossible "binopTrAsmImmMap match failed"
-    
+        | binopTrAsmImmMap other = ErrorMsg.impossible ("binopTrAsmImmMap match failed: " ^ T.binopToStr other)
+     *)
     fun relopBranchMap T.EQ = "beq"
         | relopBranchMap T.NE = "bne"
         | relopBranchMap T.LT = "blt"
@@ -112,12 +112,25 @@ struct
                 | munchExp(T.BINOP(T.MINUS,T.CONST i,e1)) =
                     result(fn r => emit(A.OPER {assem="addi `d0, `s0, " ^ intToString(~i) ^ "\n",
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
-                | munchExp(T.BINOP(binop, e1,T.CONST i)) =
-                    result(fn r => emit(A.OPER {assem=binopTrAsmImmMap binop ^ " `d0, `s0, " ^ intToString(i) ^ "\n",
+                | munchExp(T.BINOP(T.PLUS, e1,T.CONST i)) =
+                    result(fn r => emit(A.OPER {assem="addi `d0, `s0, " ^ intToString(i) ^ "\n",
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
-                | munchExp(T.BINOP(binop,T.CONST i,e1)) =
-                    result(fn r => emit(A.OPER {assem=binopTrAsmImmMap binop ^ " `d0, `s0, " ^ intToString(i) ^ "\n",
+                | munchExp(T.BINOP(T.PLUS,T.CONST i,e1)) =
+                    result(fn r => emit(A.OPER {assem="addi `d0, `s0, " ^ intToString(i) ^ "\n",
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
+                | munchExp(T.BINOP(T.AND, e1,T.CONST i)) =
+                    result(fn r => emit(A.OPER {assem="andi `d0, `s0, " ^ intToString(i) ^ "\n",
+                                                src=[munchExp e1], dst=[r], jump=NONE}))
+                | munchExp(T.BINOP(T.AND,T.CONST i,e1)) =
+                    result(fn r => emit(A.OPER {assem="andi `d0, `s0, " ^ intToString(i) ^ "\n",
+                                                src=[munchExp e1], dst=[r], jump=NONE}))
+                | munchExp(T.BINOP(T.OR, e1,T.CONST i)) =
+                    result(fn r => emit(A.OPER {assem="ori `d0, `s0, " ^ intToString(i) ^ "\n",
+                                                src=[munchExp e1], dst=[r], jump=NONE}))
+                | munchExp(T.BINOP(T.OR,T.CONST i,e1)) =
+                    result(fn r => emit(A.OPER {assem="ori `d0, `s0, " ^ intToString(i) ^ "\n",
+                                                src=[munchExp e1], dst=[r], jump=NONE}))
+                
                 | munchExp(T.CALL(T.NAME clbl, args)) = 
                     (emit(A.OPER{assem="jal `j0 \n",
                                     src=munchArgs (0, args),
@@ -135,9 +148,12 @@ struct
                     result(fn r => emit(A.OPER{assem=binopTrAsmMap binop ^ " `d0, `s0, `s1\n",
                                             src=[munchExp e1, munchExp e2], dst=[r],
                                             jump=NONE}))
-                | munchExp(T.TEMP t) = t
+                | munchExp(T.TEMP t) = t    
+                | munchExp(T.NAME n) = 
+                    result(fn r => emit(A.OPER{assem="la `d0, " ^ S.name n ^ "\n",
+                                                src=[], dst=[r], jump=NONE}))
                 | munchExp(T.ESEQ(_,_)) = ErrorMsg.impossible "ESEQ appeared in InstrSel"
-                | munchExp _ = ErrorMsg.impossible "munchExp match failed"
+                | munchExp other = (Printtree.printtree (TextIO.stdOut, T.EXP(other)); ErrorMsg.impossible "munchExp match failed, given above, should ignore outmost EXP")
             and munchArgs(index: int, args: Tree.exp list): Assem.temp list = 
                 if index >= (length args) then []
                 else

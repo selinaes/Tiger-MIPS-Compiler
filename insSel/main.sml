@@ -9,7 +9,8 @@ structure Main = struct
 
   fun emitproc out (F.PROC{body,frame}) =
     let 
-        val _ = print ("----- emit " ^ Symbol.name (Frame.name frame) ^ " -----\n")
+        (* val _ = print ("# ----- emit " ^ Symbol.name (Frame.name frame) ^ " -----\n") *)
+        val _ = TextIO.output(out,"# ----- emit " ^ Symbol.name (Frame.name frame) ^ " -----\n");
         val _ = TextIO.output(out,"# ----- translated " ^ Symbol.name (Frame.name frame) ^ " -----\n");
         val _ = Printtree.printtree(out,body);
         val stms = Canon.linearize body
