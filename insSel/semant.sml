@@ -91,12 +91,6 @@ struct
                 | _ => (Error.error pos ("Error: undefined function: " ^ S.name func); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
         
         and trrecord (fields,typ,pos) = 
-        (*  field: (symbol * exp * pos)
-        A.RecordExp of {fields: (symbol * exp * pos) list,
-			typ: symbol, pos: pos}
-        T.RECORD of (Symbol.symbol * ty) list * unique
-            table -> record typ -> symTyList
-            symTyList contains field sym, (symTyList s1.sym = field f1.sym) symTyList s1.ty ?= field f1.exp ty?*)
             case S.look(tenv,typ) of
                 SOME(T.RECORD(f1)) =>
                     let 
@@ -214,7 +208,6 @@ struct
                     SOME(T.ARRAY(ty, unique)) =>
                         if T.matchType(ty,initTy)
                         then 
-                        (* (print ((S.name typ) ^" " ^  (T.toString ty)^ "\n"); *)
                         {exp=TS.arrayCreateIR(#exp size', initExp),ty=T.ARRAY(ty,unique)}
                         else (Error.error pos ("Error: type mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
                     | _ => (Error.error pos ("Error: undefined array type"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
@@ -340,7 +333,6 @@ struct
                         | NONE => 
                             let val unique = ref () 
                             in  
-                            (* print ("getOrDefault: old ref" ^ S.name sym); *)
                                 uniqueMap := S.enter(!uniqueMap, sym, unique);
                                 unique
                             end
@@ -365,7 +357,6 @@ struct
                            ( Error.error pos "Error: cycle"; T.IMPOSSIBLE)
                         else 
                             let val ty = #ty (valOf (List.find (fn {name=tyname,ty,pos} => tyname = name) tydecList))
-                                (* val () = print ("name: " ^ S.name name ^ " ty: " ^ T.toString ty ^ "\n") *)
                             in
                                 case ty of
                                     A.NameTy(sym, pos) => evalType(sym, name::visited, pos)
@@ -373,7 +364,6 @@ struct
                                         let
                                         val t = evalType(sym, name::visited, pos)
                                         in 
-                                        (* print ("array name: " ^ S.name name ^ " ty: " ^ T.toString t ^ "\n"); *)
                                         T.ARRAY(t, getOrDefault(name))
                                         end
                                     | A.RecordTy(fieldlist) => T.RECORD(makeRec(name, fieldlist))
@@ -421,8 +411,6 @@ struct
                                 fun transparam ({name,escape,typ,pos}: A.field) =
                                 {name=name, ty=symToType (tenv, typ, pos), escape=escape}
                                 val params' = map transparam params
-                                 (* val level' = TR.newLevel(level, name, map #escape params') *)
-                                 (* level is is a dummy value for temp venv *)
                                 val funLabel = Temp.newlabel()
                                 val venv' = S.enter(venv,name,
                                             E.FunEntry{level=TS.newLevel{parent=level, name=funLabel, formals=(map (fn {ty,escape,...} => !escape) params')},
@@ -477,15 +465,12 @@ struct
 
     fun transProg exp = 
         let 
-            val () = TS.resetfragLst()
-            (* val () = Temp.resetLabs() *)
             val () = LoopCounter.reset()
             val startLabel = Temp.newlabel()
             val startLevel = TS.newLevel{parent=TS.outmost, name=startLabel, formals=[]}
             val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, startLevel, exp, startLabel)
         in
             (
-            (* print("reset after: " ^ (app (fn x => Frame.printFrag(TextIO.stdOut, x)) TS.getResult())); *)
             if T.matchType(Types.UNIT, ty)
             then (TS.procEntryExit{level=startLevel, body=result}; TS.getResult())
             else (Error.error 0 "Error: top-level expression does not have type unit"; TS.getResult()))

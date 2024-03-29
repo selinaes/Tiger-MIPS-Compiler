@@ -11,17 +11,19 @@ structure Main = struct
     let 
         (* val _ = print ("# ----- emit " ^ Symbol.name (Frame.name frame) ^ " -----\n") *)
         val _ = TextIO.output(out,"# ----- emit " ^ Symbol.name (Frame.name frame) ^ " -----\n");
+
         val _ = TextIO.output(out,"# ----- translated " ^ Symbol.name (Frame.name frame) ^ " -----\n");
         val _ = Printtree.printtree(out,body);
-        val stms = Canon.linearize body
+        
         val _ = TextIO.output(out,"# ----- linearize " ^ Symbol.name (Frame.name frame) ^ " -----\n");
-        (*         val _ = app (fn s => Printtree.printtree(out,s)) stms; *)
+        val stms = Canon.linearize body
         val stms' = Canon.traceSchedule(Canon.basicBlocks stms)
         val _ = app (fn s => Printtree.printtree(out,s)) stms';
+
         val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n");
 	      val instrs = List.concat(map (MipsGen.codegen frame) stms') 
         val format0 = Assem.format(Temp.makestring)
-        (* print "1"; *)
+ 
     in  
       app (fn i => TextIO.output(out,format0 i)) instrs
     end
@@ -36,6 +38,7 @@ structure Main = struct
   fun compile filename = 
        let 
           val () = (Translate.resetfragLst(); Temp.resetLabs())
+
           val absyn = Parse.parse filename
           val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
        in 

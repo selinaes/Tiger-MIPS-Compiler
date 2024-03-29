@@ -1,6 +1,7 @@
 structure MipsFrame : FRAME = 
 struct
     datatype access = InFrame of int | InReg of Temp.temp
+    
     (* name: tag of the frame, formals: functions arguments, stackSize: size of the frmae, 4 * #(formals + locals)) *)
     type frame = {name: Temp.label, formals: access list, stackSize: int ref}
     type register = string
@@ -44,9 +45,9 @@ struct
     val T9 = Temp.newtemp()
     (* Reserved for kernel (operating system) *)
     val K0 = Temp.newtemp()
-    val K1 = Temp.newtemp()
-
+    val K1 = Temp.newtemp() 
     
+
     val specialregs: Temp.temp list = [ZERO, AT, FP, SP, RA, RV, V1, K0, K1, GP] (* 10 *)
     val argregs: Temp.temp list = [A0, A1, A2, A3] (* 4 *)
     val calleesaves: Temp.temp list = [S0, S1, S2, S3, S4, S5, S6, S7] (* 8 *)
@@ -108,7 +109,7 @@ struct
 
     fun name(frame: frame): Temp.label = #name frame
     fun formals(frame: frame): access list = #formals frame
-    (*Frame.allocLocal(f)(true) -> allocate a new localVar in frame f. T=escape, frame, F = to reg Temp*)
+
     fun allocLocal ({name, formals, stackSize}: frame) (escape:bool) : access = 
         if escape then
             let
@@ -123,11 +124,20 @@ struct
     fun exp(InFrame offset) fp = Tree.MEM(Tree.BINOP(Tree.PLUS, fp, Tree.CONST offset))
       | exp(InReg reg) fp = Tree.TEMP reg
 
+    (* View Shift: 
+    4: Arguments conventional passing loc -> expected callee-view loc
+    5: save callee saved regs. 
+    8: restore callee-saves *)
     fun procEntryExit1(frame,body) = body
 
+    (* Append sink instruction, mark regs still live at exit, prevent allocator from reuse *)
     fun procEntryExit2(frame, body) = 
         body @ [Assem.OPER{assem="", src =[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}]
 
+    (* Rest of prologue / epilogue 
+    1: peudo-announce start 2: function name label 3: adjust SP 
+    9: reset SP 10: jump to return addr 11:peudo-announce end
+    *)
     fun procEntryExit3({name,formals,stackSize}: frame, body) = 
         {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
         body = body,

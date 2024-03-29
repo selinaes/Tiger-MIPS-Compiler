@@ -310,14 +310,12 @@ struct
                     Tr.LABEL falselbl])
         end
 
+    (* Remembering PROC *)
     fun procEntryExit {level: level, body: exp} : unit = 
         (case level of
             OUTMOST => Err.error 0 "cannot do procEntryExit at outmost frame. "
           | LEVEL {parent, frame, unique} => 
             let
-                (* val body' = Frame.procEntryExit1(frame, unNx body)
-                val body'' = Tr.MOVE(Tr.TEMP Frame.RV, unEx (Nx body')) *)
-
                 val body' = Tr.MOVE(Tr.TEMP (Frame.RV), unEx body)
                 (* Add Function Label *)
                 val body'' = Tr.SEQ(Tr.LABEL (Frame.name frame), body')

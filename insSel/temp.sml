@@ -4,7 +4,8 @@ struct
     type temp = int
     val temps = ref 100
     fun newtemp() = let val t = !temps  in temps := t+1; t end
-    fun resetTemp() = temps := 100
+    (* 100-131 are the 32 named registers in Frame, this reset only used between tests *)
+    fun resetTemp() = temps := 132 
     structure Table = IntMapTable(type key = int
 				  fun getInt n = n)
 

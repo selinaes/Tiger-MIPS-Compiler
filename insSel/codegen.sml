@@ -14,11 +14,6 @@ struct
         | binopTrAsmMap T.RSHIFT = "srl"
         | binopTrAsmMap T.ARSHIFT = "sra"
         
-    (* fun binopTrAsmImmMap T.PLUS = "addi"
-        | binopTrAsmImmMap T.AND = "andi"
-        | binopTrAsmImmMap T.OR = "or"
-        | binopTrAsmImmMap other = ErrorMsg.impossible ("binopTrAsmImmMap match failed: " ^ T.binopToStr other)
-     *)
     fun relopBranchMap T.EQ = "beq"
         | relopBranchMap T.NE = "bne"
         | relopBranchMap T.LT = "blt"
