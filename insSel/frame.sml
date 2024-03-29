@@ -96,12 +96,9 @@ struct
             val curSize = ref 0
             val curParams = ref 0
             fun allocFormal (escape) : access = 
-                if !curParams < kDefaultRegSize 
-                then (curParams := !curParams + 1; InReg(Temp.newtemp()))
-                else 
-                    if escape
-                    then (curSize := !curSize + wordSize; InFrame(~(!curSize)))
-                    else InReg(Temp.newtemp())
+                case escape of
+                    true => (curSize := !curSize + wordSize; InFrame(~(!curSize)))
+                    | false => InReg(Temp.newtemp())
         in
             {name = name, formals = map allocFormal formals , stackSize = curSize}
         end
