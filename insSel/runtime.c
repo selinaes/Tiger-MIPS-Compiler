@@ -3,10 +3,10 @@
 
 
 int *initArray(int size, int init)
-{int i;
+{int i, size = size + 1;
  int *a = (int *)malloc(size*sizeof(int));
- for(i=0;i<size;i++) a[i]=init;
- return a;
+ for(i=1;i<=size;i++) a[i]=init;
+ return a + sizeof(int);
 }
 
 int *allocRecord(int size)

@@ -121,9 +121,11 @@ struct
 
   fun basicBlocks stms = 
      let val done = Temp.newlabel()
-        fun blocks((head as T.LABEL _) :: tail, blist) = (* head is a label case *)
+        fun blocks((head as T.LABEL _) :: tail, blist) = 
+        (* head is a label case *)
           let fun next((s as (T.JUMP _))::rest, thisblock) = endblock(rest, s::thisblock)
                 | next((s as (T.CJUMP _))::rest, thisblock) = endblock(rest,s::thisblock)
+                (* no-jump, create case *)
                 | next(stms as (T.LABEL lab :: _), thisblock) = next(T.JUMP(T.NAME lab,[lab]) :: stms, thisblock)
                 | next(s::rest, thisblock) = next(rest, s::thisblock)
                 | next(nil, thisblock) = next([T.JUMP(T.NAME done, [done])], thisblock)
@@ -131,7 +133,8 @@ struct
           in next(tail, [head])
           end
         | blocks(nil, blist) = rev blist
-        | blocks(stms, blist) = blocks(T.LABEL(Temp.newlabel())::stms, blist) (* non-label, create case *)
+        (* head-no-label, create case *)
+        | blocks(stms, blist) = blocks(T.LABEL(Temp.newlabel())::stms, blist) 
      in (blocks(stms,nil), done)
      end
 
@@ -148,22 +151,27 @@ struct
       case splitlast b of 
         (most,T.JUMP(T.NAME lab, _)) =>
 	        (case Symbol.look(table, lab) of 
+            (* jump target unvisited, put as next, delete jump *)
             SOME(b' as _::_) => most @ trace(table, b', rest)
 	          | _ => b @ getnext(table,rest))
         |(most,T.CJUMP(opr,x,y,t,f)) =>
           (case (Symbol.look(table,t), Symbol.look(table,f)) of 
-             (_, SOME(b' as _::_)) => b @ trace(table, b', rest) (*false case*)
-             | (SOME(b' as _::_), _) =>  (*true case, negate the condition *)
+            (* false block not visited, so make false the successor (trace b')*)
+             (_, SOME(b' as _::_)) => b @ trace(table, b', rest) 
+            (* false visited, true not visited, so make true the successor (trace b'), and negate *)
+           | (SOME(b' as _::_), _) =>  
 		           most @ [T.CJUMP(T.notRel opr,x,y,f,t)]
 		                @ trace(table, b', rest)
-             | _ => let val f' = Temp.newlabel() (* neither, create false label*)
-		        in most @ [T.CJUMP(opr,x,y,t,f'), 
-				        T.LABEL f', T.JUMP(T.NAME f,[f])]
-			          @ getnext(table,rest)
-            end)
-      | (most, T.JUMP _) => b @ getnext(table,rest)
+             (* Both visited, so create dummy f' *)
+           | _ => let val f' = Temp.newlabel() 
+                  in most @ [T.CJUMP(opr,x,y,t,f'), 
+                      T.LABEL f', T.JUMP(T.NAME f,[f])]
+                      @ getnext(table,rest)
+                  end)
+        | (most, T.JUMP _) => b @ getnext(table,rest)
     end
 
+    (* Get next unvisited *)
     and getnext(table,(b as (T.LABEL lab::_))::rest) = 
             (case Symbol.look(table, lab)
               of SOME(_::_) => trace(table,b,rest)

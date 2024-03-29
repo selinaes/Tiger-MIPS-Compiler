@@ -53,14 +53,7 @@ struct
                 | munchStm(T.MOVE(T.MEM(T.CONST i),e2)) =
                     emit(A.OPER{assem="sw `s0, " ^ intToString(i) ^ "($0)\n",
                     src=[munchExp e2], dst=[],jump=NONE})
-                | munchStm(T.CJUMP(relop,e1,T.CONST(i), t, f)) = 
-                    emit(A.OPER{assem=relopBranchMap relop ^ " `s0, " ^ intToString(i) ^ ", `j0\n",
-                                src=[munchExp e1],
-                                dst=[],jump=SOME([t,f])})
-                | munchStm(T.CJUMP(relop,T.CONST(i),e2, t, f)) = 
-                    emit(A.OPER{assem=relopBranchMap relop ^ " " ^ intToString(i) ^ ", `s0, `j0\n",
-                                src=[munchExp e2],
-                                dst=[],jump=SOME([t,f])})
+
             (* 2 node *)
                 | munchStm(T.MOVE(T.MEM(e1),e2)) =
                     emit(A.OPER{assem="sw `s0, 0(`s1)\n",

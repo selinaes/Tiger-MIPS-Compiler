@@ -26,6 +26,7 @@ datatype stm = SEQ of stm * stm
 
   val notRel : relop -> relop
   val binopToStr : binop -> string
+  val seq : stm list -> stm
   (* val commute: relop -> relop *)
 end
 
@@ -65,6 +66,11 @@ datatype stm = SEQ of stm * stm
     | binopToStr RSHIFT = "RSHIFT"
     | binopToStr ARSHIFT = "ARSHIFT"
     | binopToStr XOR = "XOR"
+
+  
+  fun seq [s] = s
+      | seq (s::ss) = SEQ(s, seq ss)
+      | seq [] = EXP(CONST 0) 
 
   fun notRel(opr: relop) : relop = 
     (case opr of

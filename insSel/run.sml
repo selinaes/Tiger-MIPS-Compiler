@@ -68,6 +68,7 @@ fun clear() =
 
 (* clear(); *)
 runAllTests ();
+(* Main.compile "../testcases/test6.tig"; *)
 (* par "error-inte.tig"; *)
 (* par "testEsc-err.tig";  *)
 (* par "test19-err.tig"; *)

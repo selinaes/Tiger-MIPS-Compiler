@@ -22,10 +22,12 @@ structure Main = struct
 
         val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n");
 	      val instrs = List.concat(map (MipsGen.codegen frame) stms') 
+        val instrs' = Frame.procEntryExit2(frame, instrs)
+        val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs')
         val format0 = Assem.format(Temp.makestring)
  
     in  
-      app (fn i => TextIO.output(out,format0 i)) instrs
+      app (fn i => TextIO.output(out,format0 i)) body'
     end
     | emitproc out (F.STRING(lab,s)) = TextIO.output(out,F.string(lab,s))
 
@@ -38,7 +40,6 @@ structure Main = struct
   fun compile filename = 
        let 
           val () = (Translate.resetfragLst(); Temp.resetLabs())
-
           val absyn = Parse.parse filename
           val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
        in 
