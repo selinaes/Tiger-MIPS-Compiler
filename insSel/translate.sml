@@ -32,16 +32,13 @@ struct
     fun allocLocal OUTMOST (b:bool) : access = (Err.error 0 "cannot allocate at outmost frame. \n"; (OUTMOST, Frame.allocLocal (Frame.newFrame {name=Temp.newlabel(),formals=[]}) b))
     | allocLocal (LEVEL {parent, frame, unique}) (b:bool) : access = (LEVEL {parent=parent, frame=frame, unique=unique}, Frame.allocLocal frame b)
 
-    fun seq [s] = s
-        | seq (s::ss) = Tr.SEQ(s, seq ss)
-        | seq [] = Tr.EXP(Tr.CONST 0) 
 
     fun unEx (Ex e) = e
         | unEx (Cx genstm) =
             let val r = Temp.newtemp()
                 val t = Temp.newlabel() 
                 val f = Temp.newlabel()
-            in Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP r, Tr.CONST 1), 
+            in Tr.ESEQ(Tr.seq[Tr.MOVE(Tr.TEMP r, Tr.CONST 1), 
                             genstm(t,f),
                             Tr.LABEL f,
                             Tr.MOVE(Tr.TEMP r, Tr.CONST 0),
@@ -55,7 +52,7 @@ struct
             let 
                 val t = Temp.newlabel()
             in 
-                seq[genstm(t, t), Tr.LABEL t]
+                Tr.seq[genstm(t, t), Tr.LABEL t]
             end
         | unNx (Nx s) = s
 
@@ -79,7 +76,7 @@ struct
                 then 
                     Tr.TEMP Frame.FP
                 else
-                    Tr.MEM(followLink(definedLevel, parentLevel))
+                    Tr.MEM(followLink(definedParentLevel, parentLevel))
         end
 
     
@@ -129,15 +126,17 @@ struct
             val checkUpperBound = Tr.CJUMP(Tr.GE, Tr.TEMP indexTemp, Tr.TEMP sizeTemp, outOfBound, nextCheck)
             val checkLowerBound = Tr.CJUMP(Tr.LT, Tr.TEMP indexTemp, Tr.CONST(0), outOfBound, validIndex)
         in
-            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP indexTemp, index'),
-                            Tr.MOVE(Tr.TEMP sizeTemp, Tr.MEM(Tr.BINOP(Tr.MINUS, arr', Tr.CONST(4)))),
+            Ex(Tr.ESEQ(Tr.seq[Tr.MOVE(Tr.TEMP indexTemp, index'),
+                            Tr.MOVE(Tr.TEMP sizeTemp, Tr.MEM(Tr.BINOP(Tr.PLUS, arr', Tr.CONST(~4)))),
                             checkUpperBound,
                             Tr.LABEL nextCheck,
                             checkLowerBound,
                             Tr.LABEL outOfBound,
                             Tr.EXP(Frame.externalCall("exit", [Tr.CONST(1)])),
                             Tr.LABEL validIndex],
-                        Tr.MEM(Tr.BINOP(Tr.PLUS, arr', Tr.BINOP(Tr.MUL, index', Tr.CONST(Frame.wordSize))))))
+                        Tr.MEM(Tr.BINOP(Tr.PLUS, arr', Tr.BINOP(Tr.MUL, index', Tr.CONST(Frame.wordSize))))
+            ))
+        
         end
 
 
@@ -147,7 +146,7 @@ struct
             val tlbl = Temp.newlabel()
             val elbl = Temp.newlabel()
         in
-            Nx(seq[test (tlbl, elbl),
+            Nx(Tr.seq[test (tlbl, elbl),
                     Tr.LABEL tlbl,
                     ir2',
                     Tr.LABEL elbl])
@@ -163,7 +162,7 @@ struct
             val elbl = Temp.newlabel()
             val result = Temp.newtemp()
         in
-            Ex(Tr.ESEQ(seq[test (tlbl, flbl),
+            Ex(Tr.ESEQ(Tr.seq[test (tlbl, flbl),
                         Tr.LABEL tlbl,
                         Tr.MOVE(Tr.TEMP result, ir2'),
                         Tr.JUMP(Tr.NAME elbl, [elbl]),
@@ -180,7 +179,7 @@ struct
             (* val falselbl = Temp.newlabel() *)
             val testlbl = Temp.newlabel()
         in
-            Nx(seq[Tr.JUMP(Tr.NAME testlbl, [testlbl]),
+            Nx(Tr.seq[Tr.JUMP(Tr.NAME testlbl, [testlbl]),
                    Tr.LABEL truelbl,
                    body',
                    Tr.LABEL testlbl,
@@ -190,7 +189,7 @@ struct
         end
    
     fun letIR([], body): exp = body
-        | letIR(declist: exp list, body: exp) = Ex(Tr.ESEQ(seq(map unNx declist), unEx body))
+        | letIR(declist: exp list, body: exp) = Ex(Tr.ESEQ(Tr.seq(map unNx declist), unEx body))
 
     (* Translate.exp list, handle each *)
     fun seqIR([]): exp = Ex(Tr.CONST 0)
@@ -263,19 +262,31 @@ struct
             val init' = unEx init
         in
             Ex(Frame.externalCall("initArray", [size', init']))
+            (* TODO: malloc each item space an assign to the index  *)
         end
+        (* let val Tree.CONST(len) = unEx size
+            val ans = Temp.newtemp()
+            fun storeNextIndex(_, []) = seq []
+              | storeNextIndex(offset, fieldExp::r): Tr.stm = 
+                    seq[Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp),
+                    storeNextField(offset + Frame.wordSize, r)]
+        in
+            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST ((size' + 1) * Frame.wordSize)])),
+                            storeNextField(size, init)], Tr.TEMP ans))
+        end *)
+                
 
     fun recordCreateIR(fieldLsts: exp list): exp = 
         let val len = length fieldLsts
             val ans = Temp.newtemp()
             val fieldLsts' = map unEx fieldLsts
-            fun storeNextField(_, []) = seq []
+            fun storeNextField(_, []) = Tr.seq []
               | storeNextField(offset, fieldExp::r): Tr.stm = 
-                    seq[Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp),
+                    Tr.seq[Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp),
                     storeNextField(offset + Frame.wordSize, r)]
         in
             (* Ex(Tr.ESEQ(foldl storeNextField recordSeq fieldLsts, Tr.TEMP recordPtr)) *)
-            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST (len * Frame.wordSize)])),
+            Ex(Tr.ESEQ(Tr.seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST (len * Frame.wordSize)])),
                             storeNextField(0, fieldLsts')], Tr.TEMP ans))
         end
 
@@ -288,7 +299,7 @@ struct
             (* val falselbl = Temp.newlabel() L3 *)
             val incrementlbl = Temp.newlabel() (*L1*)
         in
-            Nx(seq[
+            Nx(Tr.seq[
                     Tr.MOVE(vloc', lo'),
                     Tr.CJUMP(Tr.LE, vloc', hi', truelbl, falselbl),
                     Tr.LABEL incrementlbl,
@@ -299,10 +310,18 @@ struct
                     Tr.LABEL falselbl])
         end
 
-    fun procEntryExit {level, body} : unit = 
+    (* Remembering PROC *)
+    fun procEntryExit {level: level, body: exp} : unit = 
         (case level of
             OUTMOST => Err.error 0 "cannot do procEntryExit at outmost frame. "
-          | LEVEL {parent, frame, unique} => fragLst := !fragLst @ [Frame.PROC{body=unNx body, frame=frame}])
+          | LEVEL {parent, frame, unique} => 
+            let
+                (* Step 7: move the return value (result of the function) to the register reserved for that purpose*)
+                val body' = Tr.MOVE(Tr.TEMP (Frame.RV), unEx body)
+                val body'' = Frame.procEntryExit1(frame, body')
+            in 
+                fragLst := !fragLst @ [Frame.PROC{body=body'', frame=frame}]
+            end)
    
             
    
