@@ -1,104 +1,54 @@
 L1 : .ascii Nobody 
 L2 : .ascii Somebody 
 # ----- emit L0 -----
-# ----- translated L0 -----
-SEQ(
- LABEL L0,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   MOVE(
-    TEMP t102,
-    ESEQ(
-     SEQ(
-      MOVE(
-       TEMP t101,
-       CALL(
-        NAME malloc,
-         CONST 8)),
-      SEQ(
-       MOVE(
-        MEM(
-         BINOP(PLUS,
-          TEMP t101,
-          CONST 0)),
-        NAME L1),
-       SEQ(
-        MOVE(
-         MEM(
-          BINOP(PLUS,
-           TEMP t101,
-           CONST 4)),
-         CONST 1000),
-        EXP(
-         CONST 0)))),
-     TEMP t101)),
-   ESEQ(
-    MOVE(
-     MEM(
-      TEMP t102),
-     NAME L2),
-    ESEQ(
-     MOVE(
-      MEM(
-       BINOP(PLUS,
-        TEMP t102,
-        CONST 4)),
-      CONST 900),
-     TEMP t102)))))
-# ----- linearize L0 -----
-LABEL L0
-MOVE(
- TEMP t101,
- CALL(
-  NAME malloc,
-   CONST 8))
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   CONST 0)),
- NAME L1)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   CONST 4)),
- CONST 1000)
-MOVE(
- TEMP t102,
- TEMP t101)
-MOVE(
- MEM(
-  TEMP t102),
- NAME L2)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t102,
-   CONST 4)),
- CONST 900)
-MOVE(
- TEMP t106,
- TEMP t102)
-JUMP(
- NAME L3)
-LABEL L3
-# ----- Assembly L0 -----
 L0:
-addi t103, $0, 8
-add t108, t103, $0
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
+L4:
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+addi t134, $0, 8
+add t108, t134, $0
 jal malloc 
-add t101, t106, $0
-la t104, L1
-sw t104, 0(t101)
-addi t105, $0, 1000
-sw t105, 4(t101)
-add t102, t101, $0
-la t106, L2
-sw t102, 0(t106)
-addi t107, $0, 900
-sw t107, 4(t102)
-add t106, t102, $0
+add t132, t106, $0
+la t135, L1
+sw t135, 0(t132)
+addi t136, $0, 1000
+sw t136, 4(t132)
+add t133, t132, $0
+la t137, L2
+sw t137, 0(t133)
+addi t138, $0, 900
+sw t138, 4(t133)
+add t106, t133, $0
+lw t139, -8(t100)
+add t120, t139, $0
+lw t140, -12(t100)
+add t121, t140, $0
+lw t141, -16(t100)
+add t122, t141, $0
+lw t142, -20(t100)
+add t123, t142, $0
+lw t143, -24(t100)
+add t124, t143, $0
+lw t144, -28(t100)
+add t125, t144, $0
+lw t145, -32(t100)
+add t126, t145, $0
+lw t146, -36(t100)
+add t127, t146, $0
 j L3 
 L3:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102

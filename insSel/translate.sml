@@ -262,18 +262,19 @@ struct
             val init' = unEx init
         in
             Ex(Frame.externalCall("initArray", [size', init']))
+            (* TODO: malloc each item space an assign to the index  *)
         end
-        (* let val len = length fieldLsts
+        (* let val Tree.CONST(len) = unEx size
             val ans = Temp.newtemp()
-            val fieldLsts' = map unEx fieldLsts
-            fun storeNextField(_, []) = seq []
-              | storeNextField(offset, fieldExp::r): Tr.stm = 
+            fun storeNextIndex(_, []) = seq []
+              | storeNextIndex(offset, fieldExp::r): Tr.stm = 
                     seq[Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp),
                     storeNextField(offset + Frame.wordSize, r)]
         in
-            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST (len * Frame.wordSize)])),
-                            storeNextField(0, fieldLsts')], Tr.TEMP ans))
+            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST ((size' + 1) * Frame.wordSize)])),
+                            storeNextField(size, init)], Tr.TEMP ans))
         end *)
+                
 
     fun recordCreateIR(fieldLsts: exp list): exp = 
         let val len = length fieldLsts

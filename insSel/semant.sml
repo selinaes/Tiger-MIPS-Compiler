@@ -411,7 +411,8 @@ struct
                                 fun transparam ({name,escape,typ,pos}: A.field) =
                                 {name=name, ty=symToType (tenv, typ, pos), escape=escape}
                                 val params' = map transparam params
-                                val funLabel = Temp.newlabel()
+                                (* val funLabel = Temp.newlabel() *)
+                                val funLabel =  name
                                 val venv' = S.enter(venv,name,
                                             E.FunEntry{level=TS.newLevel{parent=level, name=funLabel, formals=(map (fn {ty,escape,...} => !escape) params')},
                                                 label=funLabel, formals= map #ty params', result=result_ty})

@@ -1,227 +1,191 @@
-# ----- emit L2 -----
-# ----- translated L2 -----
-SEQ(
- LABEL L2,
- MOVE(
-  TEMP t106,
-  BINOP(PLUS,
-   CONST 1,
-   TEMP t102)))
-# ----- linearize L2 -----
-LABEL L2
-MOVE(
- TEMP t106,
- BINOP(PLUS,
-  CONST 1,
-  TEMP t102))
-JUMP(
- NAME L10)
-LABEL L10
-# ----- Assembly L2 -----
-L2:
-addi t108, t102, 1
-add t106, t108, $0
-j L10 
-L10:
-# ----- emit L1 -----
-# ----- translated L1 -----
-SEQ(
- LABEL L1,
- MOVE(
-  TEMP t106,
-  CONST 0))
-# ----- linearize L1 -----
-LABEL L1
-MOVE(
- TEMP t106,
- CONST 0)
-JUMP(
- NAME L11)
-LABEL L11
-# ----- Assembly L1 -----
-L1:
-addi t109, $0, 0
-add t106, t109, $0
-j L11 
-L11:
-# ----- emit L6 -----
-# ----- translated L6 -----
-SEQ(
- LABEL L6,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   SEQ(
-    MOVE(
-     TEMP t107,
-     TEMP t106),
-    SEQ(
-     CJUMP(LE,
-      TEMP t107,
-      CONST 8,
-      L8,L7),
-     SEQ(
-      LABEL L9,
-      SEQ(
-       MOVE(
-        TEMP t107,
-        BINOP(PLUS,
-         TEMP t107,
-         CONST 1)),
-       SEQ(
-        LABEL L8,
-        SEQ(
-         EXP(
-          BINOP(PLUS,
-           TEMP t107,
-           MEM(
-            BINOP(PLUS,
-             MEM(
-              TEMP t100),
-             CONST 0)))),
-         SEQ(
-          CJUMP(LT,
-           TEMP t107,
-           CONST 8,
-           L9,L7),
-          LABEL L7))))))),
-   CONST 0)))
-# ----- linearize L6 -----
-LABEL L6
-MOVE(
- TEMP t107,
- TEMP t106)
-CJUMP(LE,
- TEMP t107,
- CONST 8,
- L8,L7)
-LABEL L7
-MOVE(
- TEMP t106,
- CONST 0)
-JUMP(
- NAME L12)
-LABEL L9
-MOVE(
- TEMP t107,
- BINOP(PLUS,
-  TEMP t107,
-  CONST 1))
-LABEL L8
-EXP(
- BINOP(PLUS,
-  TEMP t107,
-  MEM(
-   BINOP(PLUS,
-    MEM(
-     TEMP t100),
-    CONST 0))))
-CJUMP(LT,
- TEMP t107,
- CONST 8,
- L9,L13)
-LABEL L13
-JUMP(
- NAME L7)
-LABEL L12
-# ----- Assembly L6 -----
-L6:
-add t107, t106, $0
-ble t107, 8, L8
-L7:
-addi t110, $0, 0
-add t106, t110, $0
-j L12 
-L9:
-addi t111, t107, 1
-add t107, t111, $0
+# ----- emit y -----
+y:
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
 L8:
-lw t114, 0(t100)
-lw t113, 0(t114)
-add t112, t107, t113
-blt t107, 8, L9
-L13:
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+lw t137, 0(t100)
+lw t136, -8(t137)
+addi t135, t136, 1
+add t106, t135, $0
+lw t138, -8(t100)
+add t120, t138, $0
+lw t139, -12(t100)
+add t121, t139, $0
+lw t140, -16(t100)
+add t122, t140, $0
+lw t141, -20(t100)
+add t123, t141, $0
+lw t142, -24(t100)
+add t124, t142, $0
+lw t143, -28(t100)
+add t125, t143, $0
+lw t144, -32(t100)
+add t126, t144, $0
+lw t145, -36(t100)
+add t127, t145, $0
 j L7 
+L7:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102
+# ----- emit x -----
+x:
+move t100, t101
+addi t101, t101, -48
+sw t102, 8(t101)
+sw t100, 4(t101)
+L10:
+sw t109, -8(t100)
+sw t108, -4(t100)
+sw t120, -12(t100)
+sw t121, -16(t100)
+sw t122, -20(t100)
+sw t123, -24(t100)
+sw t124, -28(t100)
+sw t125, -32(t100)
+sw t126, -36(t100)
+sw t127, -40(t100)
+addi t146, $0, 0
+add t106, t146, $0
+lw t147, -12(t100)
+add t120, t147, $0
+lw t148, -16(t100)
+add t121, t148, $0
+lw t149, -20(t100)
+add t122, t149, $0
+lw t150, -24(t100)
+add t123, t150, $0
+lw t151, -28(t100)
+add t124, t151, $0
+lw t152, -32(t100)
+add t125, t152, $0
+lw t153, -36(t100)
+add t126, t153, $0
+lw t154, -40(t100)
+add t127, t154, $0
+j L9 
+L9:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 48
+jr t102
+# ----- emit z -----
+z:
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
 L12:
-# ----- emit L0 -----
-# ----- translated L0 -----
-SEQ(
- LABEL L0,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   SEQ(
-    MOVE(
-     MEM(
-      BINOP(PLUS,
-       TEMP t100,
-       CONST 0)),
-     CONST 3),
-    MOVE(
-     TEMP t104,
-     CONST 3)),
-   ESEQ(
-    SEQ(
-     JUMP(
-      NAME L5),
-     SEQ(
-      LABEL L4,
-      SEQ(
-       EXP(
-        CONST 0),
-       SEQ(
-        LABEL L5,
-        SEQ(
-         CJUMP(LT,
-          TEMP t104,
-          CONST 7,
-          L4,L3),
-         LABEL L3))))),
-    CALL(
-     NAME exit,
-      CONST 1)))))
-# ----- linearize L0 -----
-LABEL L0
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST 0)),
- CONST 3)
-MOVE(
- TEMP t104,
- CONST 3)
-LABEL L5
-CJUMP(LT,
- TEMP t104,
- CONST 7,
- L4,L3)
-LABEL L3
-MOVE(
- TEMP t106,
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L14)
-LABEL L4
-JUMP(
- NAME L5)
-LABEL L14
-# ----- Assembly L0 -----
-L0:
-addi t115, $0, 3
-sw t115, 0(t100)
-addi t116, $0, 3
-add t104, t116, $0
+add t133, t109, $0
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+add t134, t133, $0
+addi t155, $0, 8
+ble t134, t155, L5
+L4:
+addi t156, $0, 0
+add t106, t156, $0
+lw t157, -8(t100)
+add t120, t157, $0
+lw t158, -12(t100)
+add t121, t158, $0
+lw t159, -16(t100)
+add t122, t159, $0
+lw t160, -20(t100)
+add t123, t160, $0
+lw t161, -24(t100)
+add t124, t161, $0
+lw t162, -28(t100)
+add t125, t162, $0
+lw t163, -32(t100)
+add t126, t163, $0
+lw t164, -36(t100)
+add t127, t164, $0
+j L11 
+L6:
+addi t165, t134, 1
+add t134, t165, $0
 L5:
-blt t104, 7, L4
+lw t168, 0(t100)
+lw t167, -8(t168)
+add t166, t134, t167
+addi t169, $0, 8
+blt t134, t169, L6
+L13:
+j L4 
+L11:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102
+# ----- emit L0 -----
+L0:
+move t100, t101
+addi t101, t101, -48
+sw t102, 8(t101)
+sw t100, 4(t101)
+L15:
+sw t108, -4(t100)
+sw t120, -12(t100)
+sw t121, -16(t100)
+sw t122, -20(t100)
+sw t123, -24(t100)
+sw t124, -28(t100)
+sw t125, -32(t100)
+sw t126, -36(t100)
+sw t127, -40(t100)
+addi t170, $0, 3
+sw t170, -8(t100)
+addi t171, $0, 3
+add t132, t171, $0
 L3:
-addi t117, $0, 1
-add t108, t117, $0
+addi t172, $0, 7
+blt t132, t172, L2
+L1:
+addi t173, $0, 1
+add t108, t173, $0
 jal exit 
 add t106, t106, $0
+lw t174, -12(t100)
+add t120, t174, $0
+lw t175, -16(t100)
+add t121, t175, $0
+lw t176, -20(t100)
+add t122, t176, $0
+lw t177, -24(t100)
+add t123, t177, $0
+lw t178, -28(t100)
+add t124, t178, $0
+lw t179, -32(t100)
+add t125, t179, $0
+lw t180, -36(t100)
+add t126, t180, $0
+lw t181, -40(t100)
+add t127, t181, $0
 j L14 
-L4:
-j L5 
+L2:
+j L3 
 L14:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 48
+jr t102

@@ -1,61 +1,49 @@
 # ----- emit L0 -----
-# ----- translated L0 -----
-SEQ(
- LABEL L0,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   SEQ(
-    JUMP(
-     NAME L3),
-    SEQ(
-     LABEL L2,
-     SEQ(
-      EXP(
-       BINOP(PLUS,
-        CONST 5,
-        CONST 6)),
-      SEQ(
-       LABEL L3,
-       SEQ(
-        CJUMP(GT,
-         CONST 10,
-         CONST 5,
-         L2,L1),
-        LABEL L1))))),
-   CONST 0)))
-# ----- linearize L0 -----
-LABEL L0
-LABEL L3
-CJUMP(GT,
- CONST 10,
- CONST 5,
- L2,L1)
-LABEL L1
-MOVE(
- TEMP t106,
- CONST 0)
-JUMP(
- NAME L4)
-LABEL L2
-EXP(
- BINOP(PLUS,
-  CONST 5,
-  CONST 6))
-JUMP(
- NAME L3)
-LABEL L4
-# ----- Assembly L0 -----
 L0:
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
+L5:
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
 L3:
-addi t101, $0, 10
-bgt t101, 5, L2
+addi t132, $0, 10
+addi t133, $0, 5
+bgt t132, t133, L2
 L1:
-addi t102, $0, 0
-add t106, t102, $0
+addi t134, $0, 0
+add t106, t134, $0
+lw t135, -8(t100)
+add t120, t135, $0
+lw t136, -12(t100)
+add t121, t136, $0
+lw t137, -16(t100)
+add t122, t137, $0
+lw t138, -20(t100)
+add t123, t138, $0
+lw t139, -24(t100)
+add t124, t139, $0
+lw t140, -28(t100)
+add t125, t140, $0
+lw t141, -32(t100)
+add t126, t141, $0
+lw t142, -36(t100)
+add t127, t142, $0
 j L4 
 L2:
-addi t104, $0, 5
-addi t103, t104, 6
+addi t144, $0, 5
+addi t143, t144, 6
 j L3 
 L4:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102

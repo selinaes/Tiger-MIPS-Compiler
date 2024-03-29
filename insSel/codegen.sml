@@ -56,7 +56,7 @@ struct
 
             (* 2 node *)
                 | munchStm(T.MOVE(T.MEM(e1),e2)) =
-                    emit(A.OPER{assem="sw `s0, 0(`s1)\n",
+                    emit(A.OPER{assem="sw `s1, 0(`s0)\n",
                     src=[munchExp e1, munchExp e2],
                     dst= [] ,jump=NONE})
                 | munchStm(T.MOVE(T.TEMP i, e2) ) =

@@ -1,96 +1,56 @@
 L2 : .ascii   
 # ----- emit L0 -----
-# ----- translated L0 -----
-SEQ(
- LABEL L0,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   SEQ(
-    MOVE(
-     TEMP t101,
-     CONST 10),
-    SEQ(
-     CJUMP(LE,
-      TEMP t101,
-      NAME L2,
-      L3,L1),
-     SEQ(
-      LABEL L4,
-      SEQ(
-       MOVE(
-        TEMP t101,
-        BINOP(PLUS,
-         TEMP t101,
-         CONST 1)),
-       SEQ(
-        LABEL L3,
-        SEQ(
-         MOVE(
-          TEMP t101,
-          BINOP(MINUS,
-           TEMP t101,
-           CONST 1)),
-         SEQ(
-          CJUMP(LT,
-           TEMP t101,
-           NAME L2,
-           L4,L1),
-          LABEL L1))))))),
-   CONST 0)))
-# ----- linearize L0 -----
-LABEL L0
-MOVE(
- TEMP t101,
- CONST 10)
-CJUMP(LE,
- TEMP t101,
- NAME L2,
- L3,L1)
-LABEL L1
-MOVE(
- TEMP t106,
- CONST 0)
-JUMP(
- NAME L5)
-LABEL L4
-MOVE(
- TEMP t101,
- BINOP(PLUS,
-  TEMP t101,
-  CONST 1))
-LABEL L3
-MOVE(
- TEMP t101,
- BINOP(MINUS,
-  TEMP t101,
-  CONST 1))
-CJUMP(LT,
- TEMP t101,
- NAME L2,
- L4,L6)
-LABEL L6
-JUMP(
- NAME L1)
-LABEL L5
-# ----- Assembly L0 -----
 L0:
-addi t102, $0, 10
-add t101, t102, $0
-la t103, L2
-ble t101, t103, L3
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
+L6:
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+addi t133, $0, 10
+add t132, t133, $0
+la t134, L2
+ble t132, t134, L3
 L1:
-addi t104, $0, 0
-add t106, t104, $0
+addi t135, $0, 0
+add t106, t135, $0
+lw t136, -8(t100)
+add t120, t136, $0
+lw t137, -12(t100)
+add t121, t137, $0
+lw t138, -16(t100)
+add t122, t138, $0
+lw t139, -20(t100)
+add t123, t139, $0
+lw t140, -24(t100)
+add t124, t140, $0
+lw t141, -28(t100)
+add t125, t141, $0
+lw t142, -32(t100)
+add t126, t142, $0
+lw t143, -36(t100)
+add t127, t143, $0
 j L5 
 L4:
-addi t105, t101, 1
-add t101, t105, $0
+addi t144, t132, 1
+add t132, t144, $0
 L3:
-addi t106, t101, -1
-add t101, t106, $0
-la t107, L2
-blt t101, t107, L4
-L6:
+addi t145, t132, -1
+add t132, t145, $0
+la t146, L2
+blt t132, t146, L4
+L7:
 j L1 
 L5:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102

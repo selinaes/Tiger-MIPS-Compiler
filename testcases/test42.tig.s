@@ -8,1025 +8,248 @@ L16 : .ascii kati
 L23 : .ascii sfd 
 L24 : .ascii sdf 
 # ----- emit L0 -----
-# ----- translated L0 -----
-SEQ(
- LABEL L0,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   SEQ(
-    MOVE(
-     TEMP t101,
-     CALL(
-      NAME initArray,
-       CONST 10,
-       CONST 0)),
-    SEQ(
-     MOVE(
-      TEMP t103,
-      CALL(
-       NAME initArray,
-        CONST 5,
-        ESEQ(
-         SEQ(
-          MOVE(
-           TEMP t102,
-           CALL(
-            NAME malloc,
-             CONST 16)),
-          SEQ(
-           MOVE(
-            MEM(
-             BINOP(PLUS,
-              TEMP t102,
-              CONST 0)),
-            NAME L1),
-           SEQ(
-            MOVE(
-             MEM(
-              BINOP(PLUS,
-               TEMP t102,
-               CONST 4)),
-             NAME L2),
-            SEQ(
-             MOVE(
-              MEM(
-               BINOP(PLUS,
-                TEMP t102,
-                CONST 8)),
-              CONST 0),
-             SEQ(
-              MOVE(
-               MEM(
-                BINOP(PLUS,
-                 TEMP t102,
-                 CONST 12)),
-               CONST 0),
-              EXP(
-               CONST 0)))))),
-         TEMP t102))),
-     SEQ(
-      MOVE(
-       TEMP t104,
-       CALL(
-        NAME initArray,
-         CONST 100,
-         NAME L3)),
-      SEQ(
-       MOVE(
-        TEMP t106,
-        ESEQ(
-         SEQ(
-          MOVE(
-           TEMP t105,
-           CALL(
-            NAME malloc,
-             CONST 16)),
-          SEQ(
-           MOVE(
-            MEM(
-             BINOP(PLUS,
-              TEMP t105,
-              CONST 0)),
-            NAME L4),
-           SEQ(
-            MOVE(
-             MEM(
-              BINOP(PLUS,
-               TEMP t105,
-               CONST 4)),
-             NAME L5),
-            SEQ(
-             MOVE(
-              MEM(
-               BINOP(PLUS,
-                TEMP t105,
-                CONST 8)),
-              CONST 2432),
-             SEQ(
-              MOVE(
-               MEM(
-                BINOP(PLUS,
-                 TEMP t105,
-                 CONST 12)),
-               CONST 44),
-              EXP(
-               CONST 0)))))),
-         TEMP t105)),
-       MOVE(
-        TEMP t108,
-        ESEQ(
-         SEQ(
-          MOVE(
-           TEMP t107,
-           CALL(
-            NAME malloc,
-             CONST 8)),
-          SEQ(
-           MOVE(
-            MEM(
-             BINOP(PLUS,
-              TEMP t107,
-              CONST 0)),
-            NAME L6),
-           SEQ(
-            MOVE(
-             MEM(
-              BINOP(PLUS,
-               TEMP t107,
-               CONST 4)),
-             CALL(
-              NAME initArray,
-               CONST 3,
-               CONST 1900)),
-            EXP(
-             CONST 0)))),
-         TEMP t107)))))),
-   ESEQ(
-    MOVE(
-     ESEQ(
-      SEQ(
-       MOVE(
-        TEMP t109,
-        CONST 0),
-       SEQ(
-        MOVE(
-         TEMP t110,
-         MEM(
-          BINOP(PLUS,
-           TEMP t101,
-           CONST ~4))),
-        SEQ(
-         CJUMP(GE,
-          TEMP t109,
-          TEMP t110,
-          L7,L8),
-         SEQ(
-          LABEL L8,
-          SEQ(
-           CJUMP(LT,
-            TEMP t109,
-            CONST 0,
-            L7,L9),
-           SEQ(
-            LABEL L7,
-            SEQ(
-             EXP(
-              CALL(
-               NAME exit,
-                CONST 1)),
-             LABEL L9))))))),
-      MEM(
-       BINOP(PLUS,
-        TEMP t101,
-        BINOP(MUL,
-         CONST 0,
-         CONST 4)))),
-     CONST 1),
-    ESEQ(
-     MOVE(
-      ESEQ(
-       SEQ(
-        MOVE(
-         TEMP t111,
-         CONST 9),
-        SEQ(
-         MOVE(
-          TEMP t112,
-          MEM(
-           BINOP(PLUS,
-            TEMP t101,
-            CONST ~4))),
-         SEQ(
-          CJUMP(GE,
-           TEMP t111,
-           TEMP t112,
-           L10,L11),
-          SEQ(
-           LABEL L11,
-           SEQ(
-            CJUMP(LT,
-             TEMP t111,
-             CONST 0,
-             L10,L12),
-            SEQ(
-             LABEL L10,
-             SEQ(
-              EXP(
-               CALL(
-                NAME exit,
-                 CONST 1)),
-              LABEL L12))))))),
-       MEM(
-        BINOP(PLUS,
-         TEMP t101,
-         BINOP(MUL,
-          CONST 9,
-          CONST 4)))),
-      CONST 3),
-     ESEQ(
-      MOVE(
-       MEM(
-        ESEQ(
-         SEQ(
-          MOVE(
-           TEMP t113,
-           CONST 3),
-          SEQ(
-           MOVE(
-            TEMP t114,
-            MEM(
-             BINOP(PLUS,
-              TEMP t103,
-              CONST ~4))),
-           SEQ(
-            CJUMP(GE,
-             TEMP t113,
-             TEMP t114,
-             L13,L14),
-            SEQ(
-             LABEL L14,
-             SEQ(
-              CJUMP(LT,
-               TEMP t113,
-               CONST 0,
-               L13,L15),
-              SEQ(
-               LABEL L13,
-               SEQ(
-                EXP(
-                 CALL(
-                  NAME exit,
-                   CONST 1)),
-                LABEL L15))))))),
-         MEM(
-          BINOP(PLUS,
-           TEMP t103,
-           BINOP(MUL,
-            CONST 3,
-            CONST 4))))),
-       NAME L16),
-      ESEQ(
-       MOVE(
-        MEM(
-         BINOP(PLUS,
-          ESEQ(
-           SEQ(
-            MOVE(
-             TEMP t115,
-             CONST 1),
-            SEQ(
-             MOVE(
-              TEMP t116,
-              MEM(
-               BINOP(PLUS,
-                TEMP t103,
-                CONST ~4))),
-             SEQ(
-              CJUMP(GE,
-               TEMP t115,
-               TEMP t116,
-               L17,L18),
-              SEQ(
-               LABEL L18,
-               SEQ(
-                CJUMP(LT,
-                 TEMP t115,
-                 CONST 0,
-                 L17,L19),
-                SEQ(
-                 LABEL L17,
-                 SEQ(
-                  EXP(
-                   CALL(
-                    NAME exit,
-                     CONST 1)),
-                  LABEL L19))))))),
-           MEM(
-            BINOP(PLUS,
-             TEMP t103,
-             BINOP(MUL,
-              CONST 1,
-              CONST 4)))),
-          CONST 12)),
-        CONST 23),
-       ESEQ(
-        MOVE(
-         ESEQ(
-          SEQ(
-           MOVE(
-            TEMP t117,
-            CONST 34),
-           SEQ(
-            MOVE(
-             TEMP t118,
-             MEM(
-              BINOP(PLUS,
-               TEMP t104,
-               CONST ~4))),
-            SEQ(
-             CJUMP(GE,
-              TEMP t117,
-              TEMP t118,
-              L20,L21),
-             SEQ(
-              LABEL L21,
-              SEQ(
-               CJUMP(LT,
-                TEMP t117,
-                CONST 0,
-                L20,L22),
-               SEQ(
-                LABEL L20,
-                SEQ(
-                 EXP(
-                  CALL(
-                   NAME exit,
-                    CONST 1)),
-                 LABEL L22))))))),
-          MEM(
-           BINOP(PLUS,
-            TEMP t104,
-            BINOP(MUL,
-             CONST 34,
-             CONST 4)))),
-         NAME L23),
-        ESEQ(
-         MOVE(
-          MEM(
-           TEMP t106),
-          NAME L24),
-         ESEQ(
-          MOVE(
-           ESEQ(
-            SEQ(
-             MOVE(
-              TEMP t119,
-              CONST 0),
-             SEQ(
-              MOVE(
-               TEMP t120,
-               MEM(
-                BINOP(PLUS,
-                 MEM(
-                  BINOP(PLUS,
-                   TEMP t108,
-                   CONST 4)),
-                 CONST ~4))),
-              SEQ(
-               CJUMP(GE,
-                TEMP t119,
-                TEMP t120,
-                L25,L26),
-               SEQ(
-                LABEL L26,
-                SEQ(
-                 CJUMP(LT,
-                  TEMP t119,
-                  CONST 0,
-                  L25,L27),
-                 SEQ(
-                  LABEL L25,
-                  SEQ(
-                   EXP(
-                    CALL(
-                     NAME exit,
-                      CONST 1)),
-                   LABEL L27))))))),
-            MEM(
-             BINOP(PLUS,
-              MEM(
-               BINOP(PLUS,
-                TEMP t108,
-                CONST 4)),
-              BINOP(MUL,
-               CONST 0,
-               CONST 4)))),
-           CONST 2323),
-          ESEQ(
-           MOVE(
-            ESEQ(
-             SEQ(
-              MOVE(
-               TEMP t121,
-               CONST 2),
-              SEQ(
-               MOVE(
-                TEMP t122,
-                MEM(
-                 BINOP(PLUS,
-                  MEM(
-                   BINOP(PLUS,
-                    TEMP t108,
-                    CONST 4)),
-                  CONST ~4))),
-               SEQ(
-                CJUMP(GE,
-                 TEMP t121,
-                 TEMP t122,
-                 L28,L29),
-                SEQ(
-                 LABEL L29,
-                 SEQ(
-                  CJUMP(LT,
-                   TEMP t121,
-                   CONST 0,
-                   L28,L30),
-                  SEQ(
-                   LABEL L28,
-                   SEQ(
-                    EXP(
-                     CALL(
-                      NAME exit,
-                       CONST 1)),
-                    LABEL L30))))))),
-             MEM(
-              BINOP(PLUS,
-               MEM(
-                BINOP(PLUS,
-                 TEMP t108,
-                 CONST 4)),
-               BINOP(MUL,
-                CONST 2,
-                CONST 4)))),
-            CONST 2323),
-           CONST 0)))))))))))
-# ----- linearize L0 -----
-LABEL L0
-MOVE(
- TEMP t101,
- CALL(
-  NAME initArray,
-   CONST 10,
-   CONST 0))
-MOVE(
- TEMP t102,
- CALL(
-  NAME malloc,
-   CONST 16))
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t102,
-   CONST 0)),
- NAME L1)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t102,
-   CONST 4)),
- NAME L2)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t102,
-   CONST 8)),
- CONST 0)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t102,
-   CONST 12)),
- CONST 0)
-MOVE(
- TEMP t103,
- CALL(
-  NAME initArray,
-   CONST 5,
-   TEMP t102))
-MOVE(
- TEMP t104,
- CALL(
-  NAME initArray,
-   CONST 100,
-   NAME L3))
-MOVE(
- TEMP t105,
- CALL(
-  NAME malloc,
-   CONST 16))
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t105,
-   CONST 0)),
- NAME L4)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t105,
-   CONST 4)),
- NAME L5)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t105,
-   CONST 8)),
- CONST 2432)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t105,
-   CONST 12)),
- CONST 44)
-MOVE(
- TEMP t106,
- TEMP t105)
-MOVE(
- TEMP t107,
- CALL(
-  NAME malloc,
-   CONST 8))
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t107,
-   CONST 0)),
- NAME L6)
-MOVE(
- TEMP t124,
- BINOP(PLUS,
-  TEMP t107,
-  CONST 4))
-MOVE(
- TEMP t123,
- CALL(
-  NAME initArray,
-   CONST 3,
-   CONST 1900))
-MOVE(
- MEM(
-  TEMP t124),
- TEMP t123)
-MOVE(
- TEMP t108,
- TEMP t107)
-MOVE(
- TEMP t109,
- CONST 0)
-MOVE(
- TEMP t110,
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t109,
- TEMP t110,
- L7,L8)
-LABEL L8
-CJUMP(LT,
- TEMP t109,
- CONST 0,
- L7,L9)
-LABEL L9
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   BINOP(MUL,
-    CONST 0,
-    CONST 4))),
- CONST 1)
-MOVE(
- TEMP t111,
- CONST 9)
-MOVE(
- TEMP t112,
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t111,
- TEMP t112,
- L10,L11)
-LABEL L11
-CJUMP(LT,
- TEMP t111,
- CONST 0,
- L10,L12)
-LABEL L12
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   BINOP(MUL,
-    CONST 9,
-    CONST 4))),
- CONST 3)
-MOVE(
- TEMP t113,
- CONST 3)
-MOVE(
- TEMP t114,
- MEM(
-  BINOP(PLUS,
-   TEMP t103,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t113,
- TEMP t114,
- L13,L14)
-LABEL L14
-CJUMP(LT,
- TEMP t113,
- CONST 0,
- L13,L15)
-LABEL L15
-MOVE(
- MEM(
-  MEM(
-   BINOP(PLUS,
-    TEMP t103,
-    BINOP(MUL,
-     CONST 3,
-     CONST 4)))),
- NAME L16)
-MOVE(
- TEMP t115,
- CONST 1)
-MOVE(
- TEMP t116,
- MEM(
-  BINOP(PLUS,
-   TEMP t103,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t115,
- TEMP t116,
- L17,L18)
-LABEL L18
-CJUMP(LT,
- TEMP t115,
- CONST 0,
- L17,L19)
-LABEL L19
-MOVE(
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t103,
-     BINOP(MUL,
-      CONST 1,
-      CONST 4))),
-   CONST 12)),
- CONST 23)
-MOVE(
- TEMP t117,
- CONST 34)
-MOVE(
- TEMP t118,
- MEM(
-  BINOP(PLUS,
-   TEMP t104,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t117,
- TEMP t118,
- L20,L21)
-LABEL L21
-CJUMP(LT,
- TEMP t117,
- CONST 0,
- L20,L22)
-LABEL L22
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t104,
-   BINOP(MUL,
-    CONST 34,
-    CONST 4))),
- NAME L23)
-MOVE(
- MEM(
-  TEMP t106),
- NAME L24)
-MOVE(
- TEMP t119,
- CONST 0)
-MOVE(
- TEMP t120,
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t108,
-     CONST 4)),
-   CONST ~4)))
-CJUMP(GE,
- TEMP t119,
- TEMP t120,
- L25,L26)
-LABEL L26
-CJUMP(LT,
- TEMP t119,
- CONST 0,
- L25,L27)
-LABEL L27
-MOVE(
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t108,
-     CONST 4)),
-   BINOP(MUL,
-    CONST 0,
-    CONST 4))),
- CONST 2323)
-MOVE(
- TEMP t121,
- CONST 2)
-MOVE(
- TEMP t122,
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t108,
-     CONST 4)),
-   CONST ~4)))
-CJUMP(GE,
- TEMP t121,
- TEMP t122,
- L28,L29)
-LABEL L29
-CJUMP(LT,
- TEMP t121,
- CONST 0,
- L28,L30)
-LABEL L30
-MOVE(
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t108,
-     CONST 4)),
-   BINOP(MUL,
-    CONST 2,
-    CONST 4))),
- CONST 2323)
-MOVE(
- TEMP t106,
- CONST 0)
-JUMP(
- NAME L31)
-LABEL L7
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L9)
-LABEL L10
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L12)
-LABEL L13
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L15)
-LABEL L17
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L19)
-LABEL L20
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L22)
-LABEL L25
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L27)
-LABEL L28
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L30)
-LABEL L31
-# ----- Assembly L0 -----
 L0:
-addi t125, $0, 10
-add t108, t125, $0
-addi t126, $0, 0
-add t109, t126, $0
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
+L32:
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+addi t156, $0, 10
+add t108, t156, $0
+addi t157, $0, 0
+add t109, t157, $0
 jal initArray 
-add t101, t106, $0
-addi t127, $0, 16
-add t108, t127, $0
+add t132, t106, $0
+addi t158, $0, 16
+add t108, t158, $0
 jal malloc 
-add t102, t106, $0
-la t128, L1
-sw t128, 0(t102)
-la t129, L2
-sw t129, 4(t102)
-addi t130, $0, 0
-sw t130, 8(t102)
-addi t131, $0, 0
-sw t131, 12(t102)
-addi t132, $0, 5
-add t108, t132, $0
-add t109, t102, $0
+add t133, t106, $0
+la t159, L1
+sw t159, 0(t133)
+la t160, L2
+sw t160, 4(t133)
+addi t161, $0, 0
+sw t161, 8(t133)
+addi t162, $0, 0
+sw t162, 12(t133)
+addi t163, $0, 5
+add t108, t163, $0
+add t109, t133, $0
 jal initArray 
-add t103, t106, $0
-addi t133, $0, 100
-add t108, t133, $0
-la t134, L3
-add t109, t134, $0
+add t134, t106, $0
+addi t164, $0, 100
+add t108, t164, $0
+la t165, L3
+add t109, t165, $0
 jal initArray 
-add t104, t106, $0
-addi t135, $0, 16
-add t108, t135, $0
+add t135, t106, $0
+addi t166, $0, 16
+add t108, t166, $0
 jal malloc 
-add t105, t106, $0
-la t136, L4
-sw t136, 0(t105)
-la t137, L5
-sw t137, 4(t105)
-addi t138, $0, 2432
-sw t138, 8(t105)
-addi t139, $0, 44
-sw t139, 12(t105)
-add t106, t105, $0
-addi t140, $0, 8
-add t108, t140, $0
+add t136, t106, $0
+la t167, L4
+sw t167, 0(t136)
+la t168, L5
+sw t168, 4(t136)
+addi t169, $0, 2432
+sw t169, 8(t136)
+addi t170, $0, 44
+sw t170, 12(t136)
+add t137, t136, $0
+addi t171, $0, 8
+add t108, t171, $0
 jal malloc 
-add t107, t106, $0
-la t141, L6
-sw t141, 0(t107)
-addi t142, t107, 4
-add t124, t142, $0
-addi t143, $0, 3
-add t108, t143, $0
-addi t144, $0, 1900
-add t109, t144, $0
+add t138, t106, $0
+la t172, L6
+sw t172, 0(t138)
+addi t173, t138, 4
+add t155, t173, $0
+addi t174, $0, 3
+add t108, t174, $0
+addi t175, $0, 1900
+add t109, t175, $0
 jal initArray 
-add t123, t106, $0
-sw t124, 0(t123)
-add t108, t107, $0
-addi t145, $0, 0
-add t109, t145, $0
-lw t146, -4(t101)
-add t110, t146, $0
-bge t109, t110, L7
+add t154, t106, $0
+sw t154, 0(t155)
+add t139, t138, $0
+addi t176, $0, 0
+add t140, t176, $0
+lw t177, -4(t132)
+add t141, t177, $0
+bge t140, t141, L7
 L8:
-blt t109, 0, L7
+addi t178, $0, 0
+blt t140, t178, L7
 L9:
-addi t149, $0, 0
-addi t150, $0, 4
-mul t148, t149, t150
-add t147, t101, t148
-addi t151, $0, 1
-sw t147, 0(t151)
-addi t152, $0, 9
-add t111, t152, $0
-lw t153, -4(t101)
-add t112, t153, $0
-bge t111, t112, L10
+addi t181, $0, 0
+addi t182, $0, 4
+mul t180, t181, t182
+add t179, t132, t180
+addi t183, $0, 1
+sw t183, 0(t179)
+addi t184, $0, 9
+add t142, t184, $0
+lw t185, -4(t132)
+add t143, t185, $0
+bge t142, t143, L10
 L11:
-blt t111, 0, L10
+addi t186, $0, 0
+blt t142, t186, L10
 L12:
-addi t156, $0, 9
-addi t157, $0, 4
-mul t155, t156, t157
-add t154, t101, t155
-addi t158, $0, 3
-sw t154, 0(t158)
-addi t159, $0, 3
-add t113, t159, $0
-lw t160, -4(t103)
-add t114, t160, $0
-bge t113, t114, L13
-L14:
-blt t113, 0, L13
-L15:
-addi t164, $0, 3
-addi t165, $0, 4
-mul t163, t164, t165
-add t162, t103, t163
-lw t161, 0(t162)
-la t166, L16
-sw t161, 0(t166)
-addi t167, $0, 1
-add t115, t167, $0
-lw t168, -4(t103)
-add t116, t168, $0
-bge t115, t116, L17
-L18:
-blt t115, 0, L17
-L19:
-addi t172, $0, 1
-addi t173, $0, 4
-mul t171, t172, t173
-add t170, t103, t171
-lw t169, 0(t170)
-addi t174, $0, 23
-sw t174, 12(t169)
-addi t175, $0, 34
-add t117, t175, $0
-lw t176, -4(t104)
-add t118, t176, $0
-bge t117, t118, L20
-L21:
-blt t117, 0, L20
-L22:
-addi t179, $0, 34
-addi t180, $0, 4
-mul t178, t179, t180
-add t177, t104, t178
-la t181, L23
-sw t177, 0(t181)
-la t182, L24
-sw t106, 0(t182)
-addi t183, $0, 0
-add t119, t183, $0
-lw t185, 4(t108)
-lw t184, -4(t185)
-add t120, t184, $0
-bge t119, t120, L25
-L26:
-blt t119, 0, L25
-L27:
-lw t187, 4(t108)
-addi t189, $0, 0
+addi t189, $0, 9
 addi t190, $0, 4
 mul t188, t189, t190
-add t186, t187, t188
-addi t191, $0, 2323
-sw t186, 0(t191)
-addi t192, $0, 2
-add t121, t192, $0
-lw t194, 4(t108)
-lw t193, -4(t194)
-add t122, t193, $0
-bge t121, t122, L28
-L29:
-blt t121, 0, L28
-L30:
-lw t196, 4(t108)
-addi t198, $0, 2
+add t187, t132, t188
+addi t191, $0, 3
+sw t191, 0(t187)
+addi t192, $0, 3
+add t144, t192, $0
+lw t193, -4(t134)
+add t145, t193, $0
+bge t144, t145, L13
+L14:
+addi t194, $0, 0
+blt t144, t194, L13
+L15:
+addi t198, $0, 3
 addi t199, $0, 4
 mul t197, t198, t199
-add t195, t196, t197
-addi t200, $0, 2323
-sw t195, 0(t200)
-addi t201, $0, 0
-add t106, t201, $0
+add t196, t134, t197
+lw t195, 0(t196)
+la t200, L16
+sw t200, 0(t195)
+addi t201, $0, 1
+add t146, t201, $0
+lw t202, -4(t134)
+add t147, t202, $0
+bge t146, t147, L17
+L18:
+addi t203, $0, 0
+blt t146, t203, L17
+L19:
+addi t207, $0, 1
+addi t208, $0, 4
+mul t206, t207, t208
+add t205, t134, t206
+lw t204, 0(t205)
+addi t209, $0, 23
+sw t209, 12(t204)
+addi t210, $0, 34
+add t148, t210, $0
+lw t211, -4(t135)
+add t149, t211, $0
+bge t148, t149, L20
+L21:
+addi t212, $0, 0
+blt t148, t212, L20
+L22:
+addi t215, $0, 34
+addi t216, $0, 4
+mul t214, t215, t216
+add t213, t135, t214
+la t217, L23
+sw t217, 0(t213)
+la t218, L24
+sw t218, 0(t137)
+addi t219, $0, 0
+add t150, t219, $0
+lw t221, 4(t139)
+lw t220, -4(t221)
+add t151, t220, $0
+bge t150, t151, L25
+L26:
+addi t222, $0, 0
+blt t150, t222, L25
+L27:
+lw t224, 4(t139)
+addi t226, $0, 0
+addi t227, $0, 4
+mul t225, t226, t227
+add t223, t224, t225
+addi t228, $0, 2323
+sw t228, 0(t223)
+addi t229, $0, 2
+add t152, t229, $0
+lw t231, 4(t139)
+lw t230, -4(t231)
+add t153, t230, $0
+bge t152, t153, L28
+L29:
+addi t232, $0, 0
+blt t152, t232, L28
+L30:
+lw t234, 4(t139)
+addi t236, $0, 2
+addi t237, $0, 4
+mul t235, t236, t237
+add t233, t234, t235
+addi t238, $0, 2323
+sw t238, 0(t233)
+addi t239, $0, 0
+add t106, t239, $0
+lw t240, -8(t100)
+add t120, t240, $0
+lw t241, -12(t100)
+add t121, t241, $0
+lw t242, -16(t100)
+add t122, t242, $0
+lw t243, -20(t100)
+add t123, t243, $0
+lw t244, -24(t100)
+add t124, t244, $0
+lw t245, -28(t100)
+add t125, t245, $0
+lw t246, -32(t100)
+add t126, t246, $0
+lw t247, -36(t100)
+add t127, t247, $0
 j L31 
 L7:
-addi t202, $0, 1
-add t108, t202, $0
+addi t248, $0, 1
+add t108, t248, $0
 jal exit 
 j L9 
 L10:
-addi t203, $0, 1
-add t108, t203, $0
+addi t249, $0, 1
+add t108, t249, $0
 jal exit 
 j L12 
 L13:
-addi t204, $0, 1
-add t108, t204, $0
+addi t250, $0, 1
+add t108, t250, $0
 jal exit 
 j L15 
 L17:
-addi t205, $0, 1
-add t108, t205, $0
+addi t251, $0, 1
+add t108, t251, $0
 jal exit 
 j L19 
 L20:
-addi t206, $0, 1
-add t108, t206, $0
+addi t252, $0, 1
+add t108, t252, $0
 jal exit 
 j L22 
 L25:
-addi t207, $0, 1
-add t108, t207, $0
+addi t253, $0, 1
+add t108, t253, $0
 jal exit 
 j L27 
 L28:
-addi t208, $0, 1
-add t108, t208, $0
+addi t254, $0, 1
+add t108, t254, $0
 jal exit 
 j L30 
 L31:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102

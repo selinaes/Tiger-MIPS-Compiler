@@ -1,125 +1,64 @@
 # ----- emit L0 -----
-# ----- translated L0 -----
-SEQ(
- LABEL L0,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   MOVE(
-    TEMP t101,
-    CALL(
-     NAME initArray,
-      CONST 10,
-      CONST 0)),
-   ESEQ(
-    SEQ(
-     MOVE(
-      TEMP t102,
-      CONST 2),
-     SEQ(
-      MOVE(
-       TEMP t103,
-       MEM(
-        BINOP(PLUS,
-         TEMP t101,
-         CONST ~4))),
-      SEQ(
-       CJUMP(GE,
-        TEMP t102,
-        TEMP t103,
-        L1,L2),
-       SEQ(
-        LABEL L2,
-        SEQ(
-         CJUMP(LT,
-          TEMP t102,
-          CONST 0,
-          L1,L3),
-         SEQ(
-          LABEL L1,
-          SEQ(
-           EXP(
-            CALL(
-             NAME exit,
-              CONST 1)),
-           LABEL L3))))))),
-    MEM(
-     BINOP(PLUS,
-      TEMP t101,
-      BINOP(MUL,
-       CONST 2,
-       CONST 4)))))))
-# ----- linearize L0 -----
-LABEL L0
-MOVE(
- TEMP t101,
- CALL(
-  NAME initArray,
-   CONST 10,
-   CONST 0))
-MOVE(
- TEMP t102,
- CONST 2)
-MOVE(
- TEMP t103,
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t102,
- TEMP t103,
- L1,L2)
-LABEL L2
-CJUMP(LT,
- TEMP t102,
- CONST 0,
- L1,L3)
-LABEL L3
-MOVE(
- TEMP t106,
- MEM(
-  BINOP(PLUS,
-   TEMP t101,
-   BINOP(MUL,
-    CONST 2,
-    CONST 4))))
-JUMP(
- NAME L4)
-LABEL L1
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L3)
-LABEL L4
-# ----- Assembly L0 -----
 L0:
-addi t104, $0, 10
-add t108, t104, $0
-addi t105, $0, 0
-add t109, t105, $0
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
+L5:
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+addi t135, $0, 10
+add t108, t135, $0
+addi t136, $0, 0
+add t109, t136, $0
 jal initArray 
-add t101, t106, $0
-addi t106, $0, 2
-add t102, t106, $0
-lw t107, -4(t101)
-add t103, t107, $0
-bge t102, t103, L1
+add t132, t106, $0
+addi t137, $0, 2
+add t133, t137, $0
+lw t138, -4(t132)
+add t134, t138, $0
+bge t133, t134, L1
 L2:
-blt t102, 0, L1
+addi t139, $0, 0
+blt t133, t139, L1
 L3:
-addi t111, $0, 2
-addi t112, $0, 4
-mul t110, t111, t112
-add t109, t101, t110
-lw t108, 0(t109)
-add t106, t108, $0
+addi t143, $0, 2
+addi t144, $0, 4
+mul t142, t143, t144
+add t141, t132, t142
+lw t140, 0(t141)
+add t106, t140, $0
+lw t145, -8(t100)
+add t120, t145, $0
+lw t146, -12(t100)
+add t121, t146, $0
+lw t147, -16(t100)
+add t122, t147, $0
+lw t148, -20(t100)
+add t123, t148, $0
+lw t149, -24(t100)
+add t124, t149, $0
+lw t150, -28(t100)
+add t125, t150, $0
+lw t151, -32(t100)
+add t126, t151, $0
+lw t152, -36(t100)
+add t127, t152, $0
 j L4 
 L1:
-addi t113, $0, 1
-add t108, t113, $0
+addi t153, $0, 1
+add t108, t153, $0
 jal exit 
 j L3 
 L4:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102

@@ -1,36 +1,44 @@
 # ----- emit L0 -----
-# ----- translated L0 -----
-SEQ(
- LABEL L0,
- MOVE(
-  TEMP t106,
-  ESEQ(
-   MOVE(
-    TEMP t101,
-    CALL(
-     NAME exit,
-      CONST 1)),
-   CONST 0)))
-# ----- linearize L0 -----
-LABEL L0
-MOVE(
- TEMP t101,
- CALL(
-  NAME exit,
-   CONST 1))
-MOVE(
- TEMP t106,
- CONST 0)
-JUMP(
- NAME L1)
-LABEL L1
-# ----- Assembly L0 -----
 L0:
-addi t102, $0, 1
-add t108, t102, $0
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
+L2:
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+addi t133, $0, 1
+add t108, t133, $0
 jal exit 
-add t101, t106, $0
-addi t103, $0, 0
-add t106, t103, $0
+add t132, t106, $0
+addi t134, $0, 0
+add t106, t134, $0
+lw t135, -8(t100)
+add t120, t135, $0
+lw t136, -12(t100)
+add t121, t136, $0
+lw t137, -16(t100)
+add t122, t137, $0
+lw t138, -20(t100)
+add t123, t138, $0
+lw t139, -24(t100)
+add t124, t139, $0
+lw t140, -28(t100)
+add t125, t140, $0
+lw t141, -32(t100)
+add t126, t141, $0
+lw t142, -36(t100)
+add t127, t142, $0
 j L1 
 L1:
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr t102
