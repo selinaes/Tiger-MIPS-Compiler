@@ -15,12 +15,12 @@ structure Main = struct
         (* val _ = TextIO.output(out,"# ----- translated " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
         (* val _ = Printtree.printtree(out,body); *)
         
-        (* val _ = TextIO.output(out,"# ----- linearize " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
+        val _ = TextIO.output(out,"# ----- linearize " ^ Symbol.name (Frame.name frame) ^ " -----\n");
         val stms = Canon.linearize body
         val stms' = Canon.traceSchedule(Canon.basicBlocks stms)
-        (* val _ = app (fn s => Printtree.printtree(out,s)) stms'; *)
+        val _ = app (fn s => Printtree.printtree(out,s)) stms';
 
-        (* val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
+        val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n");
 	      val instrs = List.concat(map (MipsGen.codegen frame) stms') 
         val instrs' = Frame.procEntryExit2(frame, instrs)
         val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs')

@@ -1,4 +1,121 @@
 # ----- emit y -----
+# ----- linearize y -----
+LABEL L8
+MOVE(
+ MEM(
+  BINOP(MINUS,
+   TEMP t100,
+   CONST 4)),
+ TEMP t108)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~8)),
+ TEMP t120)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)),
+ TEMP t121)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)),
+ TEMP t122)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)),
+ TEMP t123)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)),
+ TEMP t124)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)),
+ TEMP t125)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)),
+ TEMP t126)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)),
+ TEMP t127)
+MOVE(
+ TEMP t106,
+ BINOP(PLUS,
+  CONST 1,
+  MEM(
+   BINOP(PLUS,
+    MEM(
+     TEMP t100),
+    CONST ~8))))
+MOVE(
+ TEMP t120,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~8)))
+MOVE(
+ TEMP t121,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)))
+MOVE(
+ TEMP t122,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)))
+MOVE(
+ TEMP t123,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)))
+MOVE(
+ TEMP t124,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)))
+MOVE(
+ TEMP t125,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)))
+MOVE(
+ TEMP t126,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)))
+MOVE(
+ TEMP t127,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)))
+JUMP(
+ NAME L7)
+LABEL L7
+# ----- Assembly y -----
 y:
 move t100, t101
 addi t101, t101, -44
@@ -41,6 +158,123 @@ lw t100, 4(t101)
 addi t101, t101, 44
 jr t102
 # ----- emit x -----
+# ----- linearize x -----
+LABEL L10
+MOVE(
+ MEM(
+  BINOP(MINUS,
+   TEMP t100,
+   CONST 8)),
+ TEMP t109)
+MOVE(
+ MEM(
+  BINOP(MINUS,
+   TEMP t100,
+   CONST 4)),
+ TEMP t108)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)),
+ TEMP t120)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)),
+ TEMP t121)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)),
+ TEMP t122)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)),
+ TEMP t123)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)),
+ TEMP t124)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)),
+ TEMP t125)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)),
+ TEMP t126)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~40)),
+ TEMP t127)
+MOVE(
+ TEMP t106,
+ CONST 0)
+MOVE(
+ TEMP t120,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)))
+MOVE(
+ TEMP t121,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)))
+MOVE(
+ TEMP t122,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)))
+MOVE(
+ TEMP t123,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)))
+MOVE(
+ TEMP t124,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)))
+MOVE(
+ TEMP t125,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)))
+MOVE(
+ TEMP t126,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)))
+MOVE(
+ TEMP t127,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~40)))
+JUMP(
+ NAME L9)
+LABEL L9
+# ----- Assembly x -----
 x:
 move t100, t101
 addi t101, t101, -48
@@ -82,6 +316,150 @@ lw t100, 4(t101)
 addi t101, t101, 48
 jr t102
 # ----- emit z -----
+# ----- linearize z -----
+LABEL L12
+MOVE(
+ TEMP t133,
+ TEMP t109)
+MOVE(
+ MEM(
+  BINOP(MINUS,
+   TEMP t100,
+   CONST 4)),
+ TEMP t108)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~8)),
+ TEMP t120)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)),
+ TEMP t121)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)),
+ TEMP t122)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)),
+ TEMP t123)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)),
+ TEMP t124)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)),
+ TEMP t125)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)),
+ TEMP t126)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)),
+ TEMP t127)
+MOVE(
+ TEMP t134,
+ TEMP t133)
+CJUMP(LE,
+ TEMP t134,
+ CONST 8,
+ L5,L4)
+LABEL L4
+MOVE(
+ TEMP t106,
+ CONST 0)
+MOVE(
+ TEMP t120,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~8)))
+MOVE(
+ TEMP t121,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)))
+MOVE(
+ TEMP t122,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)))
+MOVE(
+ TEMP t123,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)))
+MOVE(
+ TEMP t124,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)))
+MOVE(
+ TEMP t125,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)))
+MOVE(
+ TEMP t126,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)))
+MOVE(
+ TEMP t127,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)))
+JUMP(
+ NAME L11)
+LABEL L6
+MOVE(
+ TEMP t134,
+ BINOP(PLUS,
+  TEMP t134,
+  CONST 1))
+LABEL L5
+EXP(
+ BINOP(PLUS,
+  TEMP t134,
+  MEM(
+   BINOP(PLUS,
+    MEM(
+     TEMP t100),
+    CONST ~8))))
+CJUMP(LT,
+ TEMP t134,
+ CONST 8,
+ L6,L13)
+LABEL L13
+JUMP(
+ NAME L4)
+LABEL L11
+# ----- Assembly z -----
 z:
 move t100, t101
 addi t101, t101, -44
@@ -138,6 +516,137 @@ lw t100, 4(t101)
 addi t101, t101, 44
 jr t102
 # ----- emit L0 -----
+# ----- linearize L0 -----
+LABEL L15
+MOVE(
+ MEM(
+  BINOP(MINUS,
+   TEMP t100,
+   CONST 4)),
+ TEMP t108)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)),
+ TEMP t120)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)),
+ TEMP t121)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)),
+ TEMP t122)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)),
+ TEMP t123)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)),
+ TEMP t124)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)),
+ TEMP t125)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)),
+ TEMP t126)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~40)),
+ TEMP t127)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~8)),
+ CONST 3)
+MOVE(
+ TEMP t132,
+ CONST 3)
+LABEL L3
+CJUMP(LT,
+ TEMP t132,
+ CONST 7,
+ L2,L1)
+LABEL L1
+MOVE(
+ TEMP t106,
+ CALL(
+  NAME exit,
+   CONST 1))
+MOVE(
+ TEMP t120,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~12)))
+MOVE(
+ TEMP t121,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~16)))
+MOVE(
+ TEMP t122,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~20)))
+MOVE(
+ TEMP t123,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~24)))
+MOVE(
+ TEMP t124,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~28)))
+MOVE(
+ TEMP t125,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~32)))
+MOVE(
+ TEMP t126,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~36)))
+MOVE(
+ TEMP t127,
+ MEM(
+  BINOP(PLUS,
+   TEMP t100,
+   CONST ~40)))
+JUMP(
+ NAME L14)
+LABEL L2
+JUMP(
+ NAME L3)
+LABEL L14
+# ----- Assembly L0 -----
 L0:
 move t100, t101
 addi t101, t101, -48
