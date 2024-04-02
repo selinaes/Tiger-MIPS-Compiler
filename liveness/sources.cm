@@ -33,7 +33,9 @@ codegen.sig
 codegen.sml
 flowgraph.sml
 graph.sig
-graph.sml 
+graph.sml
+makegraph.sig
+makegraph.sml 
 main.sml
 
 

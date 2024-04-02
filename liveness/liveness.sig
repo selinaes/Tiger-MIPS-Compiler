@@ -1,4 +1,4 @@
-structure LIVENESS:
+signature LIVENESS:
 sig
     datatype igraph =
         IGRAPH of  {graph: Graph.graph,

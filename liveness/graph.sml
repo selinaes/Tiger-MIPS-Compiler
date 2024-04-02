@@ -3,14 +3,29 @@ struct
   type node' = int
   type temp = Temp.temp
 
-  datatype noderep = NODE of {succ: node' list, pred: node' list}
+  
+  structure NeighborSet = RedBlackSetFn (struct
+                type ord_key = node'
+                val compare = Int.compare
+        end);
 
-  val emptyNode = NODE{succ=[],pred=[]}
+  (* datatype noderep = NODE of {succ: node' list, pred: node' list} *)
 
-  val bogusNode = NODE{succ=[~1],pred=[]}
+  datatype noderep = NODE of {succ: NeighborSet.set , pred: NeighborSet.set} 
+  
+  val emptyNode = NODE{succ=NeighborSet.empty,pred=NeighborSet.empty}
 
-  fun isBogus(NODE{succ= ~1::_,...}) = true
-    | isBogus _ = false
+  val bogusSet = NeighborSet.add(NeighborSet.empty, ~1)
+  val bogusNode = NODE{succ=bogusSet,pred=NeighborSet.empty}
+  (* val emptyNode = NODE{succ=[],pred=[]}
+
+  val bogusNode = NODE{succ=[~1],pred=[]} *)
+
+  fun isBogus(NODE{succ,...}) = NeighborSet.member (succ, ~1)
+    (* | isBogus _ = false *)
+
+  (* fun isBogus(NODE{succ= ~1::_,...}) = true
+    | isBogus _ = false *)
 
   structure A = DynamicArrayFn(struct open Array
 				    type elem = noderep
@@ -34,10 +49,10 @@ struct
                 end
 
   fun succ(g,i) = let val NODE{succ=s,...} = A.sub(g,i) 
-		   in map (augment g) s 
+		   in map (augment g) (NeighborSet.listItems s) 
 		  end
   fun pred(g,i) = let val NODE{pred=p,...} = A.sub(g,i)
-                     in map (augment g) p 
+                     in map (augment g) (NeighborSet.listItems p) 
 		  end
   fun adj gi = pred gi @ succ gi
 
@@ -60,15 +75,19 @@ struct
 
   fun diddle_edge change {from=(g:graph, i),to=(g':graph, j)} = 
       let val _ = check(g,g')
+          (* val i = NeighborSet.fromList i
+          val j = NeighborSet.fromList j *)
           val NODE{succ=si,pred=pi} = A.sub(g,i)
-          val _ = A.update(g,i,NODE{succ=change(j,si),pred=pi})
+          val _ = A.update(g,i,NODE{succ=change(si,j),pred=pi})
           val NODE{succ=sj,pred=pj} = A.sub(g,j)
-          val _ = A.update(g,j,NODE{succ=sj,pred=change(i,pj)})
+          val _ = A.update(g,j,NODE{succ=sj,pred=change(pj,i)})
        in ()
       end
 
-  val mk_edge = diddle_edge (op ::)
-  val rm_edge = diddle_edge delete
+  val mk_edge = diddle_edge NeighborSet.add
+  (* (op ::) *)
+  val rm_edge = diddle_edge NeighborSet.delete 
+  (* delete *)
 
   structure Table = IntMapTable(type key = node
 				fun getInt(g,n) = n)

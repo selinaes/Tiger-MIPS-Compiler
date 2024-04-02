@@ -1,3 +1,4 @@
-structure MAKEG_RAPH: sig
-    val instrs2graph: Assem.instr list -> Flow.flowgraph * Flow.Graph.node list
+signature MAKE_GRAPH =
+sig
+    val instrs2graph: Assem.instr list -> Flow.flowgraph * Graph.node list
 end
