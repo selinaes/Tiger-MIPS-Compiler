@@ -22,14 +22,16 @@ structure Main = struct
 
         (* val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
         val instrs = List.concat(map (MipsGen.codegen frame) stms') 
-        val instrs' = Frame.procEntryExit2(frame, instrs)
+        (* val instrs' = Frame.procEntryExit2(frame, instrs) *)
   
       
 
-        val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs')
-        val (Flow.FGRAPH {control,def,use,ismove}, ndlist) = MakeGraph.instrs2graph(body') 
-        val _ = Graph.printGraph (out, control)
-        (* val (igr, liveoutmap) = Liveness.interferenceGraph (fgr) *)
+        val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs)
+        val (fgr, ndlist) = MakeGraph.instrs2graph(body') 
+        (* val (Flow.FGRAPH {control,def,use,ismove}, ndlist) = MakeGraph.instrs2graph(body')  *)
+        (* val _ = Graph.printGraph (out, control) *)
+        val (igr, liveoutmap) = Liveness.interferenceGraph (fgr)
+        val _ = Liveness.show (out, igr)
         val format0 = Assem.format(Temp.makestring)
  
     in  

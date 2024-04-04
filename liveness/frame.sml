@@ -166,8 +166,8 @@ struct
         end
 
     (* Append sink instruction, mark regs still live at exit, prevent allocator from reuse *)
-    fun procEntryExit2(frame, body) = 
-        body @ [Assem.OPER{assem="", src =[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}]
+    (* fun procEntryExit2(frame, body) = 
+        body @ [Assem.OPER{assem="", src =[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}] *)
 
     (* Rest of prologue / epilogue 
     1: peudo-announce start 2: function name label 3: adjust SP 
@@ -188,7 +188,7 @@ struct
             val restoreRA = Assem.OPER {assem="lw `d0, 8(`s0)\n", src=[SP], dst=[RA], jump=NONE}
             val restoreFP = Assem.OPER {assem="lw `d0, 4(`s0)\n", src=[SP], dst=[FP], jump=NONE}
             val resetSP = Assem.OPER {assem="addi `d0, `s0, " ^ Int.toString (!stackSize) ^ "\n", src=[SP], dst=[SP], jump=NONE}
-            val jumpToRA = Assem.OPER {assem="jr `d0\n", src=[], dst=[RA], jump=NONE}
+            val jumpToRA = Assem.OPER {assem="jr $ra\n", src=[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}
             
         in
             {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",

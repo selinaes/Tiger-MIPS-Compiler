@@ -1,309 +1,518 @@
+n0 : nfactor:
+n1 : move t100, t101
+n2 : addi t101, t101, -44
+n3 : sw t102, 8(t101)
+n4 : sw t100, 4(t101)
+n5 : L5:
+n6 : add t132, t109, $0
+n7 : sw t108, -4(t100)
+n8 : sw t120, -8(t100)
+n9 : sw t121, -12(t100)
+n10 : sw t122, -16(t100)
+n11 : sw t123, -20(t100)
+n12 : sw t124, -24(t100)
+n13 : sw t125, -28(t100)
+n14 : sw t126, -32(t100)
+n15 : sw t127, -36(t100)
+n16 : addi t136, $0, 0
+n17 : beq t132, t136, L1
+n18 : L2:
+n19 : add t135, t132, $0
+n20 : lw t137, 0(t100)
+n21 : add t108, t137, $0
+n22 : addi t138, t132, -1
+n23 : add t109, t138, $0
+n24 : jal nfactor
+n25 : add t134, t106, $0
+n26 : mul t139, t135, t134
+n27 : add t133, t139, $0
+n28 : L3:
+n29 : add t106, t133, $0
+n30 : lw t140, -8(t100)
+n31 : add t120, t140, $0
+n32 : lw t141, -12(t100)
+n33 : add t121, t141, $0
+n34 : lw t142, -16(t100)
+n35 : add t122, t142, $0
+n36 : lw t143, -20(t100)
+n37 : add t123, t143, $0
+n38 : lw t144, -24(t100)
+n39 : add t124, t144, $0
+n40 : lw t145, -28(t100)
+n41 : add t125, t145, $0
+n42 : lw t146, -32(t100)
+n43 : add t126, t146, $0
+n44 : lw t147, -36(t100)
+n45 : add t127, t147, $0
+n46 : j L4 
+n47 : L1:
+n48 : addi t148, $0, 1
+n49 : add t133, t148, $0
+n50 : j L3 
+n51 : L4:
+n52 : lw t102, 8(t101)
+n53 : lw t100, 4(t101)
+n54 : addi t101, t101, 44
+n55 : jr $ra
+n0: 1 2 4 8 9 20 21 22 23 24 25 26 27 
+n1: 0 1 2 4 8 9 20 21 22 23 24 25 26 27 
+n2: 0 2 4 8 9 20 21 22 23 24 25 26 27 
+n3: 0 4 8 9 20 21 22 23 24 25 26 27 
+n4: 0 1 4 8 9 20 21 22 23 24 25 26 27 
+n5: 0 1 4 8 9 20 21 22 23 24 25 26 27 
+n6: 0 1 4 8 20 21 22 23 24 25 26 27 32 
+n7: 0 1 4 20 21 22 23 24 25 26 27 32 
+n8: 0 1 4 21 22 23 24 25 26 27 32 
+n9: 0 1 4 22 23 24 25 26 27 32 
+n10: 0 1 4 23 24 25 26 27 32 
+n11: 0 1 4 24 25 26 27 32 
+n12: 0 1 4 25 26 27 32 
+n13: 0 1 4 26 27 32 
+n14: 0 1 4 27 32 
+n15: 0 1 4 32 
+n16: 0 1 4 32 36 
+n17: 0 1 4 32 
+n18: 0 1 4 32 
+n19: 0 1 4 32 35 
+n20: 0 1 4 32 35 37 
+n21: 0 1 4 8 32 35 
+n22: 0 1 4 8 35 38 
+n23: 0 1 4 8 9 35 
+n24: 0 1 4 6 35 
+n25: 0 1 4 34 35 
+n26: 0 1 4 39 
+n27: 0 1 4 33 
+n28: 0 1 4 33 
+n29: 0 1 4 
+n30: 0 1 4 40 
+n31: 0 1 4 20 
+n32: 0 1 4 20 41 
+n33: 0 1 4 20 21 
+n34: 0 1 4 20 21 42 
+n35: 0 1 4 20 21 22 
+n36: 0 1 4 20 21 22 43 
+n37: 0 1 4 20 21 22 23 
+n38: 0 1 4 20 21 22 23 44 
+n39: 0 1 4 20 21 22 23 24 
+n40: 0 1 4 20 21 22 23 24 45 
+n41: 0 1 4 20 21 22 23 24 25 
+n42: 0 1 4 20 21 22 23 24 25 46 
+n43: 0 1 4 20 21 22 23 24 25 26 
+n44: 1 4 20 21 22 23 24 25 26 47 
+n45: 1 4 20 21 22 23 24 25 26 27 
+n46: 1 4 20 21 22 23 24 25 26 27 
+n47: 0 1 4 
+n48: 0 1 4 48 
+n49: 0 1 4 33 
+n50: 0 1 4 33 
+n51: 1 4 20 21 22 23 24 25 26 27 
+n52: 1 2 4 20 21 22 23 24 25 26 27 
+n53: 1 2 4 20 21 22 23 24 25 26 27 
+n54: 1 2 4 20 21 22 23 24 25 26 27 
+n55: 
+n0 -> succ={n1 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n33 n34 n35 n36 n37 n38 n39 n40 n41 n42 n43 n44 n45 n46 n48 } 
+       pred={n1 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n33 n34 n35 n36 n37 n38 n39 n40 n41 n42 n43 n44 n45 n46 n48 }
+n1 -> succ={n0 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n33 n34 n35 n36 n37 n38 n39 n40 n41 n42 n43 n44 n45 n46 n47 n48 } 
+       pred={n0 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n33 n34 n35 n36 n37 n38 n39 n40 n41 n42 n43 n44 n45 n46 n47 n48 }
+n2 -> succ={n0 n1 n4 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 } 
+       pred={n0 n1 n4 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 }
+n3 -> succ={} 
+       pred={}
+n4 -> succ={n0 n1 n2 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n33 n34 n35 n36 n37 n38 n39 n40 n41 n42 n43 n44 n45 n46 n47 n48 } 
+       pred={n0 n1 n2 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n33 n34 n35 n36 n37 n38 n39 n40 n41 n42 n43 n44 n45 n46 n47 n48 }
+n5 -> succ={} 
+       pred={}
+n6 -> succ={n0 n1 n4 n35 } 
+       pred={n0 n1 n4 n35 }
+n7 -> succ={} 
+       pred={}
+n8 -> succ={n0 n1 n2 n4 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n35 n38 } 
+       pred={n0 n1 n2 n4 n9 n20 n21 n22 n23 n24 n25 n26 n27 n32 n35 n38 }
+n9 -> succ={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n25 n26 n27 n35 } 
+       pred={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n25 n26 n27 n35 }
+n10 -> succ={} 
+       pred={}
+n11 -> succ={} 
+       pred={}
+n12 -> succ={} 
+       pred={}
+n13 -> succ={} 
+       pred={}
+n14 -> succ={} 
+       pred={}
+n15 -> succ={} 
+       pred={}
+n16 -> succ={} 
+       pred={}
+n17 -> succ={} 
+       pred={}
+n18 -> succ={} 
+       pred={}
+n19 -> succ={} 
+       pred={}
+n20 -> succ={n0 n1 n2 n4 n8 n9 n21 n22 n23 n24 n25 n26 n27 n32 n41 n42 n43 n44 n45 n46 n47 } 
+       pred={n0 n1 n2 n4 n8 n9 n21 n22 n23 n24 n25 n26 n27 n32 n41 n42 n43 n44 n45 n46 n47 }
+n21 -> succ={n0 n1 n2 n4 n8 n9 n20 n22 n23 n24 n25 n26 n27 n32 n42 n43 n44 n45 n46 n47 } 
+       pred={n0 n1 n2 n4 n8 n9 n20 n22 n23 n24 n25 n26 n27 n32 n42 n43 n44 n45 n46 n47 }
+n22 -> succ={n0 n1 n2 n4 n8 n9 n20 n21 n23 n24 n25 n26 n27 n32 n43 n44 n45 n46 n47 } 
+       pred={n0 n1 n2 n4 n8 n9 n20 n21 n23 n24 n25 n26 n27 n32 n43 n44 n45 n46 n47 }
+n23 -> succ={n0 n1 n2 n4 n8 n9 n20 n21 n22 n24 n25 n26 n27 n32 n44 n45 n46 n47 } 
+       pred={n0 n1 n2 n4 n8 n9 n20 n21 n22 n24 n25 n26 n27 n32 n44 n45 n46 n47 }
+n24 -> succ={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n25 n26 n27 n32 n45 n46 n47 } 
+       pred={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n25 n26 n27 n32 n45 n46 n47 }
+n25 -> succ={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n24 n26 n27 n32 n46 n47 } 
+       pred={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n24 n26 n27 n32 n46 n47 }
+n26 -> succ={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n24 n25 n27 n32 n47 } 
+       pred={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n24 n25 n27 n32 n47 }
+n27 -> succ={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n24 n25 n26 n32 } 
+       pred={n0 n1 n2 n4 n8 n9 n20 n21 n22 n23 n24 n25 n26 n32 }
+n28 -> succ={} 
+       pred={}
+n29 -> succ={} 
+       pred={}
+n30 -> succ={} 
+       pred={}
+n31 -> succ={} 
+       pred={}
+n32 -> succ={n0 n1 n4 n8 n20 n21 n22 n23 n24 n25 n26 n27 n35 n36 n37 } 
+       pred={n0 n1 n4 n8 n20 n21 n22 n23 n24 n25 n26 n27 n35 n36 n37 }
+n33 -> succ={n0 n1 n4 } 
+       pred={n0 n1 n4 }
+n34 -> succ={n0 n1 n4 n35 } 
+       pred={n0 n1 n4 n35 }
+n35 -> succ={n0 n1 n4 n6 n8 n9 n32 n34 n37 n38 } 
+       pred={n0 n1 n4 n6 n8 n9 n32 n34 n37 n38 }
+n36 -> succ={n0 n1 n4 n32 } 
+       pred={n0 n1 n4 n32 }
+n37 -> succ={n0 n1 n4 n32 n35 } 
+       pred={n0 n1 n4 n32 n35 }
+n38 -> succ={n0 n1 n4 n8 n35 } 
+       pred={n0 n1 n4 n8 n35 }
+n39 -> succ={n0 n1 n4 } 
+       pred={n0 n1 n4 }
+n40 -> succ={n0 n1 n4 } 
+       pred={n0 n1 n4 }
+n41 -> succ={n0 n1 n4 n20 } 
+       pred={n0 n1 n4 n20 }
+n42 -> succ={n0 n1 n4 n20 n21 } 
+       pred={n0 n1 n4 n20 n21 }
+n43 -> succ={n0 n1 n4 n20 n21 n22 } 
+       pred={n0 n1 n4 n20 n21 n22 }
+n44 -> succ={n0 n1 n4 n20 n21 n22 n23 } 
+       pred={n0 n1 n4 n20 n21 n22 n23 }
+n45 -> succ={n0 n1 n4 n20 n21 n22 n23 n24 } 
+       pred={n0 n1 n4 n20 n21 n22 n23 n24 }
+n46 -> succ={n0 n1 n4 n20 n21 n22 n23 n24 n25 } 
+       pred={n0 n1 n4 n20 n21 n22 n23 n24 n25 }
+n47 -> succ={n1 n4 n20 n21 n22 n23 n24 n25 n26 } 
+       pred={n1 n4 n20 n21 n22 n23 n24 n25 n26 }
+n48 -> succ={n0 n1 n4 } 
+       pred={n0 n1 n4 }
+n0 : L0:
+n1 : move t100, t101
+n2 : addi t101, t101, -44
+n3 : sw t102, 8(t101)
+n4 : sw t100, 4(t101)
+n5 : L7:
+n6 : sw t108, -4(t100)
+n7 : sw t120, -8(t100)
+n8 : sw t121, -12(t100)
+n9 : sw t122, -16(t100)
+n10 : sw t123, -20(t100)
+n11 : sw t124, -24(t100)
+n12 : sw t125, -28(t100)
+n13 : sw t126, -32(t100)
+n14 : sw t127, -36(t100)
+n15 : add t108, t100, $0
+n16 : addi t149, $0, 10
+n17 : add t109, t149, $0
+n18 : jal nfactor
+n19 : add t106, t106, $0
+n20 : lw t150, -8(t100)
+n21 : add t120, t150, $0
+n22 : lw t151, -12(t100)
+n23 : add t121, t151, $0
+n24 : lw t152, -16(t100)
+n25 : add t122, t152, $0
+n26 : lw t153, -20(t100)
+n27 : add t123, t153, $0
+n28 : lw t154, -24(t100)
+n29 : add t124, t154, $0
+n30 : lw t155, -28(t100)
+n31 : add t125, t155, $0
+n32 : lw t156, -32(t100)
+n33 : add t126, t156, $0
+n34 : lw t157, -36(t100)
+n35 : add t127, t157, $0
+n36 : j L6 
+n37 : L6:
+n38 : lw t102, 8(t101)
+n39 : lw t100, 4(t101)
+n40 : addi t101, t101, 44
+n41 : jr $ra
+n0: 1 2 4 8 20 21 22 23 24 25 26 27 
+n1: 0 1 2 4 8 20 21 22 23 24 25 26 27 
+n2: 0 2 4 8 20 21 22 23 24 25 26 27 
+n3: 0 4 8 20 21 22 23 24 25 26 27 
+n4: 0 1 4 8 20 21 22 23 24 25 26 27 
+n5: 0 1 4 8 20 21 22 23 24 25 26 27 
+n6: 0 1 4 20 21 22 23 24 25 26 27 
+n7: 0 1 4 21 22 23 24 25 26 27 
+n8: 0 1 4 22 23 24 25 26 27 
+n9: 0 1 4 23 24 25 26 27 
+n10: 0 1 4 24 25 26 27 
+n11: 0 1 4 25 26 27 
+n12: 0 1 4 26 27 
+n13: 0 1 4 27 
+n14: 0 1 4 
+n15: 0 1 4 8 
+n16: 0 1 4 8 49 
+n17: 0 1 4 8 9 
+n18: 0 1 4 6 
+n19: 0 1 4 
+n20: 0 1 4 50 
+n21: 0 1 4 20 
+n22: 0 1 4 20 51 
+n23: 0 1 4 20 21 
+n24: 0 1 4 20 21 52 
+n25: 0 1 4 20 21 22 
+n26: 0 1 4 20 21 22 53 
+n27: 0 1 4 20 21 22 23 
+n28: 0 1 4 20 21 22 23 54 
+n29: 0 1 4 20 21 22 23 24 
+n30: 0 1 4 20 21 22 23 24 55 
+n31: 0 1 4 20 21 22 23 24 25 
+n32: 0 1 4 20 21 22 23 24 25 56 
+n33: 0 1 4 20 21 22 23 24 25 26 
+n34: 1 4 20 21 22 23 24 25 26 57 
+n35: 1 4 20 21 22 23 24 25 26 27 
+n36: 1 4 20 21 22 23 24 25 26 27 
+n37: 1 4 20 21 22 23 24 25 26 27 
+n38: 1 2 4 20 21 22 23 24 25 26 27 
+n39: 1 2 4 20 21 22 23 24 25 26 27 
+n40: 1 2 4 20 21 22 23 24 25 26 27 
+n41: 
+n0 -> succ={n1 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 n50 n51 n52 n53 n54 n55 n56 } 
+       pred={n1 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 n50 n51 n52 n53 n54 n55 n56 }
+n1 -> succ={n0 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 n50 n51 n52 n53 n54 n55 n56 n57 } 
+       pred={n0 n2 n4 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 n50 n51 n52 n53 n54 n55 n56 n57 }
+n2 -> succ={n0 n1 n4 n8 n20 n21 n22 n23 n24 n25 n26 n27 } 
+       pred={n0 n1 n4 n8 n20 n21 n22 n23 n24 n25 n26 n27 }
+n3 -> succ={} 
+       pred={}
+n4 -> succ={n0 n1 n2 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 n50 n51 n52 n53 n54 n55 n56 n57 } 
+       pred={n0 n1 n2 n6 n8 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 n50 n51 n52 n53 n54 n55 n56 n57 }
+n5 -> succ={} 
+       pred={}
+n6 -> succ={n0 n1 n4 } 
+       pred={n0 n1 n4 }
+n7 -> succ={} 
+       pred={}
+n8 -> succ={n0 n1 n2 n4 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 } 
+       pred={n0 n1 n2 n4 n9 n20 n21 n22 n23 n24 n25 n26 n27 n49 }
+n9 -> succ={n0 n1 n4 n8 } 
+       pred={n0 n1 n4 n8 }
+n10 -> succ={} 
+       pred={}
+n11 -> succ={} 
+       pred={}
+n12 -> succ={} 
+       pred={}
+n13 -> succ={} 
+       pred={}
+n14 -> succ={} 
+       pred={}
+n15 -> succ={} 
+       pred={}
+n16 -> succ={} 
+       pred={}
+n17 -> succ={} 
+       pred={}
+n18 -> succ={} 
+       pred={}
+n19 -> succ={} 
+       pred={}
+n20 -> succ={n0 n1 n2 n4 n8 n21 n22 n23 n24 n25 n26 n27 n51 n52 n53 n54 n55 n56 n57 } 
+       pred={n0 n1 n2 n4 n8 n21 n22 n23 n24 n25 n26 n27 n51 n52 n53 n54 n55 n56 n57 }
+n21 -> succ={n0 n1 n2 n4 n8 n20 n22 n23 n24 n25 n26 n27 n52 n53 n54 n55 n56 n57 } 
+       pred={n0 n1 n2 n4 n8 n20 n22 n23 n24 n25 n26 n27 n52 n53 n54 n55 n56 n57 }
+n22 -> succ={n0 n1 n2 n4 n8 n20 n21 n23 n24 n25 n26 n27 n53 n54 n55 n56 n57 } 
+       pred={n0 n1 n2 n4 n8 n20 n21 n23 n24 n25 n26 n27 n53 n54 n55 n56 n57 }
+n23 -> succ={n0 n1 n2 n4 n8 n20 n21 n22 n24 n25 n26 n27 n54 n55 n56 n57 } 
+       pred={n0 n1 n2 n4 n8 n20 n21 n22 n24 n25 n26 n27 n54 n55 n56 n57 }
+n24 -> succ={n0 n1 n2 n4 n8 n20 n21 n22 n23 n25 n26 n27 n55 n56 n57 } 
+       pred={n0 n1 n2 n4 n8 n20 n21 n22 n23 n25 n26 n27 n55 n56 n57 }
+n25 -> succ={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n26 n27 n56 n57 } 
+       pred={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n26 n27 n56 n57 }
+n26 -> succ={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n25 n27 n57 } 
+       pred={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n25 n27 n57 }
+n27 -> succ={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n25 n26 } 
+       pred={n0 n1 n2 n4 n8 n20 n21 n22 n23 n24 n25 n26 }
+n28 -> succ={} 
+       pred={}
+n29 -> succ={} 
+       pred={}
+n30 -> succ={} 
+       pred={}
+n31 -> succ={} 
+       pred={}
+n32 -> succ={} 
+       pred={}
+n33 -> succ={} 
+       pred={}
+n34 -> succ={} 
+       pred={}
+n35 -> succ={} 
+       pred={}
+n36 -> succ={} 
+       pred={}
+n37 -> succ={} 
+       pred={}
+n38 -> succ={} 
+       pred={}
+n39 -> succ={} 
+       pred={}
+n40 -> succ={} 
+       pred={}
+n41 -> succ={} 
+       pred={}
+n42 -> succ={} 
+       pred={}
+n43 -> succ={} 
+       pred={}
+n44 -> succ={} 
+       pred={}
+n45 -> succ={} 
+       pred={}
+n46 -> succ={} 
+       pred={}
+n47 -> succ={} 
+       pred={}
+n48 -> succ={} 
+       pred={}
+n49 -> succ={n0 n1 n4 n8 } 
+       pred={n0 n1 n4 n8 }
+n50 -> succ={n0 n1 n4 } 
+       pred={n0 n1 n4 }
+n51 -> succ={n0 n1 n4 n20 } 
+       pred={n0 n1 n4 n20 }
+n52 -> succ={n0 n1 n4 n20 n21 } 
+       pred={n0 n1 n4 n20 n21 }
+n53 -> succ={n0 n1 n4 n20 n21 n22 } 
+       pred={n0 n1 n4 n20 n21 n22 }
+n54 -> succ={n0 n1 n4 n20 n21 n22 n23 } 
+       pred={n0 n1 n4 n20 n21 n22 n23 }
+n55 -> succ={n0 n1 n4 n20 n21 n22 n23 n24 } 
+       pred={n0 n1 n4 n20 n21 n22 n23 n24 }
+n56 -> succ={n0 n1 n4 n20 n21 n22 n23 n24 n25 } 
+       pred={n0 n1 n4 n20 n21 n22 n23 n24 n25 }
+n57 -> succ={n1 n4 n20 n21 n22 n23 n24 n25 n26 } 
+       pred={n1 n4 n20 n21 n22 n23 n24 n25 n26 }
 # ----- emit nfactor -----
 digraph G {
-n0 -> succ={n1 } 
-    pred{}
-n1 -> succ={n2 } 
-    pred{n0 }
-n2 -> succ={n3 } 
-    pred{n1 }
-n3 -> succ={n4 } 
-    pred{n2 }
-n4 -> succ={n5 } 
-    pred{n3 }
-n5 -> succ={n6 } 
-    pred{n4 }
-n6 -> succ={n7 } 
-    pred{n5 }
-n7 -> succ={n8 } 
-    pred{n6 }
-n8 -> succ={n9 } 
-    pred{n7 }
-n9 -> succ={n10 } 
-    pred{n8 }
-n10 -> succ={n11 } 
-    pred{n9 }
-n11 -> succ={n12 } 
-    pred{n10 }
-n12 -> succ={n13 } 
-    pred{n11 }
-n13 -> succ={n14 } 
-    pred{n12 }
-n14 -> succ={n15 } 
-    pred{n13 }
-n15 -> succ={n16 } 
-    pred{n14 }
-n16 -> succ={n17 } 
-    pred{n15 }
-n17 -> succ={n18 n47 } 
-    pred{n16 }
-n18 -> succ={n19 } 
-    pred{n17 }
-n19 -> succ={n20 } 
-    pred{n18 }
-n20 -> succ={n21 } 
-    pred{n19 }
-n21 -> succ={n22 } 
-    pred{n20 }
-n22 -> succ={n23 } 
-    pred{n21 }
-n23 -> succ={n24 } 
-    pred{n22 }
-n24 -> succ={n25 } 
-    pred{n23 }
-n25 -> succ={n26 } 
-    pred{n24 }
-n26 -> succ={n27 } 
-    pred{n25 }
-n27 -> succ={n28 } 
-    pred{n26 }
-n28 -> succ={n29 } 
-    pred{n27 n50 }
-n29 -> succ={n30 } 
-    pred{n28 }
-n30 -> succ={n31 } 
-    pred{n29 }
-n31 -> succ={n32 } 
-    pred{n30 }
-n32 -> succ={n33 } 
-    pred{n31 }
-n33 -> succ={n34 } 
-    pred{n32 }
-n34 -> succ={n35 } 
-    pred{n33 }
-n35 -> succ={n36 } 
-    pred{n34 }
-n36 -> succ={n37 } 
-    pred{n35 }
-n37 -> succ={n38 } 
-    pred{n36 }
-n38 -> succ={n39 } 
-    pred{n37 }
-n39 -> succ={n40 } 
-    pred{n38 }
-n40 -> succ={n41 } 
-    pred{n39 }
-n41 -> succ={n42 } 
-    pred{n40 }
-n42 -> succ={n43 } 
-    pred{n41 }
-n43 -> succ={n44 } 
-    pred{n42 }
-n44 -> succ={n45 } 
-    pred{n43 }
-n45 -> succ={n46 } 
-    pred{n44 }
-n46 -> succ={n51 } 
-    pred{n45 }
-n47 -> succ={n48 } 
-    pred{n17 }
-n48 -> succ={n49 } 
-    pred{n47 }
-n49 -> succ={n50 } 
-    pred{n48 }
-n50 -> succ={n28 } 
-    pred{n49 }
-n51 -> succ={n52 } 
-    pred{n46 }
-n52 -> succ={} 
-    pred{n51 }
-n53 -> succ={n54 } 
-    pred{}
-n54 -> succ={n55 } 
-    pred{n53 }
-n55 -> succ={n56 } 
-    pred{n54 }
-n56 -> succ={} 
-    pred{n55 }
 }
+Moves: 
+no moves
 nfactor:
-move t158, t159
-addi t159, t159, -44
-sw t160, 8(t159)
-sw t158, 4(t159)
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
 L5:
-add t132, t167, $0
-sw t166, -4(t158)
-sw t178, -8(t158)
-sw t179, -12(t158)
-sw t180, -16(t158)
-sw t181, -20(t158)
-sw t182, -24(t158)
-sw t183, -28(t158)
-sw t184, -32(t158)
-sw t185, -36(t158)
+add t132, t109, $0
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
 addi t136, $0, 0
 beq t132, t136, L1
 L2:
 add t135, t132, $0
-lw t137, 0(t158)
-add t166, t137, $0
+lw t137, 0(t100)
+add t108, t137, $0
 addi t138, t132, -1
-add t167, t138, $0
+add t109, t138, $0
 jal nfactor
-add t134, t164, $0
+add t134, t106, $0
 mul t139, t135, t134
 add t133, t139, $0
 L3:
-add t164, t133, $0
-lw t140, -8(t158)
-add t178, t140, $0
-lw t141, -12(t158)
-add t179, t141, $0
-lw t142, -16(t158)
-add t180, t142, $0
-lw t143, -20(t158)
-add t181, t143, $0
-lw t144, -24(t158)
-add t182, t144, $0
-lw t145, -28(t158)
-add t183, t145, $0
-lw t146, -32(t158)
-add t184, t146, $0
-lw t147, -36(t158)
-add t185, t147, $0
+add t106, t133, $0
+lw t140, -8(t100)
+add t120, t140, $0
+lw t141, -12(t100)
+add t121, t141, $0
+lw t142, -16(t100)
+add t122, t142, $0
+lw t143, -20(t100)
+add t123, t143, $0
+lw t144, -24(t100)
+add t124, t144, $0
+lw t145, -28(t100)
+add t125, t145, $0
+lw t146, -32(t100)
+add t126, t146, $0
+lw t147, -36(t100)
+add t127, t147, $0
 j L4 
 L1:
 addi t148, $0, 1
 add t133, t148, $0
 j L3 
 L4:
-livein: sp, ra
-some[] procEntryExit2, assem=""
-liveout: empty
-lw t160, 8(t159)
-lw t158, 4(t159)
-addi t159, t159, 44
-jr t160
-some[]
-
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr $ra
 # ----- emit L0 -----
 digraph G {
-n0 -> succ={n1 } 
-    pred{}
-n1 -> succ={n2 } 
-    pred{n0 }
-n2 -> succ={n3 } 
-    pred{n1 }
-n3 -> succ={n4 } 
-    pred{n2 }
-n4 -> succ={n5 } 
-    pred{n3 }
-n5 -> succ={n6 } 
-    pred{n4 }
-n6 -> succ={n7 } 
-    pred{n5 }
-n7 -> succ={n8 } 
-    pred{n6 }
-n8 -> succ={n9 } 
-    pred{n7 }
-n9 -> succ={n10 } 
-    pred{n8 }
-n10 -> succ={n11 } 
-    pred{n9 }
-n11 -> succ={n12 } 
-    pred{n10 }
-n12 -> succ={n13 } 
-    pred{n11 }
-n13 -> succ={n14 } 
-    pred{n12 }
-n14 -> succ={n15 } 
-    pred{n13 }
-n15 -> succ={n16 } 
-    pred{n14 }
-n16 -> succ={n17 } 
-    pred{n15 }
-n17 -> succ={n18 } 
-    pred{n16 }
-n18 -> succ={n19 } 
-    pred{n17 }
-n19 -> succ={n20 } 
-    pred{n18 }
-n20 -> succ={n21 } 
-    pred{n19 }
-n21 -> succ={n22 } 
-    pred{n20 }
-n22 -> succ={n23 } 
-    pred{n21 }
-n23 -> succ={n24 } 
-    pred{n22 }
-n24 -> succ={n25 } 
-    pred{n23 }
-n25 -> succ={n26 } 
-    pred{n24 }
-n26 -> succ={n27 } 
-    pred{n25 }
-n27 -> succ={n28 } 
-    pred{n26 }
-n28 -> succ={n29 } 
-    pred{n27 }
-n29 -> succ={n30 } 
-    pred{n28 }
-n30 -> succ={n31 } 
-    pred{n29 }
-n31 -> succ={n32 } 
-    pred{n30 }
-n32 -> succ={n33 } 
-    pred{n31 }
-n33 -> succ={n34 } 
-    pred{n32 }
-n34 -> succ={n35 } 
-    pred{n33 }
-n35 -> succ={n36 } 
-    pred{n34 }
-n36 -> succ={n37 } 
-    pred{n35 }
-n37 -> succ={n38 } 
-    pred{n36 }
-n38 -> succ={} 
-    pred{n37 }
-n39 -> succ={n40 } 
-    pred{}
-n40 -> succ={n41 } 
-    pred{n39 }
-n41 -> succ={n42 } 
-    pred{n40 }
-n42 -> succ={} 
-    pred{n41 }
 }
+Moves: 
+no moves
 L0:
-move t158, t159
-addi t159, t159, -44
-sw t160, 8(t159)
-sw t158, 4(t159)
+move t100, t101
+addi t101, t101, -44
+sw t102, 8(t101)
+sw t100, 4(t101)
 L7:
-sw t166, -4(t158)
-sw t178, -8(t158)
-sw t179, -12(t158)
-sw t180, -16(t158)
-sw t181, -20(t158)
-sw t182, -24(t158)
-sw t183, -28(t158)
-sw t184, -32(t158)
-sw t185, -36(t158)
-add t166, t158, $0
+sw t108, -4(t100)
+sw t120, -8(t100)
+sw t121, -12(t100)
+sw t122, -16(t100)
+sw t123, -20(t100)
+sw t124, -24(t100)
+sw t125, -28(t100)
+sw t126, -32(t100)
+sw t127, -36(t100)
+add t108, t100, $0
 addi t149, $0, 10
-add t167, t149, $0
+add t109, t149, $0
 jal nfactor
-add t164, t164, $0
-lw t150, -8(t158)
-add t178, t150, $0
-lw t151, -12(t158)
-add t179, t151, $0
-lw t152, -16(t158)
-add t180, t152, $0
-lw t153, -20(t158)
-add t181, t153, $0
-lw t154, -24(t158)
-add t182, t154, $0
-lw t155, -28(t158)
-add t183, t155, $0
-lw t156, -32(t158)
-add t184, t156, $0
-lw t157, -36(t158)
-add t185, t157, $0
+add t106, t106, $0
+lw t150, -8(t100)
+add t120, t150, $0
+lw t151, -12(t100)
+add t121, t151, $0
+lw t152, -16(t100)
+add t122, t152, $0
+lw t153, -20(t100)
+add t123, t153, $0
+lw t154, -24(t100)
+add t124, t154, $0
+lw t155, -28(t100)
+add t125, t155, $0
+lw t156, -32(t100)
+add t126, t156, $0
+lw t157, -36(t100)
+add t127, t157, $0
 j L6 
 L6:
-lw t160, 8(t159)
-lw t158, 4(t159)
-addi t159, t159, 44
-jr t160
+lw t102, 8(t101)
+lw t100, 4(t101)
+addi t101, t101, 44
+jr $ra

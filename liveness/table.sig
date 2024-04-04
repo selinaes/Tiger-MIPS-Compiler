@@ -6,5 +6,6 @@ sig
    val enter : 'a table * key * 'a -> 'a table
    val look  : 'a table * key -> 'a option
    val listItems : 'a table -> 'a list
+   val listItemsi : 'a table -> (int * 'a) list
 end
 

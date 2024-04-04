@@ -28,6 +28,7 @@ sig
     val nodename: node -> string  (* for debugging only *)
 
     val printGraph: TextIO.outstream * graph -> unit
+    val printNode: graph * int-> unit
 
 
 end

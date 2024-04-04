@@ -24,7 +24,7 @@ struct
             (* fun addNode (nil, fgr) = fgr *)
             fun convertInstrToString (instr) = 
                 case instr of
-                    A.OPER{assem, dst, src, jump} => "OPER" ^ assem
+                    A.OPER{assem, dst, src, jump} => "OPER" 
                   | A.LABEL{lab, ...} => "LABEL"
                   | A.MOVE{assem, dst, src} => "MOVE"
 
@@ -33,8 +33,9 @@ struct
                     
                     val node = G.newNode control
                     val format0 = Assem.format(Temp.makestring)
-                    (* val (g, id) = node *)
-                    val _ = print ((format0 instr) ^ (convertInstrToString instr) ^ ":" ^ G.nodename node ^ "\n")
+                    val str = format0 instr
+                    val _ = print ( G.nodename node ^ " : " ^String.substring(str,0,String.size(str)-1)^ "\n")
+
                     val (srcs, dsts) = getInstrSrcDst instr
                     val bitDsts = BitArray.bits(N, map (fn x => x - 100) dsts)
                     val bitSrcs = BitArray.bits(N, map (fn x => x - 100) srcs)

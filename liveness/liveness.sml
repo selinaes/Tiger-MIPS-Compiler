@@ -17,6 +17,18 @@ struct
     val tnodeMap: Graph.node Temp.Table.table ref = ref Temp.Table.empty
     val gtempMap: Temp.temp Graph.Table.table ref = ref Graph.Table.empty
 
+    fun show (out, ig) : unit = 
+        let
+            val IGRAPH {graph, tnode, gtemp, moves} = ig
+            fun printMoves (out, []) = TextIO.output(out, "no moves\n")
+                | printMoves (out, (n1, n2)::moves) = 
+                        (TextIO.output(out, G.nodename n1 ^ " -> " ^ G.nodename n2 ^ "\n");
+                        printMoves(out, moves))
+        in
+            Graph.printGraph (out, graph);
+            TextIO.output(out, "Moves: \n");
+            printMoves (out, moves)
+        end
     (* igraph * (Graph.node -> Temp.temp list) *)
     fun interferenceGraph (Flow.FGRAPH {control, def, use, ismove}) : igraph * (Graph.node -> liveSet) = 
         let
@@ -27,6 +39,7 @@ struct
             val liveOutMap: liveMap ref  = ref Graph.Table.empty
 
             (* Ret: 1. an igraph 2. flow-graph node -> set of temps that are live-out at that node *)
+            
             fun computeLiveness () = 
                 let
                     val hasChanged = ref false
@@ -49,7 +62,7 @@ struct
                             (* this is to compare the old and new *)
                             val oldLiveInMap = lookupLiveSet (!liveInMap, node)
                         in
-                            if BitArray.isZero (BitArray.xorb (liveIn, oldLiveInMap, N)) then
+                            if not (BitArray.isZero (BitArray.xorb (liveIn, oldLiveInMap, N))) then
                                 (liveInMap := Graph.Table.enter (!liveInMap,node,liveIn); hasChanged := true)
                             else
                                 ()
@@ -60,6 +73,14 @@ struct
                         computeLiveness()
                     else
                         ())
+                end
+
+            fun livesetToString(ls:liveSet) = 
+                let
+                    val oneIdLst = BitArray.getBits(ls)
+                    fun oneIdToString (id) = Int.toString id ^ " "
+                in
+                    foldl (fn (id, acc) => acc ^ oneIdToString id) "" oneIdLst
                 end
             
             fun addAllINodes (graph: G.graph) = 
@@ -116,47 +137,43 @@ struct
                 end
 
             (* add edge to igraph, process 1 liveout set at a moment *)
-            fun addEdgesAtOneLiveset (ls : liveSet, gr:Graph.graph) = 
+            fun addEdgesAtOneLiveset (ls : liveSet, gr: Graph.graph) = 
                 let
                     val nodes = G.nodes gr
-                    val oneIdLst = BitArray.getBits(ls)
+                    val oneIdLst = BitArray.getBits(ls) 
                     val num = length oneIdLst
-                    fun createEdge (0, ~1) = () (* return case *)
-                        | createEdge (i, ~1) = createEdge(i - 1, num)
-                        | createEdge (i, j) = 
-                            let    
-                                val n1 = List.nth(nodes, i)
-                                val n2 = List.nth(nodes, j)
-                            in
-                                G.mk_edge {from = n1, to = n2};
-                                G.mk_edge {from = n2, to = n1};
-                                createEdge (i, j - 1)
-                            end
+                    fun createEdge oneId = 
+                        let
+                            val n1 = List.nth(nodes, oneId)
+                            val lst = List.filter (fn x => x <> oneId) oneIdLst
+                            fun secondLoop (i) = 
+                                let
+                                    val n2 = List.nth(nodes, i)
+                                in
+                                    G.mk_edge {from = n1, to = n2};
+                                    G.mk_edge {from = n2, to = n1}
+                                end
+                        in
+                            app secondLoop lst
+                        end
                 in
-                    createEdge (num-1, num-1)
+                    print (livesetToString(ls) ^ "\n");
+                    app createEdge oneIdLst
                 end
                 
             val _ = computeLiveness()
             val gr = G.newGraph()
             val igraph = addAllINodes(gr)
             val igraph' = addAllMoves(igraph)
-            val _ = app (fn i => addEdgesAtOneLiveset(i, gr)) (G.Table.listItems(!liveOutMap))
+            (* (fgraph node : liveset) *)
+            val _ = app (fn (k: int,v) => (print ("n"^(Int.toString k)^": ");addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap))
+            (* val _ = app (fn (k: int,v) => (G.printNode(control,k);addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
+            (* val _ = show (TextIO.stdOut, igraph) *)
         in
             (igraph', 
             fn node => Option.getOpt(Graph.Table.look(!liveOutMap, node), 
                     ErrorMsg.impossible "interferenceGraph: liveOutMap can't find"))
         end 
 
-    fun show (out, ig) : unit = 
-        let
-            val IGRAPH {graph, tnode, gtemp, moves} = ig
-            fun printMoves (out, []) = TextIO.output(out, "no moves\n")
-                | printMoves (out, (n1, n2)::moves) = 
-                        (TextIO.output(out, G.nodename n1 ^ " -> " ^ G.nodename n2 ^ "\n");
-                        printMoves(out, moves))
-        in
-            Graph.printGraph (out, graph);
-            TextIO.output(out, "Moves: \n");
-            printMoves (out, moves)
-        end
+   
 end
