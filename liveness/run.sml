@@ -38,7 +38,7 @@ fun par f =
         end;
 
 fun sort (list: string list) = foldr (fn (x,lst)=> List.filter (fn a => a < x) lst @ [x] @ List.filter (fn a => a >= x) lst ) [] list;
-fun contains (x, []) = false
+fun contains (x:string, []) = false
             | contains (x, y::ys) = if x = y then true else contains (x, ys)
 
 (* fun filterRes lst = List.filter (fn x => not (String.isSuffix ".result" x)) lst; *)
@@ -67,10 +67,11 @@ fun clear() =
         end;
 
 (* clear(); *)
-runAllTests ();
-(* Main.compile "../testcases/test6.tig"; *)
+(* runAllTests (); *)
+Main.compile "../testcases/test4.tig";
 (* par "error-inte.tig"; *)
 (* par "testEsc-err.tig";  *)
 (* par "test19-err.tig"; *)
 (* par "merge.tig"; *)
+(* par "test1.tig";  *)
 (* par "queen.tig"; *)

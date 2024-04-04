@@ -21,15 +21,24 @@ structure Main = struct
         (* val _ = app (fn s => Printtree.printtree(out,s)) stms'; *)
 
         (* val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
-	      val instrs = List.concat(map (MipsGen.codegen frame) stms') 
+        val instrs = List.concat(map (MipsGen.codegen frame) stms') 
         val instrs' = Frame.procEntryExit2(frame, instrs)
+  
+      
+
         val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs')
+        val (Flow.FGRAPH {control,def,use,ismove}, ndlist) = MakeGraph.instrs2graph(body') 
+        val _ = Graph.printGraph (out, control)
+        (* val (igr, liveoutmap) = Liveness.interferenceGraph (fgr) *)
         val format0 = Assem.format(Temp.makestring)
  
     in  
-      app (fn i => TextIO.output(out,format0 i)) body'
+      
+        (* Liveness.show (out, igr);  *)
+       (* TextIO.output(out,"# -------------------\n");     *)
+        (app (fn i => TextIO.output(out,format0 i)) body')
     end
-    | emitproc out (F.STRING(lab,s)) = TextIO.output(out,F.string(lab,s))
+    | emitproc out (F.STRING(lab,s)) = (TextIO.output(out,F.string(lab,s)))
 
   fun withOpenFile fname f = 
       let val out = TextIO.openOut fname
@@ -42,10 +51,12 @@ structure Main = struct
           val () = (Translate.resetfragLst(); Temp.resetLabs())
           val absyn = Parse.parse filename
           val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
+          (* val bodylst = *)
+          
+          (* val bodys: Assem.instr list = foldl (fn(curr, base) => curr@base) [] bodylst
+          val (fgr, ndlist) = MakeGraph.instrs2graph(bodys)  *)
        in 
-            withOpenFile (filename ^ ".s") 
-	          (fn out => (app (emitproc out) frags))
-            (* app (emitproc out) frags *)
+            withOpenFile (filename ^ ".s") (fn out => (app (emitproc out) frags))
        end
 
 end

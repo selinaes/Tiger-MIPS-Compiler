@@ -95,5 +95,23 @@ struct
 
   fun nodename(g,i:int) = "n" ^ Int.toString(i)
 
+  fun printGraph (out, graph: graph) = 
+  let
+    fun printNode (g, i) = 
+      let
+        val NODE{succ=succ, pred=pred} = A.sub(g, i)
+      in
+        (TextIO.output(out, (nodename (g, i)) ^ " -> succ={");
+        NeighborSet.app (fn j => TextIO.output(out, nodename(graph, j) ^ " ") ) succ;
+        TextIO.output(out, "} \n    pred{");
+        NeighborSet.app (fn j => TextIO.output(out, nodename(graph, j) ^ " ") ) pred;
+        TextIO.output(out, "}\n"))
+      end
+  in
+    (TextIO.output(out, "digraph G {\n");
+    app printNode (nodes graph);
+    TextIO.output(out, "}\n"))
+  end
+
 end
 

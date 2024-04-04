@@ -83,13 +83,13 @@ struct
                 | munchStm _ = ErrorMsg.impossible "munchStm match failed"
             (* 3 node *)
             and munchExp(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i))) =
-                    result (fn r => emit (A. OPER{assem= "lw `d0, " ^ intToString(i) ^ "(`s0)\n",
+                    result (fn r => emit (A.OPER{assem= "lw `d0, " ^ intToString(i) ^ "(`s0)\n",
                                                  src= [munchExp e1], dst=[r], jump=NONE}) )
                 | munchExp(T.MEM(T.BINOP(T.PLUS,T.CONST i,e1))) =
                     result(fn r => emit(A.OPER {assem="lw `d0," ^ intToString(i) ^ "(`s0)\n",
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
                 |   munchExp(T.MEM(T.BINOP(T.MINUS, e1, T.CONST i))) =
-                    result (fn r => emit (A. OPER{assem= "lw `d0," ^ intToString(~i) ^ "(`s0)\n",
+                    result (fn r => emit (A.OPER{assem= "lw `d0," ^ intToString(~i) ^ "(`s0)\n",
                                                  src= [munchExp e1], dst=[r], jump=NONE}))
                 | munchExp(T.MEM(T.CONST i)) =
                     result(fn r => emit(A.OPER {assem="lw `d0," ^ intToString(i) ^ "($0)\n",
@@ -120,9 +120,9 @@ struct
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
                 
                 | munchExp(T.CALL(T.NAME clbl, args)) = 
-                    (emit(A.OPER{assem="jal `j0 \n",
+                    (emit(A.OPER{assem="jal " ^ S.name clbl ^ "\n",
                                     src=munchArgs (0, args),
-                                    dst=[Frame.RV],jump=SOME([clbl])});
+                                    dst=[Frame.RV],jump=NONE});
                     Frame.RV)
                 
                 (* 1 node *)

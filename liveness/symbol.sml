@@ -3,10 +3,12 @@ sig
   eqtype symbol
   val symbol : string -> symbol
   val name : symbol -> string
+  structure Table : TABLE 
   type 'a table
   val empty : 'a table
   val enter : 'a table * symbol * 'a -> 'a table
   val look  : 'a table * symbol -> 'a option
+  val listItems : 'a table -> 'a list
 end
 
 structure Symbol :> SYMBOL =
@@ -40,4 +42,5 @@ struct
   val empty = Table.empty
   val enter = Table.enter
   val look = Table.look
+  val listItems = Table.listItems
 end
