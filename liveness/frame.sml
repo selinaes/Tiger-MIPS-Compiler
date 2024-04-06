@@ -80,7 +80,9 @@ struct
         case Temp.Table.look(tempMap, t) of 
             SOME (str) => str
             | NONE => Temp.makestring t
-      
+
+
+    val registers = Temp.Table.listItems tempMap
 
     fun printFrag(outputstream, []) = ()
         | printFrag(outputstream, (PROC {body, frame}) :: frags) = 

@@ -9,23 +9,15 @@ struct
                 val compare = Int.compare
         end);
 
-  (* datatype noderep = NODE of {succ: node' list, pred: node' list} *)
-
-  datatype noderep = NODE of {succ: NeighborSet.set , pred: NeighborSet.set} 
+  datatype noderep = NODE of {succ: NeighborSet.set, pred: NeighborSet.set} 
   
   val emptyNode = NODE{succ=NeighborSet.empty,pred=NeighborSet.empty}
 
   val bogusSet = NeighborSet.add(NeighborSet.empty, ~1)
   val bogusNode = NODE{succ=bogusSet,pred=NeighborSet.empty}
-  (* val emptyNode = NODE{succ=[],pred=[]}
 
-  val bogusNode = NODE{succ=[~1],pred=[]} *)
-
+  (* Is it last dummy node *)
   fun isBogus(NODE{succ,...}) = NeighborSet.member (succ, ~1)
-    (* | isBogus _ = false *)
-
-  (* fun isBogus(NODE{succ= ~1::_,...}) = true
-    | isBogus _ = false *)
 
   structure A = DynamicArrayFn(struct open Array
 				    type elem = noderep
@@ -52,10 +44,27 @@ struct
 		   in map (augment g) (NeighborSet.listItems s) 
 		  end
   fun pred(g,i) = let val NODE{pred=p,...} = A.sub(g,i)
-                     in map (augment g) (NeighborSet.listItems p) 
+        in map (augment g) (NeighborSet.listItems p) 
 		  end
-  fun adj gi = pred gi @ succ gi
+      
+  fun adj (g,i) = 
+      let val NODE{pred=p,succ=s} = A.sub(g,i)
+      in map (augment g) (NeighborSet.union (NeighborSet.listItems p) (NeighborSet.listItems s))
+      end
 
+  fun isAdjacent(g,i,j) = 
+      let val NODE{pred=p,succ=s} = A.sub(g,i)
+        in NeighborSet.member (p,j) orelse NeighborSet.member (s,j)
+      end
+
+  fun indegree (g,i) = let val NODE{pred=p,...} = A.sub(g,i)
+           in NeighborSet.numItems p
+          end
+
+  fun outdegree (g,i) = let val NODE{succ=s,...} = A.sub(g,i)
+           in NeighborSet.numItems s
+          end
+  
   fun newNode g = (* binary search for unused node *)
     let fun look(lo,hi) =
                (* i < lo indicates i in use
