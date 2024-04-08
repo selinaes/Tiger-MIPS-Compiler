@@ -8,4 +8,5 @@ struct
   fun look(t,k) = IntBinaryMap.find(t,getInt k)
   fun listItems(t) = IntBinaryMap.listItems t
   fun listItemsi(t) = IntBinaryMap.listItemsi t
+  fun appi f m = IntBinaryMap.appi f m
 end

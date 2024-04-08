@@ -7,5 +7,6 @@ sig
    val look  : 'a table * key -> 'a option
    val listItems : 'a table -> 'a list
    val listItemsi : 'a table -> (int * 'a) list
+   val appi: ((int * 'a) -> unit) -> 'a table -> unit
 end
 

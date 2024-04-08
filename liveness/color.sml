@@ -5,19 +5,20 @@ struct
     type edge = (Graph.node * Graph.node)
     structure EdgeSet = RedBlackSetFn (struct
                 type ord_key = edge
-                val compare = Int.compare
+                val compare = Graph.compareEdge
+
     end);
 
     structure NodeSet = RedBlackSetFn (struct
                 type ord_key = Graph.node
-                val compare = Int.compare
+                val compare = Graph.compareNode
     end);
     (* Graphs *)
-    fun color ({interference: IGRAPH {graph, tnode, gtemp, moves}: Liveness.igraph, initial=allocated: allocation,
+    fun color ({interference: Liveness.igraph, initial=allocated: allocation,
                 spillCost: Graph.node -> int, registers: Frame.register list})
                 : allocation * Temp.temp list = (* Returns: (alloc, list of spills) *)
         let
-           
+            val Liveness.IGRAPH {graph, tnode, gtemp, moves} = interference
             (* Node work-lists, sets, and stacks.*)
             val precolored = ref NodeSet.empty (* machine registers, preassigned a color.*)
             val initial = ref NodeSet.empty (* temporary registers, not precolored and not yet processed*)
@@ -39,62 +40,73 @@ struct
             val workListMoves = ref EdgeSet.empty (* moves enabled for possible coalescing.*)
             val activeMoves = ref EdgeSet.empty (* moves not yet ready for coalescing.*)
             
-            val moveList: EdgeSet.set Temp.Table.table = ref Temp.Table.empty
-            val workListMoves: move list ref = ref []  
+            val moveList: EdgeSet.set Temp.Table.table ref = ref Temp.Table.empty
             
             val adjSet: EdgeSet.set ref = ref EdgeSet.empty
             val adjList: NodeSet.set Graph.Table.table ref = ref Graph.Table.empty
             val degree: int Graph.Table.table ref = ref Graph.Table.empty
              
-            val color: Frame.register Graph.Table.tabel = Graph.Table.empty
+            val color: Frame.register Graph.Table.table ref = ref Graph.Table.empty
             
             (* constructs the interference graph (and bit matrix) using the results of static liveness analysis, and also initializes the worklistMoves to contain all the moves in the program. *)
             fun build() = 
                 let    
                     fun buildAdjSetAdjList () = 
                         let
-                            fun addOneIEdge (u, v) = 
-                                if (u <> v) then
+                            fun addOneIEdge (u:Graph.node, v:Graph.node) = 
+                                if (not (Graph.eq(u, v))) then
                                     (adjSet := EdgeSet.add(!adjSet, (u, v));
                                     adjSet := EdgeSet.add(!adjSet, (v, u));
                                     if not (NodeSet.member(!precolored, u)) then
-                                        adjList := Graph.Table.enter(!adjList, u, NodeSet.add(Option.optOf(Graph.Table.look(!adjList, u), Graph.Table.empty), v))
+                                        adjList := Graph.Table.enter(!adjList, u, NodeSet.add(Option.getOpt(Graph.Table.look(!adjList, u), NodeSet.empty), v))
                                     else ();
                                     if not (NodeSet.member(!precolored, v)) then
-                                        adjList := Graph.Table.enter(!adjList, v, NodeSet.add(Option.optOf(Graph.Table.look(!adjList, v), Graph.Table.empty), u))
+                                        adjList := Graph.Table.enter(!adjList, v, NodeSet.add(Option.getOpt(Graph.Table.look(!adjList, v), NodeSet.empty), u))
                                     else ())
                                 else ()
                             fun processOneNode n = 
                                 let
-                                    val adj = Graph.adjacent n
+                                
+                                    val adj = Graph.pred n (* since pred and succ are all the same, choose either one is ok *)
                                 in
                                     app (fn m => addOneIEdge(n, m)) adj
                                 end
                             in
                             app processOneNode (Graph.nodes graph)
                         end
-                    fun computeDegree () = 
-                        Graph.Table.appi (fn (n, adjs) = degree := Graph.Table.enter(!degree, n, NodeSet.numItems adjs)) adjList
 
-                    fun initColor (node as (graph, temp)) = 
-                        (case Temp.Table.look(allocated, temp) of
-                            SOME reg => (Graph.Table.enter(!color, node, reg); 
+                    (* AdjList: NodeSet.set Graph.Table.table ref -> node : nodeset *)
+                    (*  val appi: ((int * 'a) -> unit) -> 'a table -> unit *)
+                    fun computeDegree () = 
+                        let
+                            fun addNodesDegree (n: int, adjs: NodeSet.set) = 
+                                degree := Graph.Table.enter(!degree, Graph.augment graph n, NodeSet.numItems adjs)
+                        in
+                            Graph.Table.appi addNodesDegree (!adjList)
+                        end
+                        
+                    fun initColor (node: Graph.node) = 
+                            (case Temp.Table.look(allocated, gtemp node) of
+                            SOME reg => (color := Graph.Table.enter(!color, node, reg); 
                                         NodeSet.add(!precolored, node))
                             | NONE => NodeSet.add(!initial, node))
+                        
                             
                     fun addMoves (n1, n2) = 
                             (moveList := Temp.Table.enter (!moveList, n1, 
-                               EdgeSet.add(Option.optOf(Temp.Table.look(!moveList, n1), EdgeSet.empty), (n1,n2)));
+                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, n1), EdgeSet.empty), (n1,n2)));
                             moveList := Temp.Table.enter (!moveList, n2, 
-                               EdgeSet.add(Option.optOf(Temp.Table.look(!moveList, n2), EdgeSet.empty), (n1,n2)));
-                            workListMoves := (n1, n2) :: !workListMoves)
+                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, n2), EdgeSet.empty), (n1,n2)));
+                            workListMoves := EdgeSet.add(!workListMoves, (n1, n2)))
                 in
-                    (buildAdjSetAdjList (); computeDegree(); app initColor graph; app addMoves moves)
+                    (buildAdjSetAdjList (); computeDegree(); List.app initColor (Graph.nodes graph); app addMoves moves)
                 end
-                
-            fun makeWorklist() = 
-                (NodeSet.app addNodeToWL !initial; initial := NodeSet.empty)
-
+            fun nodeMoves (n) = 
+                case Temp.Table.look(moveList, n) of 
+                    SOME m => EdgeSet.intersection(m, EdgeSet.union(activeMoves, workListMoves))
+                    | NONE => ErrorMsg.impossible "nodeMoves"
+            
+            fun moveRelated (n) = not (EdgeSet.isEmpty(nodeMoves(n)))
             fun addNodeToWL n = 
                 if (Graph.indegree n >= length registers) 
                 then
@@ -105,6 +117,9 @@ struct
                         (freezeWorklist := NodeSet.add(!freezeWorklist, n))
                     else
                         (simplifyWorklist := NodeSet.add(!simplifyWorklist, n))
+
+             fun makeWorklist() = 
+                (NodeSet.app addNodeToWL !initial; initial := NodeSet.empty)
             (* Node in igraph 'graph' *)
             (* fun addEdge((g,u):Graph.node, (g',v):Graph.node) = 
                 if (not (Graph.isAdjacent(g, u, v)) andalso u <> v) then
@@ -117,16 +132,10 @@ struct
                                 SOME lst => lst
                                 | NONE => NodeSet.empty
                 in
-                    NodeSet.substractList (adjLstOfn, selectStack)
+                    NodeSet.subtractList (adjLstOfn, selectStack)
                 end
                 
-            fun nodeMoves (n) = 
-                case Temp.Table.look(moveList, n) of 
-                    SOME m => EdgeSet.intersection(m, EdgeSet.union(activeMoves, workListMoves))
-                    | NONE => ErrorMsg.impossible "nodeMoves"
-            
-            fun moveRelated (n) = not (EdgeSet.isEmpty(nodeMoves(n)))
-            
+         
             fun enableMoves(nodes) = 
                 let
                   fun forEachN n= 
@@ -167,9 +176,9 @@ struct
             fun simplify() = 
                 let
                     fun simplifyOneNode n = 
-                        simplifyWorklist := NodeSet.delete(!simplifyWorklist, n);
+                        (simplifyWorklist := NodeSet.delete(!simplifyWorklist, n);
                         selectStack := !selectStack@[n];
-                        app (fn m => decrementDegree m) (adjacent n)
+                        app (fn m => decrementDegree m) (adjacent n))
 
                 in
                     NodeSet.app simplifyOneNode !simplifyWorklist
@@ -191,7 +200,7 @@ struct
                                         | NONE => ErrorMsg.impossible "assignColors cannot find node in adjList"
                         in
                             app forEachW ws;
-                            if Linull (!okColors) then
+                            if List.null (!okColors) then
                                 spilledNodes := NodeSet.add(!spilledNodes, n)
                             else
                                 (coloredNodes := NodeSet.add(!coloredNodes, n);

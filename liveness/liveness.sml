@@ -165,10 +165,8 @@ struct
             val gr = G.newGraph()
             val igraph = addAllINodes(gr)
             val igraph' = addAllMoves(igraph)
-            (* (fgraph node : liveset) *)
             val _ = app (fn (k: int,v) => (print ("n"^(Int.toString k)^": ");addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap))
             (* val _ = app (fn (k: int,v) => (G.printNode(control,k);addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
-            (* val _ = show (TextIO.stdOut, igraph) *)
         in
             (igraph', 
             fn node => Option.getOpt(Graph.Table.look(!liveOutMap, node), 

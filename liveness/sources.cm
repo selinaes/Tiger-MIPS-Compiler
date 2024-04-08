@@ -38,6 +38,10 @@ makegraph.sig
 makegraph.sml 
 liveness.sig
 liveness.sml
+color.sig
+color.sml
+reg_alloc.sig
+reg_alloc.sml
 main.sml
 
 

@@ -28,17 +28,21 @@ structure Main = struct
 
         val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs)
         val (fgr, ndlist) = MakeGraph.instrs2graph(body') 
-        (* val (Flow.FGRAPH {control,def,use,ismove}, ndlist) = MakeGraph.instrs2graph(body')  *)
-        (* val _ = Graph.printGraph (out, control) *)
         val (igr, liveoutmap) = Liveness.interferenceGraph (fgr)
         val _ = Liveness.show (out, igr)
+        
+        fun getSpillCost node = 1
+        val precoloredInit = Frame.tempMap
+        val (allocMapping, tlst) = Color.color ({interference=igr, initial=precoloredInit, spillCost=getSpillCost, registers=Frame.registers})
+        val _ = Reg_Alloc.printAllocation out allocMapping
+
         val format0 = Assem.format(Temp.makestring)
  
     in  
-      
-        (* Liveness.show (out, igr);  *)
+    
        (* TextIO.output(out,"# -------------------\n");     *)
-        (app (fn i => TextIO.output(out,format0 i)) body')
+        (* (app (fn i => TextIO.output(out,format0 i)) body') *)
+        ()
     end
     | emitproc out (F.STRING(lab,s)) = (TextIO.output(out,F.string(lab,s)))
 

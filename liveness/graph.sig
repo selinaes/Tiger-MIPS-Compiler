@@ -7,12 +7,19 @@ sig
             type ord_key = node'
             val compare = Int.compare
     end); *)
+
+    val augment: graph -> int -> node
     
     val nodes: graph -> node list
     val succ: node -> node list
     val pred: node -> node list
-    val adj: node -> node list   (* succ+pred *)
+
     val eq: node * node -> bool
+    val compareEdge: ((node * node) * (node * node)) -> order
+    val compareNode: node * node -> order
+
+    val outdegree: node -> int
+    val indegree: node -> int
 
     val newGraph: unit -> graph
     val newNode : graph -> node

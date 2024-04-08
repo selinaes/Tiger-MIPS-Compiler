@@ -47,10 +47,17 @@ struct
         in map (augment g) (NeighborSet.listItems p) 
 		  end
       
-  fun adj (g,i) = 
+  (* fun adj (g,i) = 
       let val NODE{pred=p,succ=s} = A.sub(g,i)
-      in map (augment g) (NeighborSet.union (NeighborSet.listItems p) (NeighborSet.listItems s))
-      end
+      in map (augment g) (NeighborSet.union (p, s))
+      end *)
+
+  fun compareNode ((_,n1), (_,n2)): order = Int.compare (n1, n2)
+  fun compareEdge ((f1, t1), (f2, t2)): order = 
+      case compareNode(f1, f2) of
+        EQUAL => compareNode(t1, t2)
+        | res => res
+  
 
   fun isAdjacent(g,i,j) = 
       let val NODE{pred=p,succ=s} = A.sub(g,i)

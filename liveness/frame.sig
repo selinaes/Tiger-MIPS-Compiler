@@ -24,6 +24,7 @@ signature FRAME = sig
 
     val tempToString : Temp.temp -> string
     val tempMap: register Temp.Table.table
+    val registers: register list
     val FP : Temp.temp
     val SP : Temp.temp
     val RA : Temp.temp
