@@ -34,7 +34,7 @@ struct
                     val node = G.newNode control
                     val format0 = Assem.format(Temp.makestring)
                     val str = format0 instr
-                    val _ = print ( G.nodename node ^ " : " ^String.substring(str,0,String.size(str)-1)^ "\n")
+                    (* val _ = print ( G.nodename node ^ " : " ^String.substring(str,0,String.size(str)-1)^ "\n") *)
 
                     val (srcs, dsts) = getInstrSrcDst instr
                     val bitDsts = BitArray.bits(N, map (fn x => x - 100) dsts)

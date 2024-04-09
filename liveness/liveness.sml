@@ -85,21 +85,34 @@ struct
             
             fun addAllINodes (graph: G.graph) = 
                 let
-                    fun addNodeByTemp (1) = G.newNode graph
-                      | addNodeByTemp (n) = 
-                        let
-                            val newNode = G.newNode graph
+                    fun addNodeByTemp n = 
+                        let fun helper (i, n) = 
+                                if i = n then ()
+                                else let
+                                        val newNode = G.newNode graph
+                                        val tnum = i + 100
+                                    in
+                                        tnodeMap := Temp.Table.enter (!tnodeMap, tnum, newNode);
+                                        gtempMap := Graph.Table.enter (!gtempMap, newNode, tnum); 
+                                        helper (i + 1, n)
+                                    end  
                         in
-                            tnodeMap := Temp.Table.enter (!tnodeMap, n, newNode);
-                            gtempMap := Graph.Table.enter (!gtempMap, newNode, n); 
-                            addNodeByTemp (n-1)
-                        end  
+                            helper(0, n)
+                        end
                 in
-                    (addNodeByTemp N;
+                    (   print ("N: " ^ Int.toString N ^ "\n");
+                        addNodeByTemp N;
+
                     IGRAPH {
                         graph = graph,
                         tnode = fn temp => Option.getOpt(Temp.Table.look (!tnodeMap, temp), ErrorMsg.impossible "addNodeByTemp, tnodeMap"),
-                        gtemp = fn node => Option.getOpt(Graph.Table.look (!gtempMap, node), ErrorMsg.impossible "addNodeByTemp, gtempMap"),
+                        gtemp = fn node => 
+                        (case (Graph.Table.look (!gtempMap, node)) of 
+                        SOME v => (print (Temp.makestring v);v)
+                        | _ => ErrorMsg.impossible "a"),
+                        (* Option.getOpt(Graph.Table.look (!gtempMap, node), 
+                        ((List.app (fn (k,v) => print ((Int.toString k) ^":"^Temp.makestring v ^  ","))( Graph.Table.listItemsi(!gtempMap)));
+                        ErrorMsg.impossible ("addNodeByTemp, gtempMap, given node " ^ Graph.nodename node))), *)
                         moves = []
                     })
                 end
@@ -157,7 +170,7 @@ struct
                             app secondLoop lst
                         end
                 in
-                    print (livesetToString(ls) ^ "\n");
+                    (* print (livesetToString(ls) ^ "\n"); *)
                     app createEdge oneIdLst
                 end
                 
@@ -165,8 +178,9 @@ struct
             val gr = G.newGraph()
             val igraph = addAllINodes(gr)
             val igraph' = addAllMoves(igraph)
-            val _ = app (fn (k: int,v) => (print ("n"^(Int.toString k)^": ");addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap))
-            (* val _ = app (fn (k: int,v) => (G.printNode(control,k);addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
+            val _ = app (fn (k: int,v) => (addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap))
+            (* val _ = app (fn (k: int,v) => (print ("n"^(Int.toString k)^": ");addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
+
         in
             (igraph', 
             fn node => Option.getOpt(Graph.Table.look(!liveOutMap, node), 

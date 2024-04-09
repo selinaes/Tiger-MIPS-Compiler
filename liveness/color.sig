@@ -1,6 +1,6 @@
 signature COLOR =
 sig
-    structure Frame : FRAME
+    (* structure Frame : FRAME *)
 
     type allocation = Frame.register Temp.Table.table
 
@@ -9,5 +9,4 @@ sig
                 spillCost: Graph.node -> int,
                 registers: Frame.register list}
             -> allocation * Temp.temp list
-    val getSpillCost: Graph.node -> int
 end

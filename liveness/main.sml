@@ -29,12 +29,12 @@ structure Main = struct
         val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs)
         val (fgr, ndlist) = MakeGraph.instrs2graph(body') 
         val (igr, liveoutmap) = Liveness.interferenceGraph (fgr)
-        val _ = Liveness.show (out, igr)
+        (* val _ = Liveness.show (out, igr) *)
         
         fun getSpillCost node = 1
         val precoloredInit = Frame.tempMap
         val (allocMapping, tlst) = Color.color ({interference=igr, initial=precoloredInit, spillCost=getSpillCost, registers=Frame.registers})
-        val _ = Reg_Alloc.printAllocation out allocMapping
+        val _ = Reg_Alloc.printAllocation (out, allocMapping)
 
         val format0 = Assem.format(Temp.makestring)
  

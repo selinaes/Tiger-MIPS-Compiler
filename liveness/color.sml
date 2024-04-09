@@ -86,25 +86,29 @@ struct
                         end
                         
                     fun initColor (node: Graph.node) = 
-                            (case Temp.Table.look(allocated, gtemp node) of
+                            (
+                                (* print ("initColor: " ^ Graph.nodename node ^ "\n"); *)
+                                case Temp.Table.look(allocated, gtemp node) of
                             SOME reg => (color := Graph.Table.enter(!color, node, reg); 
-                                        NodeSet.add(!precolored, node))
-                            | NONE => NodeSet.add(!initial, node))
+                                        precolored := NodeSet.add(!precolored, node))
+                            | NONE => initial := NodeSet.add(!initial, node))
                         
                             
-                    fun addMoves (n1, n2) = 
-                            (moveList := Temp.Table.enter (!moveList, n1, 
-                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, n1), EdgeSet.empty), (n1,n2)));
-                            moveList := Temp.Table.enter (!moveList, n2, 
-                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, n2), EdgeSet.empty), (n1,n2)));
+                    fun addMoves (n1: Graph.node, n2: Graph.node) = 
+                            (moveList := Temp.Table.enter (!moveList, gtemp n1, 
+                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, gtemp n1), EdgeSet.empty), (n1,n2)));
+                            moveList := Temp.Table.enter (!moveList, gtemp n2, 
+                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, gtemp n2), EdgeSet.empty), (n1,n2)));
                             workListMoves := EdgeSet.add(!workListMoves, (n1, n2)))
                 in
                     (buildAdjSetAdjList (); computeDegree(); List.app initColor (Graph.nodes graph); app addMoves moves)
                 end
-            fun nodeMoves (n) = 
-                case Temp.Table.look(moveList, n) of 
-                    SOME m => EdgeSet.intersection(m, EdgeSet.union(activeMoves, workListMoves))
-                    | NONE => ErrorMsg.impossible "nodeMoves"
+                
+            fun nodeMoves (n: Graph.node) = 
+                case Temp.Table.look(!moveList, gtemp n) of 
+                    SOME m => EdgeSet.intersection(m, EdgeSet.union(!activeMoves, !workListMoves))
+                    | NONE => EdgeSet.empty
+                    (* (print (Graph.nodename n);ErrorMsg.impossible "nodeMoves") *)
             
             fun moveRelated (n) = not (EdgeSet.isEmpty(nodeMoves(n)))
             fun addNodeToWL n = 
@@ -119,7 +123,7 @@ struct
                         (simplifyWorklist := NodeSet.add(!simplifyWorklist, n))
 
              fun makeWorklist() = 
-                (NodeSet.app addNodeToWL !initial; initial := NodeSet.empty)
+                (NodeSet.app addNodeToWL (!initial); initial := NodeSet.empty)
             (* Node in igraph 'graph' *)
             (* fun addEdge((g,u):Graph.node, (g',v):Graph.node) = 
                 if (not (Graph.isAdjacent(g, u, v)) andalso u <> v) then
@@ -132,7 +136,7 @@ struct
                                 SOME lst => lst
                                 | NONE => NodeSet.empty
                 in
-                    NodeSet.subtractList (adjLstOfn, selectStack)
+                    NodeSet.subtractList (adjLstOfn, !selectStack)
                 end
                 
          
@@ -142,15 +146,15 @@ struct
                     let
                         val moves = nodeMoves n
                         fun forEachM m = 
-                            if EdgeSet.member(activeMoves, m) then
+                            if EdgeSet.member(!activeMoves, m) then
                                 (activeMoves := EdgeSet.delete(!activeMoves, m);
                                 workListMoves := EdgeSet.add(!workListMoves, m))
                             else ()
                     in
-                        app forEachM moves
+                        EdgeSet.app forEachM moves
                     end
                 in
-                  app forEachN nodes
+                  NodeSet.app forEachN nodes
                 end
             
             fun decrementDegree(m) = 
@@ -178,10 +182,10 @@ struct
                     fun simplifyOneNode n = 
                         (simplifyWorklist := NodeSet.delete(!simplifyWorklist, n);
                         selectStack := !selectStack@[n];
-                        app (fn m => decrementDegree m) (adjacent n))
+                        NodeSet.app (fn m => decrementDegree m) (adjacent n))
 
                 in
-                    NodeSet.app simplifyOneNode !simplifyWorklist
+                    NodeSet.app simplifyOneNode (!simplifyWorklist)
                 end
             
             (* Pre-coalesce version *)
@@ -191,35 +195,37 @@ struct
                         let
                             val okColors = ref registers
                             fun forEachW w = 
-                                if NodeSet.member(NodeSet.union(coloredNodes, precolored), w)
+                                if NodeSet.member(NodeSet.union(!coloredNodes, !precolored), w)
                                 then 
-                                    okColors := List.filter (fn c => c <> Option.valOf(Graph.Table.look(!color, w))) !okColors
+                                    case Graph.Table.look(!color, w) of
+                                        SOME c => okColors := List.filter (fn r => r <> c) (!okColors)
+                                        | NONE => ()
                                 else ()
                             val ws = case Graph.Table.look(!adjList, n) of
                                         SOME ws => ws
                                         | NONE => ErrorMsg.impossible "assignColors cannot find node in adjList"
                         in
-                            app forEachW ws;
+                            NodeSet.app forEachW ws;
                             if List.null (!okColors) then
                                 spilledNodes := NodeSet.add(!spilledNodes, n)
                             else
-                                (coloredNodes := NodeSet.add(!coloredNodes, n);
-                                Graph.Table.enter(!color, n, hd (!okColors)))
+                                (Graph.Table.enter(!color, n, hd (!okColors));
+                                coloredNodes := NodeSet.add(!coloredNodes, n))
                         end
                 in
-                    app forNinStack rev(!selectStack)
+                    app forNinStack (rev(!selectStack))
                 end
             
             (*color = node:register, alloc = temp:register*)
             fun colorToAllocation() = 
                 let
-                    val finalAlloc : allocation = ref Temp.Table.empty
-                    fun forN n = 
+                    val finalAlloc : allocation ref = ref Temp.Table.empty
+                    fun forN (n:Graph.node) = 
                         case Graph.Table.look(!color, n) of
                             SOME r => finalAlloc := Temp.Table.enter(!finalAlloc, gtemp n, r)
                             | NONE => ErrorMsg.impossible "colorToAllocation unfound"
                 in
-                    (List.app forN NodeSet.toList(coloredNodes);
+                    (NodeSet.app forN (!coloredNodes);
                     !finalAlloc)
                 end
         in
@@ -228,7 +234,7 @@ struct
             makeWorklist();
             simplify();
             assignColors();
-            (colorToAllocation(), map gtemp NodeSet.toList(!spilledNodes))
+            (colorToAllocation(), List.map gtemp (NodeSet.toList(!spilledNodes)))
             )
         end
 
