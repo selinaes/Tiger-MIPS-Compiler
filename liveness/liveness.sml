@@ -100,7 +100,7 @@ struct
                             helper(0, n)
                         end
                 in
-                    (   print ("N: " ^ Int.toString N ^ "\n");
+                    (   
                         addNodeByTemp N;
 
                     IGRAPH {
@@ -108,7 +108,7 @@ struct
                         tnode = fn temp => Option.getOpt(Temp.Table.look (!tnodeMap, temp), ErrorMsg.impossible "addNodeByTemp, tnodeMap"),
                         gtemp = fn node => 
                         (case (Graph.Table.look (!gtempMap, node)) of 
-                        SOME v => (print (Temp.makestring v);v)
+                        SOME v => v
                         | _ => ErrorMsg.impossible "a"),
                         (* Option.getOpt(Graph.Table.look (!gtempMap, node), 
                         ((List.app (fn (k,v) => print ((Int.toString k) ^":"^Temp.makestring v ^  ","))( Graph.Table.listItemsi(!gtempMap)));

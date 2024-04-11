@@ -7,6 +7,8 @@ structure Main = struct
 
   fun getsome (SOME x) = x
 
+
+
   fun emitproc out (F.PROC{body,frame}) =
     let 
         (* val _ = print ("# ----- emit " ^ Symbol.name (Frame.name frame) ^ " -----\n") *)
@@ -34,15 +36,22 @@ structure Main = struct
         fun getSpillCost node = 1
         val precoloredInit = Frame.tempMap
         val (allocMapping, tlst) = Color.color ({interference=igr, initial=precoloredInit, spillCost=getSpillCost, registers=Frame.registers})
-        val _ = Reg_Alloc.printAllocation (out, allocMapping)
+        (* val (_, alloc) = Reg_Alloc.alloc() *)
+        (* val _ = Reg_Alloc.printAllocation (out, allocMapping) *)
 
-        val format0 = Assem.format(Temp.makestring)
+        fun getTempAlloc alloc temp = 
+            case Temp.Table.look(alloc, temp) of
+                SOME reg => reg
+              | NONE => ErrorMsg.impossible ("getTempAlloc: " ^ Temp.makestring temp)
+        val format0 = Assem.format(getTempAlloc allocMapping)
+        val format1 = Assem.format(Temp.makestring)
  
     in  
     
-       (* TextIO.output(out,"# -------------------\n");     *)
-        (* (app (fn i => TextIO.output(out,format0 i)) body') *)
-        ()
+       
+        (app (fn i => TextIO.output(out,format1 i)) body';
+        TextIO.output(out,"# -------------------\n");    
+        app (fn i => TextIO.output(out,format0 i)) body')
     end
     | emitproc out (F.STRING(lab,s)) = (TextIO.output(out,F.string(lab,s)))
 

@@ -201,15 +201,17 @@ struct
                                         SOME c => okColors := List.filter (fn r => r <> c) (!okColors)
                                         | NONE => ()
                                 else ()
-                            val ws = case Graph.Table.look(!adjList, n) of
+                            (* val () = Graph.Table.appi (fn (k,i:NodeSet.set)=> print ((Int.toString k) ^ ", ")) (!adjList) *)
+                            val ws: NodeSet.set = case Graph.Table.look(!adjList, n) of
                                         SOME ws => ws
-                                        | NONE => ErrorMsg.impossible "assignColors cannot find node in adjList"
+                                        | NONE => NodeSet.empty
+                                        (* ErrorMsg.impossible ("assignColors cannot find node in adjList, given: " ^ (Graph.nodename n)) *)
                         in
                             NodeSet.app forEachW ws;
                             if List.null (!okColors) then
                                 spilledNodes := NodeSet.add(!spilledNodes, n)
                             else
-                                (Graph.Table.enter(!color, n, hd (!okColors));
+                                (color := Graph.Table.enter(!color, n, hd (!okColors));
                                 coloredNodes := NodeSet.add(!coloredNodes, n))
                         end
                 in
@@ -223,17 +225,21 @@ struct
                     fun forN (n:Graph.node) = 
                         case Graph.Table.look(!color, n) of
                             SOME r => finalAlloc := Temp.Table.enter(!finalAlloc, gtemp n, r)
-                            | NONE => ErrorMsg.impossible "colorToAllocation unfound"
+                            | NONE => ErrorMsg.impossible ("colorToAllocation unfound, given " ^ (Graph.nodename n))
                 in
-                    (NodeSet.app forN (!coloredNodes);
-                    !finalAlloc)
+                    Graph.Table.appi (fn (k,v) => print((Int.toString k) ^ ":" ^ v ^ "\n")) (!color);
+                    NodeSet.app forN (!precolored);
+                    NodeSet.app forN (!coloredNodes);
+                    (!finalAlloc)
                 end
+
         in
             (
             build();
             makeWorklist();
             simplify();
             assignColors();
+            print ("spilledNodes: " ^ Int.toString(NodeSet.numItems(!spilledNodes)) ^ "\n");
             (colorToAllocation(), List.map gtemp (NodeSet.toList(!spilledNodes)))
             )
         end
