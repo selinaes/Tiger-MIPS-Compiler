@@ -60,9 +60,9 @@ struct
                     src=[munchExp e1, munchExp e2],
                     dst= [] ,jump=NONE})
                 | munchStm(T.MOVE(T.TEMP i, e2) ) =
-                    emit(A.OPER{assem="add `d0, `s0, $0\n",
-                    src=[munchExp e2],
-                    dst=[i],jump=NONE})
+                    emit(A.MOVE{assem="move `d0, `s0\n",
+                    src=munchExp e2,
+                    dst=i})
                 | munchStm(T.JUMP(T.NAME elbl, lblLst)) = 
                     emit(A.OPER{assem="j `j0 \n",
                     src=[],
@@ -94,6 +94,20 @@ struct
                 | munchExp(T.MEM(T.CONST i)) =
                     result(fn r => emit(A.OPER {assem="lw `d0," ^ intToString(i) ^ "($0)\n",
                                                 src=[], dst=[r], jump=NONE}))
+                (* Optimize for coalesce *)
+                | munchExp(T.BINOP(T.PLUS,T.CONST 0,e1)) = 
+                    result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
+                                                src=munchExp e1, dst=r}))
+                | munchExp(T.BINOP(T.PLUS,e1,T.CONST 0)) = 
+                    result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
+                                                src=munchExp e1, dst=r}))
+                | munchExp(T.BINOP(T.MINUS,T.CONST 0,e1)) = 
+                    result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
+                                                src=munchExp e1, dst=r}))
+                | munchExp(T.BINOP(T.MINUS,e1,T.CONST 0)) = 
+                    result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
+                                                src=munchExp e1, dst=r}))
+                (* Regular BINOP *)
                 | munchExp(T.BINOP(T.MINUS, e1,T.CONST i)) =
                     result(fn r => emit(A.OPER {assem="addi `d0, `s0, " ^ intToString(~i) ^ "\n",
                                                 src=[munchExp e1], dst=[r], jump=NONE}))

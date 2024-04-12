@@ -105,14 +105,14 @@ struct
 
                     IGRAPH {
                         graph = graph,
-                        tnode = fn temp => Option.getOpt(Temp.Table.look (!tnodeMap, temp), ErrorMsg.impossible "addNodeByTemp, tnodeMap"),
+                        tnode = fn temp => 
+                        (case (Temp.Table.look (!tnodeMap, temp)) of 
+                            SOME v => v
+                            | _ => ErrorMsg.impossible "addNodeByTemp, tnodeMap"),
                         gtemp = fn node => 
                         (case (Graph.Table.look (!gtempMap, node)) of 
-                        SOME v => v
-                        | _ => ErrorMsg.impossible "a"),
-                        (* Option.getOpt(Graph.Table.look (!gtempMap, node), 
-                        ((List.app (fn (k,v) => print ((Int.toString k) ^":"^Temp.makestring v ^  ","))( Graph.Table.listItemsi(!gtempMap)));
-                        ErrorMsg.impossible ("addNodeByTemp, gtempMap, given node " ^ Graph.nodename node))), *)
+                            SOME v => v
+                            | _ => ErrorMsg.impossible "addNodeByTemp, gtempMap"),
                         moves = []
                     })
                 end
@@ -121,8 +121,9 @@ struct
                 let
                    fun addOneMove ([defidx], [useidx], prevmoves) = 
                         let
-                            val deftnode = tnode defidx
-                            val usetnode = tnode useidx
+                        (* val _ = List.app (fn (k,v) => (print (Temp.makestring k ^ " -> " ^ G.nodename v ^ "\n")) ) (Temp.Table.listItemsi(!tnodeMap)) *)
+                            val deftnode = tnode (defidx+100)
+                            val usetnode = tnode (useidx+100)
                         in
                             (deftnode, usetnode)::prevmoves
                         end
@@ -137,9 +138,11 @@ struct
                                     val defidx = BitArray.getBits defba
                                     val useidx = BitArray.getBits useba
                                 in 
+                                    (* print ("addOneMove\n"); *)
                                     addOneMove(defidx, useidx, prevmoves)
                                 end
-                            | _ => prevmoves    
+                            (* | SOME (false) => (print "false :no moves\n";prevmoves)  *)
+                            | _ => (prevmoves)
                  in 
                     IGRAPH {
                         graph = gr,

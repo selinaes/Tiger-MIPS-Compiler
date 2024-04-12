@@ -41,7 +41,7 @@ struct
                     val bitSrcs = BitArray.bits(N, map (fn x => x - 100) srcs)
                     val def = G.Table.enter(def, node, bitDsts)
                     val use = G.Table.enter(use, node, bitSrcs)
-                    val ismove = G.Table.enter(ismove, node, case instr of A.MOVE _ => true | _ => false)
+                    val ismove' = G.Table.enter(ismove, node, case instr of A.MOVE _ => true | _ => false)
                     val _ = case instr of
                         A.LABEL{lab, ...} => (labelNodeMap := Symbol.enter(!labelNodeMap, lab, node))
                       | _ => ()
@@ -50,7 +50,7 @@ struct
                     F.FGRAPH {control = control,
                               def = def,
                               use = use,
-                              ismove = ismove}
+                              ismove = ismove'}
                 end 
 
             
@@ -81,11 +81,11 @@ struct
             | addEdge (_, _, _) = Err.impossible "addEdge: instrs and nodes length not match"
 
             val control = G.newGraph()
-            val flowGraph = F.FGRAPH {control = control,
+            val emptyGraph = F.FGRAPH {control = control,
                         def = Graph.Table.empty,
                         use = Graph.Table.empty,
                         ismove = G.Table.empty}
-            val flowGraph: F.flowgraph = foldl addNode flowGraph instrs 
+            val flowGraph: F.flowgraph = foldl addNode emptyGraph instrs 
         in
             
             (* print (Int.toString(length (Symbol.listItems(!labelNodeMap)))); *)
