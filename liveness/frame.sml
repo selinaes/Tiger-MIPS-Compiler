@@ -8,44 +8,47 @@ struct
     (* MIPS registers *)
     type register = string
 
-    val FP = Temp.newtemp() (* t100 *)
-    val SP = Temp.newtemp() (* t101 *)
-    val RA = Temp.newtemp() (* t102 *)
-    (* Global pointer *)
-    val GP = Temp.newtemp() (* t103 *)
-    (* Return value *)
-    val ZERO = Temp.newtemp() (* t104 *)
-    (* Reserved for assembler *)
-    val AT = Temp.newtemp() (* t105 *)
-    (* First and second return values *)
-    val RV = Temp.newtemp() (* t106 *)
-    val V1 = Temp.newtemp() (* t107 *)
-    (* First four arguments to functions *)
-    val A0 = Temp.newtemp() (* t108 *)
-    val A1 = Temp.newtemp() (* t109 *)
-    val A2 = Temp.newtemp() (* t110 *)
-    val A3 = Temp.newtemp() (* t111 *)
+    (* this order is the priority of the reg allocation, the former defined is allocated first *)
     (* Temporary registers (caller saves) *)
-    val T0 = Temp.newtemp() (* t112 *)
-    val T1 = Temp.newtemp() (* t113 *)
-    val T2 = Temp.newtemp() (* t114 *)
-    val T3 = Temp.newtemp() (* t115 *)
-    val T4 = Temp.newtemp() (* t116 *)
-    val T5 = Temp.newtemp() (* t117 *)
-    val T6 = Temp.newtemp() (* t118 *)
-    val T7 = Temp.newtemp() (* t119 *)
-    (* Saved registers (callee saves) *)
-    val S0 = Temp.newtemp() (* t120 *)
-    val S1 = Temp.newtemp() (* t121 *)
-    val S2 = Temp.newtemp() (* t122 *)
-    val S3 = Temp.newtemp() (* t123 *)
-    val S4 = Temp.newtemp() (* t124 *)
-    val S5 = Temp.newtemp() (* t125 *)
-    val S6 = Temp.newtemp() (* t126 *)
-    val S7 = Temp.newtemp() (* t127 *)
+    val T0 = Temp.newtemp() (* t100 *)
+    val T1 = Temp.newtemp() (* t101 *)
+    val T2 = Temp.newtemp() (* t102 *)
+    val T3 = Temp.newtemp() (* t103 *)
+    val T4 = Temp.newtemp() (* t104 *)
+    val T5 = Temp.newtemp() (* t105 *)
+    val T6 = Temp.newtemp() (* t106 *)
+    val T7 = Temp.newtemp() (* t107 *)
     (* More temporary registers *)
-    val T8 = Temp.newtemp() (* t128 *)
-    val T9 = Temp.newtemp() (* t129 *)
+    val T8 = Temp.newtemp() (* t108 *)
+    val T9 = Temp.newtemp() (* t109 *)
+    (* Saved registers (callee saves) *)
+    val S0 = Temp.newtemp() (* t110*)
+    val S1 = Temp.newtemp() (* t111 *)
+    val S2 = Temp.newtemp() (* t112 *)
+    val S3 = Temp.newtemp() (* t113 *)
+    val S4 = Temp.newtemp() (* t114 *)
+    val S5 = Temp.newtemp() (* t115 *)
+    val S6 = Temp.newtemp() (* t116 *)
+    val S7 = Temp.newtemp() (* t117 *)
+    (* First four arguments to functions *)
+    val A0 = Temp.newtemp() (* t118  *)
+    val A1 = Temp.newtemp() (* t119  *)
+    val A2 = Temp.newtemp() (* t120 *)
+    val A3 = Temp.newtemp() (* t121 *)
+    (**)
+    val FP = Temp.newtemp() (* t122 *)
+    val SP = Temp.newtemp() (* t123 *)
+    val RA = Temp.newtemp() (* t124 *)
+    (* Global pointer *)
+    val GP = Temp.newtemp() (* t125 *)
+    (* Return value *)
+    val ZERO = Temp.newtemp() (* t126 *)
+    (* Reserved for assembler *)
+    val AT = Temp.newtemp() (* t127 *)
+    (* First and second return values *)
+    val RV = Temp.newtemp() (* t128 *)
+    val V1 = Temp.newtemp() (* t129 *)
+    
     (* Reserved for kernel (operating system) *)
     val K0 = Temp.newtemp() (* t130 *)
     val K1 = Temp.newtemp()  (* t131 *)
@@ -65,11 +68,12 @@ struct
     val tempMap: register Temp.Table.table = 
         let 
             val baseRegs = [
-                (FP, "%fp"), (SP, "%sp"), (RA, "%ra"), (RV, "%rv"), (V1, "%v1"), 
-                (A0, "%a0"), (A1, "%a1"), (A2, "%a2"), (A3, "%a3"), (T0, "%t0"), (T1, "%t1"), (T2, "%t2"), 
-                (T3, "%t3"), (T4, "%t4"), (T5, "%t5"), (T6, "%t6"), (T7, "%t7"), (S0, "%s0"), (S1, "%s1"), 
-                (S2, "%s2"), (S3, "%s3"), (S4, "%s4"), (S5, "%s5"), (S6, "%s6"), (S7, "%s7"), (T8, "%t8"), 
-                (T9, "%t9"), (GP, "%gp"), (ZERO, "%zero"), (AT, "%at"), (K0, "%k0"), (K1, "%k1")
+                (T1, "%t1"), (T2, "%t2"), (T3, "%t3"), (T4, "%t4"), (T5, "%t5"), (T6, "%t6"), 
+                (T7, "%t7"), (S0, "%s0"), (S1, "%s1"), (S2, "%s2"), (S3, "%s3"), (S4, "%s4"), 
+                (S5, "%s5"), (S6, "%s6"), (S7, "%s7"), (T8, "%t8"), (T9, "%t9"), (FP, "%fp"), 
+                (SP, "%sp"), (RA, "%ra"), (RV, "%rv"), (V1, "%v1"), (A0, "%a0"), (A1, "%a1"), 
+                (A2, "%a2"), (A3, "%a3"), (T0, "%t0"), (GP, "%gp"), (ZERO, "%zero"), 
+                (AT, "%at"), (K0, "%k0"), (K1, "%k1")
             ]
         in
              foldr (fn ((s, t), acc) => Temp.Table.enter(acc, s, t)) Temp.Table.empty baseRegs 
@@ -169,8 +173,8 @@ struct
         end
 
     (* Append sink instruction, mark regs still live at exit, prevent allocator from reuse *)
-    (* fun procEntryExit2(frame, body) = 
-        body @ [Assem.OPER{assem="", src =[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}] *)
+    fun procEntryExit2(frame, body) = 
+        body @ [Assem.OPER{assem="", src =[ZERO,RA,SP]@calleesaves, dst=[], jump=NONE}]
 
     (* Rest of prologue / epilogue 
     1: peudo-announce start 2: function name label 3: adjust SP 
@@ -191,8 +195,8 @@ struct
             val restoreRA = Assem.OPER {assem="lw `d0, 8(`s0)\n", src=[SP], dst=[RA], jump=NONE}
             val restoreFP = Assem.OPER {assem="lw `d0, 4(`s0)\n", src=[SP], dst=[FP], jump=NONE}
             val resetSP = Assem.OPER {assem="addi `d0, `s0, " ^ Int.toString (!stackSize) ^ "\n", src=[SP], dst=[SP], jump=NONE}
-            val jumpToRA = Assem.OPER {assem="jr $ra\n", src=[ZERO,RA,SP]@calleesaves, dst=[], jump=SOME[]}
-            
+            val jumpToRA = Assem.OPER {assem="jr $ra\n", src=[], dst=[], jump=SOME[]}
+            (*  *)
         in
             {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
             body = [labeling, setnewFP, extendSP, saveRA, saveFP]
@@ -204,7 +208,11 @@ struct
 
     fun externalCall(name: string, args: Tree.exp list): Tree.exp = 
         Tree.CALL(Tree.NAME(Temp.namedlabel name), args)
-        
+    
+    fun getAccessOffset(acc: access) = 
+        case acc of
+            InFrame x => x
+            |   InReg t => ErrorMsg.impossible "alloced InReg" 
 end
 
 structure Frame : FRAME = MipsFrame

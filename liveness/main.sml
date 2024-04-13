@@ -24,11 +24,14 @@ structure Main = struct
 
         (* val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
         val instrs = List.concat(map (MipsGen.codegen frame) stms') 
-        (* val instrs' = Frame.procEntryExit2(frame, instrs) *)
+        val instrs' = Frame.procEntryExit2(frame, instrs)
 
-        val {prolog, body=body', epilog} = Frame.procEntryExit3(frame, instrs)
+        val (body', alloc) = Reg_Alloc.alloc(instrs', frame)
+
+        (* exit 3 malloc the frame size, thus call at last, alloc may spill the extra node to alloc on the stack which increase stack size *)
+        val {prolog, body=body'', epilog} = Frame.procEntryExit3(frame, body')
         
-        val (body'', alloc) = Reg_Alloc.alloc(body', frame)
+        
         (* val _ = Reg_Alloc.printAllocation (out, allocMapping) *)
 
         fun getTempAlloc alloc temp = 
@@ -40,7 +43,7 @@ structure Main = struct
  
     in  
         (
-            app (fn i => TextIO.output(out,format0 i)) body';
+            (* app (fn i => TextIO.output(out,format0 i)) body'; *)
             TextIO.output(out,"# -------------------\n");    
         app (fn i => TextIO.output(out,format0 i)) body'')
     end

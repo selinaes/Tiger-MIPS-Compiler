@@ -68,7 +68,8 @@ fun clear() =
 
 (* clear(); *)
 (* runAllTests (); *)
-Main.compile "../testcases/test4.tig";
+(* Main.compile "../testcases/test4.tig"; *)
+Main.compile "../testcases/spillTest.tig";
 (* Main.compile "../testcases/coalesceTest.tig"; *)
 (* par "error-inte.tig"; *)
 (* par "testEsc-err.tig";  *)

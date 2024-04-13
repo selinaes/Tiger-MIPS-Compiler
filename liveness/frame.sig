@@ -10,13 +10,13 @@ signature FRAME = sig
     val newFrame : {name: Temp.label, formals: bool list} -> frame 
     val name : frame -> Temp.label
     val formals : frame -> access list
-    (*Frame.allocLocal(f)(true) -> allocate a new localVar in frame f. T=escape, frame, F = to reg Temp*)
+
     val allocLocal : frame -> bool -> access 
     val string : Temp.label * string -> string
 
     val exp : access -> Tree.exp -> Tree.exp (* InFrame/InReg -> (cury)frame pointer -> IR MEM/TEMP *)
     val procEntryExit1 : frame * Tree.stm -> Tree.stm
-    (* val procEntryExit2 : frame * Assem.instr list -> Assem.instr list *)
+    val procEntryExit2 : frame * Assem.instr list -> Assem.instr list
     val procEntryExit3 : frame * Assem.instr list -> {prolog: string, body: Assem.instr list, epilog: string}
     val externalCall: string * Tree.exp list -> Tree.exp
 
@@ -25,6 +25,7 @@ signature FRAME = sig
     val tempToString : Temp.temp -> string
     val tempMap: register Temp.Table.table
     val registers: register list
+    val getAccessOffset: access -> int
     val FP : Temp.temp
     val SP : Temp.temp
     val RA : Temp.temp

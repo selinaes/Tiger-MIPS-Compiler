@@ -5,7 +5,88 @@ struct
     
     fun getSpillCost node = 1
 
-    fun rewriteProgram (instrs: Assem.instr list, spill: Temp.temp list, frame: Frame.frame):Assem.instr list = instrs
+    fun rewriteProgram (instrs: Assem.instr list, spill: Temp.temp list, frame: Frame.frame): Assem.instr list = 
+    (* for each spill node, move it to stack, save for each def, lw for each use *)
+        let
+            val spillAccessMap = ref Temp.Table.empty
+            (* def => store to offset *)
+            (* use => load to newtemp, change all use to use newtemp *)
+            fun allocSpill (spill: Temp.temp) = 
+                let
+                    val offset = Frame.getAccessOffset(Frame.allocLocal frame true)
+                in
+                    spillAccessMap := Temp.Table.enter(!spillAccessMap, spill, offset)
+                end
+           
+            fun changeSpillInstrs (instr, acc) = 
+                let
+                    fun generateStores (dst: Temp.temp list) = 
+                        let
+                            fun storeOne (dst, (storesAcc, dstAcc)) = 
+                                (case Temp.Table.look (!spillAccessMap, dst) of
+                                    SOME offset => 
+                                        let
+                                            val v1 = Temp.newtemp()
+                                            val sw = Assem.MOVE {assem="sw `s0, " ^ MipsGen.intToString offset ^ "(`d0)\n", src=v1, dst=Frame.FP}
+                                        in
+                                            (sw::storesAcc, v1::dstAcc)
+                                        end
+                                    | NONE => (storesAcc, dst::dstAcc))
+                        in
+                            foldr storeOne ([], []) dst
+                        end
+                    fun generateLoads (src: Temp.temp list) = 
+                        let
+                            fun loadOne (src, (loadsAcc, srcAcc)) = 
+                                case Temp.Table.look (!spillAccessMap, src) of
+                                    SOME offset => 
+                                        let
+                                            val v2 = Temp.newtemp()
+                                            val lw = Assem.MOVE {assem="lw `d0, "^ MipsGen.intToString offset ^"(`s0)\n", src=Frame.FP, dst=v2}
+                                        in
+                                            (lw::loadsAcc, v2::srcAcc)
+                                        end
+                                    | NONE => (loadsAcc, src::srcAcc)
+                        in
+                            foldr loadOne ([], []) src
+                        end
+                    
+                    fun instrGen instr = 
+                        case instr of
+                            Assem.OPER {assem, dst, src, jump} => 
+                                let val (allStore, dst') = generateStores dst
+                                    val (allLoad, src') = generateLoads src
+                                in
+                                    allStore @ [Assem.OPER {assem=assem, dst=dst', src=src', jump=jump}] @ allLoad
+                                end
+                            | Assem.MOVE {assem, dst, src} =>
+                                let val (allStore, [dst']) = generateStores [dst]
+                                    val (allLoad, [src']) = generateLoads [src]
+                                in
+                                    allStore @ [Assem.MOVE {assem=assem, dst=dst', src=src'}] @ allLoad
+                                end
+                            | instr => [instr]
+                in
+                    acc@(instrGen instr)
+                end
+        in
+            let
+                val _ =  app allocSpill spill;
+                val x = foldr changeSpillInstrs [] instrs
+                val format1 = Assem.format(Temp.makestring)
+            in
+                (* print spill access map *)
+                print("spill access map:");
+                Temp.Table.appi (fn (t, offset) => TextIO.output(TextIO.stdOut, Temp.makestring t ^ " -> " ^ Int.toString offset ^ "\n")) (!spillAccessMap);
+                (* print all spill node *)
+                print("spill nodes:");
+                app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill;
+                print "\n";
+                 app (fn i => TextIO.output(TextIO.stdOut,format1 i)) x;
+                 x
+            end
+           
+        end
 
     fun alloc(instrs: Assem.instr list, frame: Frame.frame): Assem.instr list * allocation = 
         let
@@ -24,12 +105,13 @@ struct
                             srcColor <> dstColor
                         end
                     | _ => true)
-            val filteredInstrs = List.filter removeRedundantMove instrs
+            (* val filteredInstrs = List.filter removeRedundantMove instrs *)
         in
             if spills = [] then
-                (filteredInstrs, allocMapping)
+                (List.filter removeRedundantMove instrs, allocMapping)
             else
-                alloc(rewriteProgram(instrs, spills, frame), frame)
+                (print "num of spills: "; print (Int.toString (length spills)); print "\n";
+                alloc(rewriteProgram(instrs, spills, frame), frame))
         end
     
 
