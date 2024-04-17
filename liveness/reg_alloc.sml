@@ -76,16 +76,15 @@ struct
                 val format1 = Assem.format(Temp.makestring)
             in
                 (* print spill access map *)
-                print("spill access map:");
-                Temp.Table.appi (fn (t, offset) => TextIO.output(TextIO.stdOut, Temp.makestring t ^ " -> " ^ Int.toString offset ^ "\n")) (!spillAccessMap);
-                (* print all spill node *)
-                print("spill nodes:");
-                app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill;
-                print "\n";
-                 app (fn i => TextIO.output(TextIO.stdOut,format1 i)) x;
+                (* print("spill access map:"); *)
+                (* Temp.Table.appi (fn (t, offset) => TextIO.output(TextIO.stdOut, Temp.makestring t ^ " -> " ^ Int.toString offset ^ "\n")) (!spillAccessMap); *)
+                (* print all spill node  *)
+                 (* print("spill nodes:");
+                app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill; *)
+                (* print "\n"; *)
+                 (* app (fn i => TextIO.output(TextIO.stdOut,format1 i)) x; *)
                  x
             end
-           
         end
 
     fun alloc(instrs: Assem.instr list, frame: Frame.frame): Assem.instr list * allocation = 
@@ -110,7 +109,10 @@ struct
             if spills = [] then
                 (List.filter removeRedundantMove instrs, allocMapping)
             else
-                (print "num of spills: "; print (Int.toString (length spills)); print "\n";
+            (
+                (* (print "num of spills: "; print (Int.toString (length spills)); print "\n"; *)
+                 (* print("spill nodes:");*)
+                (* app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill;  *)
                 alloc(rewriteProgram(instrs, spills, frame), frame))
         end
     

@@ -41,7 +41,7 @@ struct
             val workListMoves = ref EdgeSet.empty (* moves enabled for possible coalescing.*)
             val activeMoves = ref EdgeSet.empty (* moves not yet ready for coalescing.*)
             
-            val moveList: EdgeSet.set Temp.Table.table ref = ref Temp.Table.empty
+            val moveList: EdgeSet.set Graph.Table.table ref = ref Graph.Table.empty
             
             val adjSet: EdgeSet.set ref = ref EdgeSet.empty
             val adjList: NodeSet.set Graph.Table.table ref = ref Graph.Table.empty
@@ -100,29 +100,41 @@ struct
                         
                             
                     fun addMoves (n1: Graph.node, n2: Graph.node) = 
-                            (moveList := Temp.Table.enter (!moveList, gtemp n1, 
-                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, gtemp n1), EdgeSet.empty), (n1,n2)));
-                            moveList := Temp.Table.enter (!moveList, gtemp n2, 
-                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, gtemp n2), EdgeSet.empty), (n1,n2)));
+                            (moveList := Graph.Table.enter (!moveList, n1, 
+                               EdgeSet.add(Option.getOpt(Graph.Table.look(!moveList, n1), EdgeSet.empty), (n1,n2)));
+                            moveList := Graph.Table.enter (!moveList, n2, 
+                               EdgeSet.add(Option.getOpt(Graph.Table.look(!moveList, n2), EdgeSet.empty), (n1,n2)));
                             workListMoves := EdgeSet.add(!workListMoves, (n1, n2)))
                 in
-                    (List.app initColor (Graph.nodes graph); buildAdjSetAdjList (); computeDegree();  app addMoves moves)
+                    (List.app initColor (Graph.nodes graph); buildAdjSetAdjList (); computeDegree();  app addMoves moves;
+                    (* print moveList *)
+                    print "moveList: ";
+                    List.app (fn (i,es) => print ((Int.toString i) ^ ",")) (Graph.Table.listItemsi(!moveList))
+                    )
+                    
                 end
             
             fun nodeMoves (n: Graph.node) = 
-                case Temp.Table.look(!moveList, gtemp n) of 
+                (case Graph.Table.look(!moveList, n) of 
                     SOME m => EdgeSet.intersection(m, EdgeSet.union(!activeMoves, !workListMoves))
-                    | NONE => EdgeSet.empty
+                    | NONE => (print ("nodeMoves of "^ (Graph.nodename n) ^ " is empty\n") ;EdgeSet.empty))
             
-            fun moveRelated (n) = not (EdgeSet.isEmpty(nodeMoves(n)))
+            fun moveRelated (n) = (
+                let
+                    val res = not (EdgeSet.isEmpty(nodeMoves(n)))
+                in
+                    print ("moveRelated: " ^ (Graph.nodename n) ^ " is - " ^ Bool.toString res ^ "\n");
+                    res
+                end
+                )
             fun addNodeToWL n = 
                 if (Graph.indegree n >= K) 
                 then
                     (spillWorklist := NodeSet.add(!spillWorklist, n))
                 else
-                    if moveRelated n
+                    if (moveRelated n)
                     then 
-                        (freezeWorklist := NodeSet.add(!freezeWorklist, n))
+                        (print ("addNodeToWL added: " ^ (Graph.nodename n) ^ "\n");freezeWorklist := NodeSet.add(!freezeWorklist, n))
                     else
                         (simplifyWorklist := NodeSet.add(!simplifyWorklist, n))
 
@@ -151,7 +163,9 @@ struct
                         val moves = nodeMoves n
                         fun forEachM m = 
                             if EdgeSet.member(!activeMoves, m) then
-                                (activeMoves := EdgeSet.delete(!activeMoves, m);
+                                (
+                                    (* print ("enableMoves: m in active moves - " ^ Bool.toString (EdgeSet.member(!activeMoves, m)) ^ "\n"); *)
+                                    activeMoves := EdgeSet.delete(!activeMoves, m);
                                 workListMoves := EdgeSet.add(!workListMoves, m))
                             else ()
                     in
@@ -169,9 +183,10 @@ struct
                     if d = K
                     then
                        (enableMoves(NodeSet.union(NodeSet.singleton(m), adjacent(m))); 
+                       (* print ("decrementDegree: m in spillWorklist - " ^ Bool.toString (NodeSet.member(!spillWorklist,m)) ^ "\n"); *)
                         spillWorklist := NodeSet.delete(!spillWorklist, m);
                         if moveRelated m then
-                            freezeWorklist := NodeSet.add(!freezeWorklist, m)
+                            (print ("Add to freezeWorklist: " ^ Graph.nodename m ^ "\n");freezeWorklist := NodeSet.add(!freezeWorklist, m))
                         else
                             (simplifyWorklist := NodeSet.add(!simplifyWorklist, m))
                         )
@@ -181,7 +196,9 @@ struct
             fun simplify() = 
                 let
                     fun simplifyOneNode n = 
-                        (simplifyWorklist := NodeSet.delete(!simplifyWorklist, n);
+                        (
+                            (* print ("simplify: n in simplifyWorklist - " ^ Bool.toString (NodeSet.member(!simplifyWorklist, n)) ^ "\n"); *)
+                            simplifyWorklist := NodeSet.delete(!simplifyWorklist, n);
                         selectStack := !selectStack@[n];
                         NodeSet.app (fn m => decrementDegree m) (adjacent n))
                 in
@@ -221,9 +238,12 @@ struct
                 let
                     val uDegree = getDegree u
                 in
+                    (* (print "enter addWorkList"); *)
                     if (not (NodeSet.member(!precolored, u)) andalso not (moveRelated(u)) andalso uDegree < K)
                     then
-                        (freezeWorklist := NodeSet.delete(!freezeWorklist, u);
+                        (
+                            (* print ("addWorkList: u in freezeWorklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist, u)) ^ "\n"); *)
+                            freezeWorklist := NodeSet.delete(!freezeWorklist, u);
                         simplifyWorklist := NodeSet.add(!simplifyWorklist, u))
                     else ()
                 end
@@ -233,26 +253,37 @@ struct
                 let
                     fun handleAdjacent t = 
                         (adjSet := EdgeSet.add(!adjSet, (u, t));
+                        adjSet := EdgeSet.add(!adjSet, (t, u));
                         adjList := Graph.Table.enter(!adjList, u, NodeSet.add(Option.getOpt(Graph.Table.look(!adjList, u), NodeSet.empty), t));    
                         adjList := Graph.Table.enter(!adjList, t, NodeSet.add(Option.getOpt(Graph.Table.look(!adjList, t), NodeSet.empty), u));    
                         decrementDegree t)
                     fun isFreezed n = NodeSet.member(!freezeWorklist, n)
                     fun spillCheck () = 
-                        (if (getDegree u) >= K andalso isFreezed v
-                        then (freezeWorklist := NodeSet.delete(!freezeWorklist, u); spillWorklist := NodeSet.add(!spillWorklist, u))
+                        (if (getDegree u) >= K andalso isFreezed u
+                        then (
+                            (* print ("combine: u in freezeWorklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist, u)) ^ "\n"); *)
+                            freezeWorklist := NodeSet.delete(!freezeWorklist, u); 
+                            spillWorklist := NodeSet.add(!spillWorklist, u))
                         else ())
                 in
                     (if isFreezed v
-                    then freezeWorklist := NodeSet.delete(!freezeWorklist, v)
-                    else spillWorklist := NodeSet.delete(!spillWorklist, v);
+                    then (
+                        (* print ("combine: v in freezeWorklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist,v)) ^ "\n"); *)
+                        freezeWorklist := NodeSet.delete(!freezeWorklist, v))
+                    else 
+                    (
+                        (* print ("combine: v in spillWorklist - " ^ Bool.toString (NodeSet.member(!spillWorklist,v)) ^ "\n"); *)
+                    spillWorklist := NodeSet.delete(!spillWorklist, v)));
                     coalescedNodes := NodeSet.add(!coalescedNodes, v);
                     alias := Graph.Table.enter(!alias, v, u);
-                    moveList := Temp.Table.enter (!moveList, gtemp u, 
-                               EdgeSet.add(Option.getOpt(Temp.Table.look(!moveList, gtemp u), EdgeSet.empty), (u,v)));
+                              
+                    moveList := Graph.Table.enter (!moveList, u, 
+                               EdgeSet.union(nodeMoves(u), nodeMoves(v)));
+                    (* moveList := Temp.Table.enter (!moveList, gtemp u, 
+                               EdgeSet.union(Option.getOpt(Temp.Table.look(!moveList, gtemp u), EdgeSet.empty), 
+                                            Option.getOpt(Temp.Table.look(!moveList, gtemp v), EdgeSet.empty)));  *)
                     NodeSet.app handleAdjacent (adjacent v);
                     spillCheck ()
-                    )
-
                     
                 end
 
@@ -269,6 +300,7 @@ struct
                                 in NodeSet.all (fn t => OK(t, u)) tlist
                                 end  
                         in
+                            (* print ("coalesce: m in worklistmoves - " ^ Bool.toString (EdgeSet.member(!workListMoves, m)) ^ "\n"); *)
                             workListMoves := EdgeSet.delete(!workListMoves, m);
                             if Graph.eq(u,v)
                             then (coalescedMoves := EdgeSet.add(!coalescedMoves, m); addWorkList(u))
@@ -293,18 +325,44 @@ struct
             fun freezeMoves u = 
                 let 
                     val edges: EdgeSet.set = nodeMoves u
+                    (* val _ = print ("nodeMoves " ^(Graph.nodename u)^ " are: " )
+                    val _ = EdgeSet.app (fn (x,y) => print ((Graph.nodename x) ^ "," ^ (Graph.nodename y) ^ " ")) edges
+                    val _ = print "\n" *)
                     fun freezeOneMove m = 
                     let
                         val (x, y) = m
+                        val _ = print ("u is: " ^ (Graph.nodename u) ^ "\n")
+                        val _ = print ("(x,y)=" ^(Graph.nodename x) ^ "," ^(Graph.nodename y)^ "\n")
+                        (* val _ = print ("move is in: " ^ 
+                                (case EdgeSet.member(!activeMoves, m) of
+                                    true => "activeMoves"
+                                    | false => " ") ^ 
+                                (case EdgeSet.member(!frozenMoves, m) of
+                                        true => "frozenMoves"
+                                        | false => " ") ^
+                                (case EdgeSet.member(!workListMoves, m) of
+                                            true => "workListMoves"
+                                            | false => "") ^
+                                (case EdgeSet.member(!coalescedMoves, m) of
+                                                true => "coalescedMoves"
+                                                | false => " ") ^ 
+                                (case EdgeSet.member(!constrainedMoves, m) of
+                                                    true => "constrainedMoves"
+                                                    |false => " ")
+                                ^ "\n") *)
                         val v = if Graph.eq(getAlias y, getAlias u) 
                                 then (getAlias x)
                                 else (getAlias y)
                         val vDegree = getDegree v
                     in
+                        (* print ("freezeOneMove: m in activeMoves - " ^ Bool.toString (EdgeSet.member(!activeMoves, m)) ^ "\n"); *)
                         activeMoves := EdgeSet.delete(!activeMoves, m);
                         frozenMoves := EdgeSet.add(!frozenMoves, m);
                         if (EdgeSet.isEmpty(nodeMoves v) andalso vDegree < K)
-                        then (freezeWorklist := NodeSet.delete(!freezeWorklist, v);
+                        then (
+                            print ("freezeOneMove: v in freezeWorklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist, v)) ^ "\n"); 
+                            print (Graph.nodename v);
+                            freezeWorklist := NodeSet.delete(!freezeWorklist, v);
                             simplifyWorklist := NodeSet.add(!simplifyWorklist, v))
                         else ()
                     end
@@ -315,7 +373,9 @@ struct
             fun freeze () = 
                 let
                     fun freezeOneNode u = 
-                        (freezeWorklist := NodeSet.delete (!freezeWorklist, u);
+                        (
+                            (* print ("freeze: n in freezeWorklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist, u)) ^ "\n"); *)
+                        freezeWorklist := NodeSet.delete (!freezeWorklist, u);
                         simplifyWorklist := NodeSet.add (!simplifyWorklist, u);
                         freezeMoves u )
                 in
@@ -327,6 +387,7 @@ struct
                 let
                     val chosedSpill = NodeSet.foldl (fn (n, m) => if spillCost n > spillCost m then n else m) (NodeSet.minItem (!spillWorklist)) (!spillWorklist)
                 in
+                    (* print ("selectSpill: chosedSpill in spillWorklist - " ^ Bool.toString (NodeSet.member(!spillWorklist, chosedSpill)) ^ "\n"); *)
                     spillWorklist := NodeSet.delete (!spillWorklist, chosedSpill);
                     simplifyWorklist := NodeSet.add (!simplifyWorklist, chosedSpill);
                     freezeMoves chosedSpill
@@ -390,17 +451,20 @@ struct
                     Graph.Table.appi (fn (k,v) => print((Int.toString k) ^ ":" ^ v ^ "\n")) (!color); *)
                     NodeSet.app forN (!precolored);
                     NodeSet.app forN (!coloredNodes);
-                     print "colorToAllocation - print finalAlloc\n";
-                    Temp.Table.appi (fn (k,v) => print((Temp.makestring k) ^ ":" ^ v ^ "\n")) (!finalAlloc);
+                     (* print "colorToAllocation - print finalAlloc\n";
+                    Temp.Table.appi (fn (k,v) => print((Temp.makestring k) ^ ":" ^ v ^ "\n")) (!finalAlloc); *)
                     (!finalAlloc)
                 end
 
 
             fun iterateOptimizeStep () = 
                 (
+                
                 if not (NodeSet.isEmpty (!simplifyWorklist)) then (simplify()) else 
                     if not (EdgeSet.isEmpty (!workListMoves)) then (coalesce()) else 
-                        if not (NodeSet.isEmpty (!freezeWorklist)) then (freeze()) else 
+                        if not (NodeSet.isEmpty (!freezeWorklist)) then (print ("freezeWorklist: ");
+                NodeSet.app (fn n => print ((Graph.nodename n) ^ ",")) (!freezeWorklist);
+                print "\n"; freeze()) else 
                             if not (NodeSet.isEmpty (!spillWorklist)) then (selectSpill()) else ();
                 if (NodeSet.isEmpty (!simplifyWorklist) andalso EdgeSet.isEmpty (!workListMoves)
                     andalso NodeSet.isEmpty (!freezeWorklist) andalso NodeSet.isEmpty (!spillWorklist))

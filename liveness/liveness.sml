@@ -177,6 +177,8 @@ struct
                     app createEdge oneIdLst
                 end
                 
+            val _ = gtempMap := Graph.Table.empty
+            val _ = tnodeMap := Temp.Table.empty
             val _ = computeLiveness()
             val gr = G.newGraph()
             val igraph = addAllINodes(gr)
