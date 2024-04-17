@@ -187,10 +187,10 @@ struct
             (* Allocate more space for RA + FP, (sallee-save is done at procEntryExit1's allocLocal) *)
             val () = stackSize := !stackSize + 2 * wordSize
             (* Allocate Frame *)
-            val setnewFP = Assem.MOVE {assem ="move `d0, `s0\n",src = SP , dst= FP}
+            val setnewFP = Assem.MOVE {assem ="move `d0, `s0\n",src =SP, dst=FP}
             val extendSP = Assem.OPER {assem="addi `d0, `s0, -" ^ Int.toString (!stackSize) ^ "\n", src=[SP], dst=[SP], jump=NONE}
-            val saveRA = Assem.OPER {assem="sw `s0, 8(`d0)\n", src=[RA], dst=[SP], jump=NONE}
-            val saveFP = Assem.OPER {assem="sw `s0, 4(`d0)\n",src=[FP], dst=[SP],jump=NONE}
+            val saveRA = Assem.OPER {assem="sw `s0, 8(`s1)\n", src=[RA,SP], dst=[], jump=NONE}
+            val saveFP = Assem.OPER {assem="sw `s0, 4(`s1)\n",src=[FP,SP], dst=[],jump=NONE}
             (* Deallocate Frame *)
             val restoreRA = Assem.OPER {assem="lw `d0, 8(`s0)\n", src=[SP], dst=[RA], jump=NONE}
             val restoreFP = Assem.OPER {assem="lw `d0, 4(`s0)\n", src=[SP], dst=[FP], jump=NONE}

@@ -1,0 +1,1296 @@
+Standard ML of New Jersey (64-bit) v110.99.4 [built: Tue Aug 01 16:07:38 2023]
+- = [opening run.sml]
+[autoloading]
+[library $smlnj/cm/cm.cm is stable]
+[library $smlnj/internal/cm-sig-lib.cm is stable]
+[library $/pgraph.cm is stable]
+[library $smlnj/internal/srcpath-lib.cm is stable]
+[library $SMLNJ-BASIS/basis.cm is stable]
+[library $SMLNJ-BASIS/(basis.cm):basis-common.cm is stable]
+[autoloading done]
+[scanning sources.cm]
+[library $/ml-yacc-lib.cm is stable]
+[attempting to load plugin $/lex-ext.cm]
+[library $/lex-ext.cm is stable]
+[library $smlnj/cm/tools.cm is stable]
+[library $smlnj/internal/cm-lib.cm is stable]
+[plugin $/lex-ext.cm loaded successfully]
+[attempting to load plugin $/mllex-tool.cm]
+[library $/mllex-tool.cm is stable]
+[plugin $/mllex-tool.cm loaded successfully]
+[attempting to load plugin $/grm-ext.cm]
+[library $/grm-ext.cm is stable]
+[plugin $/grm-ext.cm loaded successfully]
+[attempting to load plugin $/mlyacc-tool.cm]
+[library $/mlyacc-tool.cm is stable]
+[plugin $/mlyacc-tool.cm loaded successfully]
+[library $SMLNJ-ML-YACC-LIB/ml-yacc-lib.cm is stable]
+[library $SMLNJ-LIB/Util/smlnj-lib.cm is stable]
+[loading (sources.cm):table.sig]
+[loading (sources.cm):table.sml]
+[loading (sources.cm):symbol.sml]
+[loading (sources.cm):temp.sig]
+[loading (sources.cm):temp.sml]
+[loading (sources.cm):graph.sig]
+[loading (sources.cm):graph.sml]
+[loading (sources.cm):flowgraph.sml]
+[loading (sources.cm):types.sml]
+[loading (sources.cm):tree.sml]
+[loading (sources.cm):printtree.sml]
+[loading (sources.cm):errormsg.sml]
+[loading (sources.cm):assem.sml]
+[loading (sources.cm):frame.sig]
+[loading (sources.cm):frame.sml]
+[loading (sources.cm):translate.sig]
+[loading (sources.cm):translate.sml]
+[loading (sources.cm):makegraph.sig]
+[loading (sources.cm):liveness.sig]
+[loading (sources.cm):liveness.sml]
+[loading (sources.cm):color.sig]
+[loading (sources.cm):makegraph.sml]
+[loading (sources.cm):env.sig]
+[loading (sources.cm):env.sml]
+[loading (sources.cm):absyn.sml]
+[loading (sources.cm):tiger.grm.sig]
+[loading (sources.cm):tiger.grm.sml]
+[loading (sources.cm):tiger.lex.sml]
+[loading (sources.cm):color.sml]
+[loading (sources.cm):codegen.sig]
+[loading (sources.cm):codegen.sml]
+[loading (sources.cm):reg_alloc.sig]
+[loading (sources.cm):reg_alloc.sml]
+[loading (sources.cm):parse.sml]
+[loading (sources.cm):semant.sig]
+[loading (sources.cm):semant.sml]
+[loading (sources.cm):findEscape.sig]
+[loading (sources.cm):findEscape.sml]
+[loading (sources.cm):canon.sml]
+[loading (sources.cm):main.sml]
+[loading (sources.cm):prabsyn.sml]
+[New bindings added.]
+val it = true : bool
+[autoloading]
+[autoloading done]
+val readAllFiles = fn : string -> string list
+[autoloading]
+[autoloading done]
+val par = fn : string -> unit
+[autoloading]
+[autoloading done]
+val sort = fn : string list -> string list
+val contains = fn : string * string list -> bool
+val runAllTests = fn : unit -> unit
+val clear = fn : unit -> unit
+loads:instr:   new:    stores:
+----------------
+loads:instr:j L1 
+   new:    j L1 
+stores:
+----------------
+loads:instr:move t117, t237
+   new:    move t117, t237
+stores:
+----------------
+loads:instr:lw t237, -36(t122)
+   new:    lw t237, -36(t122)
+stores:
+----------------
+loads:instr:move t116, t236
+   new:    move t116, t236
+stores:
+----------------
+loads:instr:lw t236, -32(t122)
+   new:    lw t236, -32(t122)
+stores:
+----------------
+loads:instr:move t115, t235
+   new:    move t115, t235
+stores:
+----------------
+loads:instr:lw t235, -28(t122)
+   new:    lw t235, -28(t122)
+stores:
+----------------
+loads:instr:move t114, t234
+   new:    move t114, t234
+stores:
+----------------
+loads:instr:lw t234, -24(t122)
+   new:    lw t234, -24(t122)
+stores:
+----------------
+loads:instr:move t113, t233
+   new:    move t113, t233
+stores:
+----------------
+loads:instr:lw t233, -20(t122)
+   new:    lw t233, -20(t122)
+stores:
+----------------
+loads:instr:move t112, t232
+   new:    move t112, t232
+stores:
+----------------
+loads:instr:lw t232, -16(t122)
+   new:    lw t232, -16(t122)
+stores:
+----------------
+loads:instr:move t111, t231
+   new:    move t111, t231
+stores:
+----------------
+loads:instr:lw t231, -12(t122)
+   new:    lw t231, -12(t122)
+stores:
+----------------
+loads:instr:move t110, t230
+   new:    move t110, t230
+stores:
+----------------
+loads:instr:lw t230, -8(t122)
+   new:    lw t230, -8(t122)
+stores:
+----------------
+loads:instr:move t128, t198
+   new:    move t128, t198
+stores:
+----------------
+loads:instr:add t198, t199, t164
+   new:    add t198, t199, t164
+stores:
+----------------
+loads:instr:add t199, t200, t163
+   new:    add t199, t200, t163
+stores:
+----------------
+loads:instr:add t200, t201, t162
+   new:    add t200, t201, t162
+stores:
+----------------
+loads:instr:add t201, t202, t161
+   new:    add t201, t202, t161
+stores:
+----------------
+loads:instr:add t202, t203, t160
+   new:    add t202, t203, t160
+stores:
+----------------
+loads:instr:add t203, t204, t159
+   new:    add t203, t204, t159
+stores:
+----------------
+loads:instr:add t204, t205, t158
+   new:    add t204, t205, t158
+stores:
+----------------
+loads:instr:add t205, t206, t157
+   new:    add t205, t206, t157
+stores:
+----------------
+loads:instr:add t206, t207, t156
+   new:    add t206, t207, t156
+stores:
+----------------
+loads:instr:add t207, t208, t155
+   new:    add t207, t208, t155
+stores:
+----------------
+loads:instr:add t208, t209, t154
+   new:    add t208, t209, t154
+stores:
+----------------
+loads:instr:add t209, t210, t153
+   new:    add t209, t210, t153
+stores:
+----------------
+loads:instr:add t210, t211, t152
+   new:    add t210, t211, t152
+stores:
+----------------
+loads:instr:add t211, t212, t151
+   new:    add t211, t212, t151
+stores:
+----------------
+loads:instr:add t212, t213, t150
+   new:    add t212, t213, t150
+stores:
+----------------
+loads:instr:add t213, t214, t149
+   new:    add t213, t214, t149
+stores:
+----------------
+loads:instr:add t214, t215, t148
+   new:    add t214, t215, t148
+stores:
+----------------
+loads:instr:add t215, t216, t147
+   new:    add t215, t216, t147
+stores:
+----------------
+loads:instr:add t216, t217, t146
+   new:    add t216, t217, t146
+stores:
+----------------
+loads:instr:add t217, t218, t145
+   new:    add t217, t218, t145
+stores:
+----------------
+loads:instr:add t218, t219, t144
+   new:    add t218, t219, t144
+stores:
+----------------
+loads:instr:add t219, t220, t143
+   new:    add t219, t220, t143
+stores:
+----------------
+loads:instr:add t220, t221, t142
+   new:    add t220, t221, t142
+stores:
+----------------
+loads:instr:add t221, t222, t141
+   new:    add t221, t222, t141
+stores:
+----------------
+loads:instr:add t222, t223, t140
+   new:    add t222, t223, t140
+stores:
+----------------
+loads:instr:add t223, t224, t139
+   new:    add t223, t224, t139
+stores:
+----------------
+loads:instr:add t224, t225, t138
+   new:    add t224, t225, t138
+stores:
+----------------
+loads:lw t238, -60(t122)
+instr:add t225, t226, t137
+   new:    add t225, t226, t238
+stores:
+----------------
+loads:lw t239, -56(t122)
+instr:add t226, t227, t136
+   new:    add t226, t227, t239
+stores:
+----------------
+loads:lw t240, -52(t122)
+instr:add t227, t228, t135
+   new:    add t227, t228, t240
+stores:
+----------------
+loads:lw t241, -48(t122)
+instr:add t228, t229, t134
+   new:    add t228, t229, t241
+stores:
+----------------
+loads:lw t243, -40(t122)
+lw t242, -44(t122)
+instr:add t229, t132, t133
+   new:    add t229, t243, t242
+stores:
+----------------
+loads:instr:move t164, t197
+   new:    move t164, t197
+stores:
+----------------
+loads:instr:addi t197, $0, 33
+   new:    addi t197, $0, 33
+stores:
+----------------
+loads:instr:move t163, t196
+   new:    move t163, t196
+stores:
+----------------
+loads:instr:addi t196, $0, 32
+   new:    addi t196, $0, 32
+stores:
+----------------
+loads:instr:move t162, t195
+   new:    move t162, t195
+stores:
+----------------
+loads:instr:addi t195, $0, 31
+   new:    addi t195, $0, 31
+stores:
+----------------
+loads:instr:move t161, t194
+   new:    move t161, t194
+stores:
+----------------
+loads:instr:addi t194, $0, 30
+   new:    addi t194, $0, 30
+stores:
+----------------
+loads:instr:move t160, t193
+   new:    move t160, t193
+stores:
+----------------
+loads:instr:addi t193, $0, 29
+   new:    addi t193, $0, 29
+stores:
+----------------
+loads:instr:move t159, t192
+   new:    move t159, t192
+stores:
+----------------
+loads:instr:addi t192, $0, 28
+   new:    addi t192, $0, 28
+stores:
+----------------
+loads:instr:move t158, t191
+   new:    move t158, t191
+stores:
+----------------
+loads:instr:addi t191, $0, 27
+   new:    addi t191, $0, 27
+stores:
+----------------
+loads:instr:move t157, t190
+   new:    move t157, t190
+stores:
+----------------
+loads:instr:addi t190, $0, 26
+   new:    addi t190, $0, 26
+stores:
+----------------
+loads:instr:move t156, t189
+   new:    move t156, t189
+stores:
+----------------
+loads:instr:addi t189, $0, 25
+   new:    addi t189, $0, 25
+stores:
+----------------
+loads:instr:move t155, t188
+   new:    move t155, t188
+stores:
+----------------
+loads:instr:addi t188, $0, 24
+   new:    addi t188, $0, 24
+stores:
+----------------
+loads:instr:move t154, t187
+   new:    move t154, t187
+stores:
+----------------
+loads:instr:addi t187, $0, 23
+   new:    addi t187, $0, 23
+stores:
+----------------
+loads:instr:move t153, t186
+   new:    move t153, t186
+stores:
+----------------
+loads:instr:addi t186, $0, 22
+   new:    addi t186, $0, 22
+stores:
+----------------
+loads:instr:move t152, t185
+   new:    move t152, t185
+stores:
+----------------
+loads:instr:addi t185, $0, 21
+   new:    addi t185, $0, 21
+stores:
+----------------
+loads:instr:move t151, t184
+   new:    move t151, t184
+stores:
+----------------
+loads:instr:addi t184, $0, 20
+   new:    addi t184, $0, 20
+stores:
+----------------
+loads:instr:move t150, t183
+   new:    move t150, t183
+stores:
+----------------
+loads:instr:addi t183, $0, 19
+   new:    addi t183, $0, 19
+stores:
+----------------
+loads:instr:move t149, t182
+   new:    move t149, t182
+stores:
+----------------
+loads:instr:addi t182, $0, 18
+   new:    addi t182, $0, 18
+stores:
+----------------
+loads:instr:move t148, t181
+   new:    move t148, t181
+stores:
+----------------
+loads:instr:addi t181, $0, 17
+   new:    addi t181, $0, 17
+stores:
+----------------
+loads:instr:move t147, t180
+   new:    move t147, t180
+stores:
+----------------
+loads:instr:addi t180, $0, 16
+   new:    addi t180, $0, 16
+stores:
+----------------
+loads:instr:move t146, t179
+   new:    move t146, t179
+stores:
+----------------
+loads:instr:addi t179, $0, 15
+   new:    addi t179, $0, 15
+stores:
+----------------
+loads:instr:move t145, t178
+   new:    move t145, t178
+stores:
+----------------
+loads:instr:addi t178, $0, 14
+   new:    addi t178, $0, 14
+stores:
+----------------
+loads:instr:move t144, t177
+   new:    move t144, t177
+stores:
+----------------
+loads:instr:addi t177, $0, 13
+   new:    addi t177, $0, 13
+stores:
+----------------
+loads:instr:move t143, t176
+   new:    move t143, t176
+stores:
+----------------
+loads:instr:addi t176, $0, 12
+   new:    addi t176, $0, 12
+stores:
+----------------
+loads:instr:move t142, t175
+   new:    move t142, t175
+stores:
+----------------
+loads:instr:addi t175, $0, 11
+   new:    addi t175, $0, 11
+stores:
+----------------
+loads:instr:move t141, t174
+   new:    move t141, t174
+stores:
+----------------
+loads:instr:addi t174, $0, 10
+   new:    addi t174, $0, 10
+stores:
+----------------
+loads:instr:move t140, t173
+   new:    move t140, t173
+stores:
+----------------
+loads:instr:addi t173, $0, 9
+   new:    addi t173, $0, 9
+stores:
+----------------
+loads:instr:move t139, t172
+   new:    move t139, t172
+stores:
+----------------
+loads:instr:addi t172, $0, 8
+   new:    addi t172, $0, 8
+stores:
+----------------
+loads:instr:move t138, t171
+   new:    move t138, t171
+stores:
+----------------
+loads:instr:addi t171, $0, 7
+   new:    addi t171, $0, 7
+stores:
+----------------
+loads:instr:move t137, t170
+   new:    move t244, t170
+stores:sw t244, -60(t122)
+
+----------------
+loads:instr:addi t170, $0, 6
+   new:    addi t170, $0, 6
+stores:
+----------------
+loads:instr:move t136, t169
+   new:    move t245, t169
+stores:sw t245, -56(t122)
+
+----------------
+loads:instr:addi t169, $0, 5
+   new:    addi t169, $0, 5
+stores:
+----------------
+loads:instr:move t135, t168
+   new:    move t246, t168
+stores:sw t246, -52(t122)
+
+----------------
+loads:instr:addi t168, $0, 4
+   new:    addi t168, $0, 4
+stores:
+----------------
+loads:instr:move t134, t167
+   new:    move t247, t167
+stores:sw t247, -48(t122)
+
+----------------
+loads:instr:addi t167, $0, 3
+   new:    addi t167, $0, 3
+stores:
+----------------
+loads:instr:move t133, t166
+   new:    move t248, t166
+stores:sw t248, -44(t122)
+
+----------------
+loads:instr:addi t166, $0, 2
+   new:    addi t166, $0, 2
+stores:
+----------------
+loads:instr:move t132, t165
+   new:    move t249, t165
+stores:sw t249, -40(t122)
+
+----------------
+loads:instr:addi t165, $0, 1
+   new:    addi t165, $0, 1
+stores:
+----------------
+loads:instr:sw t117, -36(t122)
+   new:    sw t117, -36(t122)
+stores:
+----------------
+loads:instr:sw t116, -32(t122)
+   new:    sw t116, -32(t122)
+stores:
+----------------
+loads:instr:sw t115, -28(t122)
+   new:    sw t115, -28(t122)
+stores:
+----------------
+loads:instr:sw t114, -24(t122)
+   new:    sw t114, -24(t122)
+stores:
+----------------
+loads:instr:sw t113, -20(t122)
+   new:    sw t113, -20(t122)
+stores:
+----------------
+loads:instr:sw t112, -16(t122)
+   new:    sw t112, -16(t122)
+stores:
+----------------
+loads:instr:sw t111, -12(t122)
+   new:    sw t111, -12(t122)
+stores:
+----------------
+loads:instr:sw t110, -8(t122)
+   new:    sw t110, -8(t122)
+stores:
+----------------
+loads:instr:sw t118, -4(t122)
+   new:    sw t118, -4(t122)
+stores:
+----------------
+spill nodes:6
+t132, t133, t134, t135, t136, t137, 
+rewrite program done
+loads:instr:sw t118, -4(t122)
+   new:    sw t118, -4(t122)
+stores:
+----------------
+loads:instr:sw t110, -8(t122)
+   new:    sw t110, -8(t122)
+stores:
+----------------
+loads:instr:sw t111, -12(t122)
+   new:    sw t111, -12(t122)
+stores:
+----------------
+loads:instr:sw t112, -16(t122)
+   new:    sw t112, -16(t122)
+stores:
+----------------
+loads:instr:sw t113, -20(t122)
+   new:    sw t113, -20(t122)
+stores:
+----------------
+loads:instr:sw t114, -24(t122)
+   new:    sw t114, -24(t122)
+stores:
+----------------
+loads:instr:sw t115, -28(t122)
+   new:    sw t115, -28(t122)
+stores:
+----------------
+loads:instr:sw t116, -32(t122)
+   new:    sw t116, -32(t122)
+stores:
+----------------
+loads:instr:sw t117, -36(t122)
+   new:    sw t117, -36(t122)
+stores:
+----------------
+loads:instr:addi t165, $0, 1
+   new:    addi t250, $0, 1
+stores:sw t250, -172(t122)
+
+----------------
+loads:instr:sw t249, -40(t122)
+   new:    sw t249, -40(t122)
+stores:
+----------------
+loads:lw t251, -172(t122)
+instr:move t249, t165
+   new:    move t249, t251
+stores:
+----------------
+loads:instr:addi t166, $0, 2
+   new:    addi t252, $0, 2
+stores:sw t252, -176(t122)
+
+----------------
+loads:instr:sw t248, -44(t122)
+   new:    sw t248, -44(t122)
+stores:
+----------------
+loads:lw t253, -176(t122)
+instr:move t248, t166
+   new:    move t248, t253
+stores:
+----------------
+loads:instr:addi t167, $0, 3
+   new:    addi t254, $0, 3
+stores:sw t254, -180(t122)
+
+----------------
+loads:instr:sw t247, -48(t122)
+   new:    sw t247, -48(t122)
+stores:
+----------------
+loads:lw t255, -180(t122)
+instr:move t247, t167
+   new:    move t247, t255
+stores:
+----------------
+loads:instr:addi t168, $0, 4
+   new:    addi t256, $0, 4
+stores:sw t256, -184(t122)
+
+----------------
+loads:instr:sw t246, -52(t122)
+   new:    sw t246, -52(t122)
+stores:
+----------------
+loads:lw t257, -184(t122)
+instr:move t246, t168
+   new:    move t246, t257
+stores:
+----------------
+loads:instr:addi t169, $0, 5
+   new:    addi t258, $0, 5
+stores:sw t258, -188(t122)
+
+----------------
+loads:instr:sw t245, -56(t122)
+   new:    sw t245, -56(t122)
+stores:
+----------------
+loads:lw t259, -188(t122)
+instr:move t245, t169
+   new:    move t245, t259
+stores:
+----------------
+loads:instr:addi t170, $0, 6
+   new:    addi t260, $0, 6
+stores:sw t260, -192(t122)
+
+----------------
+loads:instr:sw t244, -60(t122)
+   new:    sw t244, -60(t122)
+stores:
+----------------
+loads:lw t261, -192(t122)
+instr:move t244, t170
+   new:    move t244, t261
+stores:
+----------------
+loads:instr:addi t171, $0, 7
+   new:    addi t262, $0, 7
+stores:sw t262, -196(t122)
+
+----------------
+loads:lw t264, -196(t122)
+instr:move t138, t171
+   new:    move t263, t264
+stores:sw t263, -64(t122)
+
+----------------
+loads:instr:addi t172, $0, 8
+   new:    addi t265, $0, 8
+stores:sw t265, -200(t122)
+
+----------------
+loads:lw t267, -200(t122)
+instr:move t139, t172
+   new:    move t266, t267
+stores:sw t266, -68(t122)
+
+----------------
+loads:instr:addi t173, $0, 9
+   new:    addi t268, $0, 9
+stores:sw t268, -204(t122)
+
+----------------
+loads:lw t270, -204(t122)
+instr:move t140, t173
+   new:    move t269, t270
+stores:sw t269, -72(t122)
+
+----------------
+loads:instr:addi t174, $0, 10
+   new:    addi t271, $0, 10
+stores:sw t271, -208(t122)
+
+----------------
+loads:lw t273, -208(t122)
+instr:move t141, t174
+   new:    move t272, t273
+stores:sw t272, -76(t122)
+
+----------------
+loads:instr:addi t175, $0, 11
+   new:    addi t274, $0, 11
+stores:sw t274, -212(t122)
+
+----------------
+loads:lw t276, -212(t122)
+instr:move t142, t175
+   new:    move t275, t276
+stores:sw t275, -80(t122)
+
+----------------
+loads:instr:addi t176, $0, 12
+   new:    addi t277, $0, 12
+stores:sw t277, -216(t122)
+
+----------------
+loads:lw t279, -216(t122)
+instr:move t143, t176
+   new:    move t278, t279
+stores:sw t278, -84(t122)
+
+----------------
+loads:instr:addi t177, $0, 13
+   new:    addi t280, $0, 13
+stores:sw t280, -220(t122)
+
+----------------
+loads:lw t282, -220(t122)
+instr:move t144, t177
+   new:    move t281, t282
+stores:sw t281, -88(t122)
+
+----------------
+loads:instr:addi t178, $0, 14
+   new:    addi t283, $0, 14
+stores:sw t283, -224(t122)
+
+----------------
+loads:lw t285, -224(t122)
+instr:move t145, t178
+   new:    move t284, t285
+stores:sw t284, -92(t122)
+
+----------------
+loads:instr:addi t179, $0, 15
+   new:    addi t286, $0, 15
+stores:sw t286, -228(t122)
+
+----------------
+loads:lw t288, -228(t122)
+instr:move t146, t179
+   new:    move t287, t288
+stores:sw t287, -96(t122)
+
+----------------
+loads:instr:addi t180, $0, 16
+   new:    addi t289, $0, 16
+stores:sw t289, -232(t122)
+
+----------------
+loads:lw t291, -232(t122)
+instr:move t147, t180
+   new:    move t290, t291
+stores:sw t290, -100(t122)
+
+----------------
+loads:instr:addi t181, $0, 17
+   new:    addi t292, $0, 17
+stores:sw t292, -236(t122)
+
+----------------
+loads:lw t294, -236(t122)
+instr:move t148, t181
+   new:    move t293, t294
+stores:sw t293, -104(t122)
+
+----------------
+loads:instr:addi t182, $0, 18
+   new:    addi t295, $0, 18
+stores:sw t295, -240(t122)
+
+----------------
+loads:lw t297, -240(t122)
+instr:move t149, t182
+   new:    move t296, t297
+stores:sw t296, -108(t122)
+
+----------------
+loads:instr:addi t183, $0, 19
+   new:    addi t298, $0, 19
+stores:sw t298, -244(t122)
+
+----------------
+loads:lw t300, -244(t122)
+instr:move t150, t183
+   new:    move t299, t300
+stores:sw t299, -112(t122)
+
+----------------
+loads:instr:addi t184, $0, 20
+   new:    addi t301, $0, 20
+stores:sw t301, -248(t122)
+
+----------------
+loads:lw t303, -248(t122)
+instr:move t151, t184
+   new:    move t302, t303
+stores:sw t302, -116(t122)
+
+----------------
+loads:instr:addi t185, $0, 21
+   new:    addi t304, $0, 21
+stores:sw t304, -252(t122)
+
+----------------
+loads:lw t306, -252(t122)
+instr:move t152, t185
+   new:    move t305, t306
+stores:sw t305, -120(t122)
+
+----------------
+loads:instr:addi t186, $0, 22
+   new:    addi t307, $0, 22
+stores:sw t307, -256(t122)
+
+----------------
+loads:lw t309, -256(t122)
+instr:move t153, t186
+   new:    move t308, t309
+stores:sw t308, -124(t122)
+
+----------------
+loads:instr:addi t187, $0, 23
+   new:    addi t310, $0, 23
+stores:sw t310, -260(t122)
+
+----------------
+loads:lw t312, -260(t122)
+instr:move t154, t187
+   new:    move t311, t312
+stores:sw t311, -128(t122)
+
+----------------
+loads:instr:addi t188, $0, 24
+   new:    addi t313, $0, 24
+stores:sw t313, -264(t122)
+
+----------------
+loads:lw t315, -264(t122)
+instr:move t155, t188
+   new:    move t314, t315
+stores:sw t314, -132(t122)
+
+----------------
+loads:instr:addi t189, $0, 25
+   new:    addi t316, $0, 25
+stores:sw t316, -268(t122)
+
+----------------
+loads:lw t318, -268(t122)
+instr:move t156, t189
+   new:    move t317, t318
+stores:sw t317, -136(t122)
+
+----------------
+loads:instr:addi t190, $0, 26
+   new:    addi t319, $0, 26
+stores:sw t319, -272(t122)
+
+----------------
+loads:lw t321, -272(t122)
+instr:move t157, t190
+   new:    move t320, t321
+stores:sw t320, -140(t122)
+
+----------------
+loads:instr:addi t191, $0, 27
+   new:    addi t322, $0, 27
+stores:sw t322, -276(t122)
+
+----------------
+loads:lw t324, -276(t122)
+instr:move t158, t191
+   new:    move t323, t324
+stores:sw t323, -144(t122)
+
+----------------
+loads:instr:addi t192, $0, 28
+   new:    addi t325, $0, 28
+stores:sw t325, -280(t122)
+
+----------------
+loads:lw t327, -280(t122)
+instr:move t159, t192
+   new:    move t326, t327
+stores:sw t326, -148(t122)
+
+----------------
+loads:instr:addi t193, $0, 29
+   new:    addi t328, $0, 29
+stores:sw t328, -284(t122)
+
+----------------
+loads:lw t330, -284(t122)
+instr:move t160, t193
+   new:    move t329, t330
+stores:sw t329, -152(t122)
+
+----------------
+loads:instr:addi t194, $0, 30
+   new:    addi t331, $0, 30
+stores:sw t331, -288(t122)
+
+----------------
+loads:lw t333, -288(t122)
+instr:move t161, t194
+   new:    move t332, t333
+stores:sw t332, -156(t122)
+
+----------------
+loads:instr:addi t195, $0, 31
+   new:    addi t334, $0, 31
+stores:sw t334, -292(t122)
+
+----------------
+loads:lw t336, -292(t122)
+instr:move t162, t195
+   new:    move t335, t336
+stores:sw t335, -160(t122)
+
+----------------
+loads:instr:addi t196, $0, 32
+   new:    addi t337, $0, 32
+stores:sw t337, -296(t122)
+
+----------------
+loads:lw t339, -296(t122)
+instr:move t163, t196
+   new:    move t338, t339
+stores:sw t338, -164(t122)
+
+----------------
+loads:instr:addi t197, $0, 33
+   new:    addi t340, $0, 33
+stores:sw t340, -300(t122)
+
+----------------
+loads:lw t342, -300(t122)
+instr:move t164, t197
+   new:    move t341, t342
+stores:sw t341, -168(t122)
+
+----------------
+loads:instr:add t229, t243, t242
+   new:    add t229, t243, t242
+stores:
+----------------
+loads:instr:lw t242, -44(t122)
+   new:    lw t242, -44(t122)
+stores:
+----------------
+loads:instr:lw t243, -40(t122)
+   new:    lw t243, -40(t122)
+stores:
+----------------
+loads:instr:add t228, t229, t241
+   new:    add t228, t229, t241
+stores:
+----------------
+loads:instr:lw t241, -48(t122)
+   new:    lw t241, -48(t122)
+stores:
+----------------
+loads:instr:add t227, t228, t240
+   new:    add t227, t228, t240
+stores:
+----------------
+loads:instr:lw t240, -52(t122)
+   new:    lw t240, -52(t122)
+stores:
+----------------
+loads:instr:add t226, t227, t239
+   new:    add t226, t227, t239
+stores:
+----------------
+loads:instr:lw t239, -56(t122)
+   new:    lw t239, -56(t122)
+stores:
+----------------
+loads:instr:add t225, t226, t238
+   new:    add t225, t226, t238
+stores:
+----------------
+loads:instr:lw t238, -60(t122)
+   new:    lw t238, -60(t122)
+stores:
+----------------
+loads:lw t343, -64(t122)
+instr:add t224, t225, t138
+   new:    add t224, t225, t343
+stores:
+----------------
+loads:lw t344, -68(t122)
+instr:add t223, t224, t139
+   new:    add t223, t224, t344
+stores:
+----------------
+loads:lw t345, -72(t122)
+instr:add t222, t223, t140
+   new:    add t222, t223, t345
+stores:
+----------------
+loads:lw t346, -76(t122)
+instr:add t221, t222, t141
+   new:    add t221, t222, t346
+stores:
+----------------
+loads:lw t347, -80(t122)
+instr:add t220, t221, t142
+   new:    add t220, t221, t347
+stores:
+----------------
+loads:lw t348, -84(t122)
+instr:add t219, t220, t143
+   new:    add t219, t220, t348
+stores:
+----------------
+loads:lw t349, -88(t122)
+instr:add t218, t219, t144
+   new:    add t218, t219, t349
+stores:
+----------------
+loads:lw t350, -92(t122)
+instr:add t217, t218, t145
+   new:    add t217, t218, t350
+stores:
+----------------
+loads:lw t351, -96(t122)
+instr:add t216, t217, t146
+   new:    add t216, t217, t351
+stores:
+----------------
+loads:lw t352, -100(t122)
+instr:add t215, t216, t147
+   new:    add t215, t216, t352
+stores:
+----------------
+loads:lw t353, -104(t122)
+instr:add t214, t215, t148
+   new:    add t214, t215, t353
+stores:
+----------------
+loads:lw t354, -108(t122)
+instr:add t213, t214, t149
+   new:    add t213, t214, t354
+stores:
+----------------
+loads:lw t355, -112(t122)
+instr:add t212, t213, t150
+   new:    add t212, t213, t355
+stores:
+----------------
+loads:lw t356, -116(t122)
+instr:add t211, t212, t151
+   new:    add t211, t212, t356
+stores:
+----------------
+loads:lw t357, -120(t122)
+instr:add t210, t211, t152
+   new:    add t210, t211, t357
+stores:
+----------------
+loads:lw t358, -124(t122)
+instr:add t209, t210, t153
+   new:    add t209, t210, t358
+stores:
+----------------
+loads:lw t359, -128(t122)
+instr:add t208, t209, t154
+   new:    add t208, t209, t359
+stores:
+----------------
+loads:lw t360, -132(t122)
+instr:add t207, t208, t155
+   new:    add t361, t208, t360
+stores:sw t361, -340(t122)
+
+----------------
+loads:lw t363, -340(t122)
+lw t362, -136(t122)
+instr:add t206, t207, t156
+   new:    add t364, t363, t362
+stores:sw t364, -336(t122)
+
+----------------
+loads:lw t366, -336(t122)
+lw t365, -140(t122)
+instr:add t205, t206, t157
+   new:    add t367, t366, t365
+stores:sw t367, -332(t122)
+
+----------------
+loads:lw t369, -332(t122)
+lw t368, -144(t122)
+instr:add t204, t205, t158
+   new:    add t370, t369, t368
+stores:sw t370, -328(t122)
+
+----------------
+loads:lw t372, -328(t122)
+lw t371, -148(t122)
+instr:add t203, t204, t159
+   new:    add t373, t372, t371
+stores:sw t373, -324(t122)
+
+----------------
+loads:lw t375, -324(t122)
+lw t374, -152(t122)
+instr:add t202, t203, t160
+   new:    add t376, t375, t374
+stores:sw t376, -320(t122)
+
+----------------
+loads:lw t378, -320(t122)
+lw t377, -156(t122)
+instr:add t201, t202, t161
+   new:    add t379, t378, t377
+stores:sw t379, -316(t122)
+
+----------------
+loads:lw t381, -316(t122)
+lw t380, -160(t122)
+instr:add t200, t201, t162
+   new:    add t382, t381, t380
+stores:sw t382, -312(t122)
+
+----------------
+loads:lw t384, -312(t122)
+lw t383, -164(t122)
+instr:add t199, t200, t163
+   new:    add t385, t384, t383
+stores:sw t385, -308(t122)
+
+----------------
+loads:lw t387, -308(t122)
+lw t386, -168(t122)
+instr:add t198, t199, t164
+   new:    add t388, t387, t386
+stores:sw t388, -304(t122)
+
+----------------
+loads:lw t389, -304(t122)
+instr:move t128, t198
+   new:    move t128, t389
+stores:
+----------------
+loads:instr:lw t230, -8(t122)
+   new:    lw t230, -8(t122)
+stores:
+----------------
+loads:instr:move t110, t230
+   new:    move t110, t230
+stores:
+----------------
+loads:instr:lw t231, -12(t122)
+   new:    lw t231, -12(t122)
+stores:
+----------------
+loads:instr:move t111, t231
+   new:    move t111, t231
+stores:
+----------------
+loads:instr:lw t232, -16(t122)
+   new:    lw t232, -16(t122)
+stores:
+----------------
+loads:instr:move t112, t232
+   new:    move t112, t232
+stores:
+----------------
+loads:instr:lw t233, -20(t122)
+   new:    lw t233, -20(t122)
+stores:
+----------------
+loads:instr:move t113, t233
+   new:    move t113, t233
+stores:
+----------------
+loads:instr:lw t234, -24(t122)
+   new:    lw t234, -24(t122)
+stores:
+----------------
+loads:instr:move t114, t234
+   new:    move t114, t234
+stores:
+----------------
+loads:instr:lw t235, -28(t122)
+   new:    lw t235, -28(t122)
+stores:
+----------------
+loads:instr:move t115, t235
+   new:    move t115, t235
+stores:
+----------------
+loads:instr:lw t236, -32(t122)
+   new:    lw t236, -32(t122)
+stores:
+----------------
+loads:instr:move t116, t236
+   new:    move t116, t236
+stores:
+----------------
+loads:instr:lw t237, -36(t122)
+   new:    lw t237, -36(t122)
+stores:
+----------------
+loads:instr:move t117, t237
+   new:    move t117, t237
+stores:
+----------------
+loads:instr:j L1 
+   new:    j L1 
+stores:
+----------------
+loads:instr:   new:    stores:
+----------------
+spill nodes:70
+t138, t139, t140, t141, t142, t143, t144, t145, t146, t147, t148, t149, t150, t151, t152, t153, t154, t155, t156, t157, t158, t159, t160, t161, t162, t163, t164, t165, t166, t167, t168, t169, t170, t171, t172, t173, t174, t175, t176, t177, t178, t179, t180, t181, t182, t183, t184, t185, t186, t187, t188, t189, t190, t191, t192, t193, t194, t195, t196, t197, t198, t199, t200, t201, t202, t203, t204, t205, t206, t207, 
+rewrite program done
+val it = () : unit
+val it = () : unit
+

@@ -27,7 +27,8 @@ struct
                                     SOME offset => 
                                         let
                                             val v1 = Temp.newtemp()
-                                            val sw = Assem.MOVE {assem="sw `s0, " ^ MipsGen.intToString offset ^ "(`d0)\n", src=v1, dst=Frame.FP}
+                                            val sw = Assem.OPER {assem="sw `s0, " ^ MipsGen.intToString offset ^ "(`s1)\n", src=[v1,Frame.FP], dst=[],jump=NONE}
+                                             (* val format0 = Assem.format(Temp.makestring) *)
                                         in
                                             (sw::storesAcc, v1::dstAcc)
                                         end
@@ -42,7 +43,8 @@ struct
                                     SOME offset => 
                                         let
                                             val v2 = Temp.newtemp()
-                                            val lw = Assem.MOVE {assem="lw `d0, "^ MipsGen.intToString offset ^"(`s0)\n", src=Frame.FP, dst=v2}
+                                            val lw = Assem.OPER {assem="lw `d0, "^ MipsGen.intToString offset ^"(`s0)\n", src=[Frame.FP], dst=[v2],jump=NONE}
+                                            (* val format0 = Assem.format(Temp.makestring) *)
                                         in
                                             (lw::loadsAcc, v2::srcAcc)
                                         end
@@ -54,16 +56,43 @@ struct
                     fun instrGen instr = 
                         case instr of
                             Assem.OPER {assem, dst, src, jump} => 
-                                let val (allStore, dst') = generateStores dst
+                            (* 
+                            lw -> src: FP, dst: v2
+                            lw -> src: FP, dst: v2'
+                            add t219, t220, t143 -> src: t220, t143, dst: t219. => src: v2, v2', dst: v1
+                            sw -> src: v1, dst: FP
+                            *)
+                                let 
                                     val (allLoad, src') = generateLoads src
+                                    val (allStore, dst') = generateStores dst
+                                    val format0 = Assem.format(Temp.makestring)
                                 in
-                                    allStore @ [Assem.OPER {assem=assem, dst=dst', src=src', jump=jump}] @ allLoad
+                                    print "loads:";
+                                    app (fn i => TextIO.output(TextIO.stdOut,format0 i)) allLoad;
+                                    print "instr:";
+                                    TextIO.output(TextIO.stdOut, format0 (Assem.OPER {assem=assem, dst=dst, src=src, jump=jump}));
+                                    print "   new:    ";
+                                    TextIO.output(TextIO.stdOut, format0 (Assem.OPER {assem=assem, dst=dst', src=src', jump=jump}));
+                                    print "stores:";
+                                    app (fn i => TextIO.output(TextIO.stdOut,format0 i)) allStore;
+                                    print "\n----------------\n";
+                                   allLoad @ [Assem.OPER {assem=assem, dst=dst', src=src', jump=jump}] @ allStore
                                 end
                             | Assem.MOVE {assem, dst, src} =>
                                 let val (allStore, [dst']) = generateStores [dst]
                                     val (allLoad, [src']) = generateLoads [src]
+                                    val format0 = Assem.format(Temp.makestring)
                                 in
-                                    allStore @ [Assem.MOVE {assem=assem, dst=dst', src=src'}] @ allLoad
+                                    print "loads:";
+                                    app (fn i => TextIO.output(TextIO.stdOut,format0 i)) allLoad;
+                                    print "instr:";
+                                    TextIO.output(TextIO.stdOut, format0 (Assem.MOVE {assem=assem, dst=dst, src=src}));
+                                    print "   new:    ";
+                                    TextIO.output(TextIO.stdOut, format0 (Assem.MOVE {assem=assem, dst=dst', src=src'}));
+                                    print "stores:";
+                                    app (fn i => TextIO.output(TextIO.stdOut,format0 i)) allStore;
+                                    print "\n----------------\n";
+                                    allLoad @ [Assem.MOVE {assem=assem, dst=dst', src=src'}] @ allStore
                                 end
                             | instr => [instr]
                 in
@@ -76,12 +105,12 @@ struct
                 val format1 = Assem.format(Temp.makestring)
             in
                 (* print spill access map *)
-                (* print("spill access map:"); *)
+                (* print("spill access map:" ^ (Int.toString (length(Temp.Table.listItems (!spillAccessMap)))) ^ "\n");  *)
                 (* Temp.Table.appi (fn (t, offset) => TextIO.output(TextIO.stdOut, Temp.makestring t ^ " -> " ^ Int.toString offset ^ "\n")) (!spillAccessMap); *)
                 (* print all spill node  *)
-                 (* print("spill nodes:");
-                app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill; *)
-                (* print "\n"; *)
+                 print("spill nodes:" ^ (Int.toString (length spill)) ^ "\n");
+                app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill;
+                print "\n";
                  (* app (fn i => TextIO.output(TextIO.stdOut,format1 i)) x; *)
                  x
             end
@@ -107,13 +136,21 @@ struct
             (* val filteredInstrs = List.filter removeRedundantMove instrs *)
         in
             if spills = [] then
-                (List.filter removeRedundantMove instrs, allocMapping)
-            else
-            (
+                (* (List.filter removeRedundantMove  *)
+                (instrs, allocMapping)
+            else 
+                let
+                    val x = rewriteProgram(instrs, spills, frame)
+                in
+                    print("rewrite program done\n");
+                    alloc(x, frame)
+                end
+            (* (List.filter removeRedundantMove instrs, allocMapping) *)
+            (* ( *)
                 (* (print "num of spills: "; print (Int.toString (length spills)); print "\n"; *)
-                 (* print("spill nodes:");*)
-                (* app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill;  *)
-                alloc(rewriteProgram(instrs, spills, frame), frame))
+                 (* print("spill nodes:");
+                app (fn i => TextIO.output(TextIO.stdOut, Temp.makestring i ^ ", ")) spill *)
+                (* alloc(rewriteProgram(instrs, spills, frame), frame) *)
         end
     
 

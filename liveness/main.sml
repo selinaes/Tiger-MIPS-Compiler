@@ -43,7 +43,7 @@ structure Main = struct
  
     in  
         (
-            (* app (fn i => TextIO.output(out,format0 i)) body'; *)
+            app (fn i => TextIO.output(out,format1 i)) instrs';
             TextIO.output(out,"# -------------------\n");    
         app (fn i => TextIO.output(out,format0 i)) body'')
     end
@@ -60,10 +60,6 @@ structure Main = struct
           val () = (Translate.resetfragLst(); Temp.resetLabs())
           val absyn = Parse.parse filename
           val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
-          (* val bodylst = *)
-          
-          (* val bodys: Assem.instr list = foldl (fn(curr, base) => curr@base) [] bodylst
-          val (fgr, ndlist) = MakeGraph.instrs2graph(bodys)  *)
        in 
             withOpenFile (filename ^ ".s") (fn out => (app (emitproc out) frags))
        end
