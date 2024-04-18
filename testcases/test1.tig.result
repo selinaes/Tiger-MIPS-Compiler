@@ -1,0 +1,267 @@
+----------- AST -----------
+LetExp([
+ TypeDec[
+  (arrtype,
+   ArrayTy(int))],
+ VarDec(arr1,false,SOME(arrtype),
+  ArrayExp(arrtype,
+   IntExp(10),
+   IntExp(0)))],
+ SeqExp[
+  VarExp(
+   SimpleVar(arr1))])
+----------- IR -----------
+PROC: frame with name: L0
+SEQ(
+ MOVE(
+  MEM(
+   BINOP(MINUS,
+    TEMP t100,
+    CONST 4)),
+  TEMP t108),
+ SEQ(
+  MOVE(
+   MEM(
+    BINOP(PLUS,
+     TEMP t100,
+     CONST ~8)),
+   TEMP t120),
+  SEQ(
+   MOVE(
+    MEM(
+     BINOP(PLUS,
+      TEMP t100,
+      CONST ~12)),
+    TEMP t121),
+   SEQ(
+    MOVE(
+     MEM(
+      BINOP(PLUS,
+       TEMP t100,
+       CONST ~16)),
+     TEMP t122),
+    SEQ(
+     MOVE(
+      MEM(
+       BINOP(PLUS,
+        TEMP t100,
+        CONST ~20)),
+      TEMP t123),
+     SEQ(
+      MOVE(
+       MEM(
+        BINOP(PLUS,
+         TEMP t100,
+         CONST ~24)),
+       TEMP t124),
+      SEQ(
+       MOVE(
+        MEM(
+         BINOP(PLUS,
+          TEMP t100,
+          CONST ~28)),
+        TEMP t125),
+       SEQ(
+        MOVE(
+         MEM(
+          BINOP(PLUS,
+           TEMP t100,
+           CONST ~32)),
+         TEMP t126),
+        SEQ(
+         MOVE(
+          MEM(
+           BINOP(PLUS,
+            TEMP t100,
+            CONST ~36)),
+          TEMP t127),
+         SEQ(
+          MOVE(
+           TEMP t106,
+           CONST 0),
+          SEQ(
+           MOVE(
+            TEMP t120,
+            MEM(
+             BINOP(PLUS,
+              TEMP t100,
+              CONST ~8))),
+           SEQ(
+            MOVE(
+             TEMP t121,
+             MEM(
+              BINOP(PLUS,
+               TEMP t100,
+               CONST ~12))),
+            SEQ(
+             MOVE(
+              TEMP t122,
+              MEM(
+               BINOP(PLUS,
+                TEMP t100,
+                CONST ~16))),
+             SEQ(
+              MOVE(
+               TEMP t123,
+               MEM(
+                BINOP(PLUS,
+                 TEMP t100,
+                 CONST ~20))),
+              SEQ(
+               MOVE(
+                TEMP t124,
+                MEM(
+                 BINOP(PLUS,
+                  TEMP t100,
+                  CONST ~24))),
+               SEQ(
+                MOVE(
+                 TEMP t125,
+                 MEM(
+                  BINOP(PLUS,
+                   TEMP t100,
+                   CONST ~28))),
+                SEQ(
+                 MOVE(
+                  TEMP t126,
+                  MEM(
+                   BINOP(PLUS,
+                    TEMP t100,
+                    CONST ~32))),
+                 MOVE(
+                  TEMP t127,
+                  MEM(
+                   BINOP(PLUS,
+                    TEMP t100,
+                    CONST ~36))))))))))))))))))))
+PROC: frame with name: L3
+SEQ(
+ MOVE(
+  MEM(
+   BINOP(MINUS,
+    TEMP t100,
+    CONST 4)),
+  TEMP t108),
+ SEQ(
+  MOVE(
+   MEM(
+    BINOP(PLUS,
+     TEMP t100,
+     CONST ~8)),
+   TEMP t120),
+  SEQ(
+   MOVE(
+    MEM(
+     BINOP(PLUS,
+      TEMP t100,
+      CONST ~12)),
+    TEMP t121),
+   SEQ(
+    MOVE(
+     MEM(
+      BINOP(PLUS,
+       TEMP t100,
+       CONST ~16)),
+     TEMP t122),
+    SEQ(
+     MOVE(
+      MEM(
+       BINOP(PLUS,
+        TEMP t100,
+        CONST ~20)),
+      TEMP t123),
+     SEQ(
+      MOVE(
+       MEM(
+        BINOP(PLUS,
+         TEMP t100,
+         CONST ~24)),
+       TEMP t124),
+      SEQ(
+       MOVE(
+        MEM(
+         BINOP(PLUS,
+          TEMP t100,
+          CONST ~28)),
+        TEMP t125),
+       SEQ(
+        MOVE(
+         MEM(
+          BINOP(PLUS,
+           TEMP t100,
+           CONST ~32)),
+         TEMP t126),
+        SEQ(
+         MOVE(
+          MEM(
+           BINOP(PLUS,
+            TEMP t100,
+            CONST ~36)),
+          TEMP t127),
+         SEQ(
+          MOVE(
+           TEMP t106,
+           ESEQ(
+            MOVE(
+             TEMP t141,
+             CALL(
+              NAME initArray,
+               CONST 10,
+               CONST 0)),
+            TEMP t141)),
+          SEQ(
+           MOVE(
+            TEMP t120,
+            MEM(
+             BINOP(PLUS,
+              TEMP t100,
+              CONST ~8))),
+           SEQ(
+            MOVE(
+             TEMP t121,
+             MEM(
+              BINOP(PLUS,
+               TEMP t100,
+               CONST ~12))),
+            SEQ(
+             MOVE(
+              TEMP t122,
+              MEM(
+               BINOP(PLUS,
+                TEMP t100,
+                CONST ~16))),
+             SEQ(
+              MOVE(
+               TEMP t123,
+               MEM(
+                BINOP(PLUS,
+                 TEMP t100,
+                 CONST ~20))),
+              SEQ(
+               MOVE(
+                TEMP t124,
+                MEM(
+                 BINOP(PLUS,
+                  TEMP t100,
+                  CONST ~24))),
+               SEQ(
+                MOVE(
+                 TEMP t125,
+                 MEM(
+                  BINOP(PLUS,
+                   TEMP t100,
+                   CONST ~28))),
+                SEQ(
+                 MOVE(
+                  TEMP t126,
+                  MEM(
+                   BINOP(PLUS,
+                    TEMP t100,
+                    CONST ~32))),
+                 MOVE(
+                  TEMP t127,
+                  MEM(
+                   BINOP(PLUS,
+                    TEMP t100,
+                    CONST ~36))))))))))))))))))))
+----------- Proc List -----------
