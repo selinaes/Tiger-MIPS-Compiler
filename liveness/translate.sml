@@ -226,12 +226,12 @@ struct
             val right' = unEx right
         in
             case (ty, relop) of 
-                 (T.STRING, Tr.EQ) => Ex(Frame.externalCall("stringEqual", [left', right']))
-                | (T.STRING, Tr.NE) => Ex(Frame.externalCall("stringNe", [left', right']))
+                 (T.STRING, Tr.EQ) => Ex(Frame.externalCall("tig_stringEqual", [left', right']))
+                (* | (T.STRING, Tr.NE) => Ex(Frame.externalCall("stringNe", [left', right']))
                 | (T.STRING, Tr.LT) => Ex(Frame.externalCall("stringLt", [left', right']))
                 | (T.STRING, Tr.GT) => Ex(Frame.externalCall("stringGt", [left', right']))
                 | (T.STRING, Tr.LE) => Ex(Frame.externalCall("stringLe", [left', right']))
-                | (T.STRING, Tr.GE) => Ex(Frame.externalCall("stringGe", [left', right']))
+                | (T.STRING, Tr.GE) => Ex(Frame.externalCall("stringGe", [left', right'])) *)
                 | _ => Cx(fn (t, f) => Tr.CJUMP(relop, left', right', t, f))
         end
         
@@ -258,22 +258,42 @@ struct
     fun intIR(num: int): exp = Ex(Tr.CONST num)
     
     fun arrayCreateIR(size: exp, init: exp): exp = 
-        let val size' = unEx size
+        let 
+            val ptrReg = Temp.newtemp()
+            val sizeReg = Temp.newtemp()
+            val countReg = Temp.newtemp()
+            val size' = unEx size
             val init' = unEx init
+            val testExp = Ex(Tr.BINOP(Tr.MINUS, size', Tr.TEMP countReg))
+            val bodyExp = Nx(
+                Tr.seq([
+                    Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ptrReg, Tr.BINOP(Tr.MUL, Tr.TEMP countReg, Tr.CONST 4))), init'),
+                    Tr.MOVE(Tr.TEMP countReg, Tr.BINOP(Tr.PLUS, Tr.TEMP countReg, Tr.CONST 1))
+                ]))
+            val breakLabel = Temp.newlabel()
         in
-            Ex(Frame.externalCall("initArray", [size', init']))
-            (* TODO: malloc each item space an assign to the index  *)
+          Ex(Tr.ESEQ(Tree.seq([
+                Tr.MOVE(Tr.TEMP(sizeReg), size'),
+                Tr.MOVE(Tr.TEMP(ptrReg), Frame.externalCall("malloc", [Tr.BINOP(Tr.PLUS , Tr.BINOP(Tr.MUL, Tr.TEMP sizeReg, Tr.CONST 4), Tr.CONST 4)])),
+                Tr.MOVE(Tr.TEMP(countReg), Tr.CONST 0),
+                (* while loop *)
+                unNx(whileIR(testExp, bodyExp, breakLabel)),
+                Tr.MOVE(Tr.MEM(Tr.TEMP ptrReg), Tr.TEMP sizeReg)]), 
+             Tr.BINOP(Tr.PLUS, Tr.TEMP(ptrReg), Tr.CONST 4)))
+            (* Ex(Frame.externalCall("initArray", [size', init'])) *)
         end
-        (* let val Tree.CONST(len) = unEx size
-            val ans = Temp.newtemp()
-            fun storeNextIndex(_, []) = seq []
-              | storeNextIndex(offset, fieldExp::r): Tr.stm = 
-                    seq[Tr.MOVE(Tr.MEM(Tr.BINOP(Tr.PLUS, Tr.TEMP ans, Tr.CONST offset)), fieldExp),
-                    storeNextField(offset + Frame.wordSize, r)]
-        in
-            Ex(Tr.ESEQ(seq[Tr.MOVE(Tr.TEMP ans, Frame.externalCall("malloc", [Tr.CONST ((size' + 1) * Frame.wordSize)])),
-                            storeNextField(size, init)], Tr.TEMP ans))
-        end *)
+(*   let 
+   val sizeReg = newTemp()
+  val ptrReg = newTemp()
+  val countReg = newTemp()
+in
+   ESEQ(seq[ MOVE(TEMP(sizeReg), sizeExp),
+                      MOVE(TEMP(ptrReg, CALL("malloc", (BINOP(+ , BINOP( * , sizeReg, CONST 4), CONST 4))
+                       MOVE(TEMP(countReg), CONST(0)),
+                       //emit code like a while loop here
+                      //after the loop, strore the size, adjust ptrReg = ptrReg+4] ,
+                  TEMP(ptrReg))
+end *)
                 
 
     fun recordCreateIR(fieldLsts: exp list): exp = 

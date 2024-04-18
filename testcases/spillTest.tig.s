@@ -1,73 +1,3 @@
-# system calls for Tiger, when running on SPIM
-#
-# $Id: sysspim.s,v 1.1 2002/08/25 05:06:41 shivers Exp $
-
-	.globl malloc
-	.ent malloc
-	.text
-malloc:
-	# round up the requested amount to a multiple of 4
-	add $a0, $a0, 3
-	srl $a0, $a0, 2
-	sll $a0, $a0, 2
-
-	# allocate the memory with sbrk()
-	li $v0, 9
-	syscall
-	
-	j $ra
-
-	.end malloc
-
-	
-
-	.data
-	.align 4
-getchar_buf:	.byte 0, 0
-
-	.text
-getchar:
-	# read the character
-	la $a0, getchar_buf
-	li $a1, 2
-	li $v0, 8
-	syscall
-
-	# return it
-	lb $v0, ($a0)
-	j $ra
-	
-
-	.data
-	.align 4
-putchar_buf:	.byte 0, 0
-
-	.text
-putchar:
-	# save the character so that it is NUL-terminated 
-	la $t0, putchar_buf
-	sb $a0, ($t0)
-
-	# print it out
-	la $a0, putchar_buf
-	li $v0, 4
-	syscall
-
-	j $ra
-
-
-	.text	
-# just prints the format string, not the arguments
-printf:
-	li $v0, 4
-	syscall
-	j $ra
-
-
-	.text
-exit:
-	li $v0, 10
-	syscall
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
@@ -821,13 +751,85 @@ tig_flush:
 tig_exit:
   j exit
   .end tig_exit
+# system calls for Tiger, when running on SPIM
+#
+# $Id: sysspim.s,v 1.1 2002/08/25 05:06:41 shivers Exp $
+
+	.globl malloc
+	.ent malloc
+	.text
+malloc:
+	# round up the requested amount to a multiple of 4
+	add $a0, $a0, 3
+	srl $a0, $a0, 2
+	sll $a0, $a0, 2
+
+	# allocate the memory with sbrk()
+	li $v0, 9
+	syscall
 	
+	j $ra
+
+	.end malloc
+
+	
+
+	.data
+	.align 4
+getchar_buf:	.byte 0, 0
+
+	.text
+getchar:
+	# read the character
+	la $a0, getchar_buf
+	li $a1, 2
+	li $v0, 8
+	syscall
+
+	# return it
+	lb $v0, ($a0)
+	j $ra
+	
+
+	.data
+	.align 4
+putchar_buf:	.byte 0, 0
+
+	.text
+putchar:
+	# save the character so that it is NUL-terminated 
+	la $t0, putchar_buf
+	sb $a0, ($t0)
+
+	# print it out
+	la $a0, putchar_buf
+	li $v0, 4
+	syscall
+
+	j $ra
+
+
+	.text	
+# just prints the format string, not the arguments
+printf:
+	li $v0, 4
+	syscall
+	j $ra
+
+
+	.text
+exit:
+	li $v0, 10
+	syscall
+	
+.data
+.text
+# ----- emit tig_main -----
 tig_main:
-L0:
 move $fp, $sp
-addi $sp, $sp, -84
-sw $ra, 8($sp)
-sw $fp, 4($sp)
+addi $sp, $sp, -88
+sw $ra, 4($sp)
+sw $fp, 0($sp)
 L2:
 sw $a0, -4($fp)
 sw $s0, -8($fp)
@@ -858,71 +860,95 @@ addi $t0, $0, 9
 sw $t0, -72($fp)
 addi $t0, $0, 10
 sw $t0, -76($fp)
-addi $gp, $0, 11
-addi $a3, $0, 12
-addi $a2, $0, 13
-addi $a1, $0, 14
-addi $a0, $0, 15
-addi $s7, $0, 16
-addi $s6, $0, 17
-addi $s5, $0, 18
-addi $s4, $0, 19
-addi $s3, $0, 20
-addi $s2, $0, 21
-addi $s1, $0, 22
-addi $s0, $0, 23
-addi $t9, $0, 24
-addi $t8, $0, 25
-addi $t7, $0, 26
-addi $t6, $0, 27
-addi $t5, $0, 28
-addi $t4, $0, 29
-addi $t3, $0, 30
-addi $t2, $0, 31
-addi $t1, $0, 32
+addi $t0, $0, 11
+sw $t0, -80($fp)
+addi $t0, $0, 12
+move $v1, $t0
+addi $t0, $0, 13
+move $a3, $t0
+addi $t0, $0, 14
+move $a2, $t0
+addi $t0, $0, 15
+move $a1, $t0
+addi $t0, $0, 16
+move $a0, $t0
+addi $t0, $0, 17
+move $s7, $t0
+addi $t0, $0, 18
+move $s6, $t0
+addi $t0, $0, 19
+move $s5, $t0
+addi $t0, $0, 20
+move $s4, $t0
+addi $t0, $0, 21
+move $s3, $t0
+addi $t0, $0, 22
+move $s2, $t0
+addi $t0, $0, 23
+move $s1, $t0
+addi $t0, $0, 24
+move $s0, $t0
+addi $t0, $0, 25
+move $t9, $t0
+addi $t0, $0, 26
+move $t8, $t0
+addi $t0, $0, 27
+move $t7, $t0
+addi $t0, $0, 28
+move $t6, $t0
+addi $t0, $0, 29
+move $t5, $t0
+addi $t0, $0, 30
+move $t4, $t0
+addi $t0, $0, 31
+move $t3, $t0
+addi $t0, $0, 32
+move $t2, $t0
 addi $t0, $0, 33
-lw $v0, -40($fp)
-lw $v1, -44($fp)
-add $v1, $v0, $v1
-lw $v0, -48($fp)
-add $v1, $v1, $v0
-lw $v0, -52($fp)
-add $v1, $v1, $v0
-lw $v0, -56($fp)
-add $v1, $v1, $v0
-lw $v0, -60($fp)
-add $v1, $v1, $v0
-lw $v0, -64($fp)
-add $v1, $v1, $v0
-lw $v0, -68($fp)
-add $v1, $v1, $v0
-lw $v0, -72($fp)
-add $v1, $v1, $v0
-lw $v0, -76($fp)
-add $v0, $v1, $v0
-add $gp, $v0, $gp
-add $a3, $gp, $a3
-add $a2, $a3, $a2
-add $a1, $a2, $a1
-add $a0, $a1, $a0
-add $s7, $a0, $s7
-add $s6, $s7, $s6
-add $s5, $s6, $s5
-add $s4, $s5, $s4
-add $s3, $s4, $s3
-add $s2, $s3, $s2
-add $s1, $s2, $s1
-add $s0, $s1, $s0
-add $t9, $s0, $t9
-add $t8, $t9, $t8
-add $t7, $t8, $t7
-add $t6, $t7, $t6
-add $t5, $t6, $t5
-add $t4, $t5, $t4
-add $t3, $t4, $t3
-add $t2, $t3, $t2
-add $t1, $t2, $t1
-add $v0, $t1, $t0
+move $t1, $t0
+lw $t0, -40($fp)
+lw $v0, -44($fp)
+add $v0, $t0, $v0
+lw $t0, -48($fp)
+add $v0, $v0, $t0
+lw $t0, -52($fp)
+add $v0, $v0, $t0
+lw $t0, -56($fp)
+add $v0, $v0, $t0
+lw $t0, -60($fp)
+add $v0, $v0, $t0
+lw $t0, -64($fp)
+add $v0, $v0, $t0
+lw $t0, -68($fp)
+add $v0, $v0, $t0
+lw $t0, -72($fp)
+add $v0, $v0, $t0
+lw $t0, -76($fp)
+add $v0, $v0, $t0
+lw $t0, -80($fp)
+add $t0, $v0, $t0
+add $t0, $t0, $v1
+add $t0, $t0, $a3
+add $t0, $t0, $a2
+add $t0, $t0, $a1
+add $t0, $t0, $a0
+add $t0, $t0, $s7
+add $t0, $t0, $s6
+add $t0, $t0, $s5
+add $t0, $t0, $s4
+add $t0, $t0, $s3
+add $t0, $t0, $s2
+add $t0, $t0, $s1
+add $t0, $t0, $s0
+add $t0, $t0, $t9
+add $t0, $t0, $t8
+add $t0, $t0, $t7
+add $t0, $t0, $t6
+add $t0, $t0, $t5
+add $t0, $t0, $t4
+add $t0, $t0, $t3
+add $t0, $t0, $t2
+add $v0, $t0, $t1
 lw $s0, -8($fp)
 lw $s1, -12($fp)
 lw $s2, -16($fp)
@@ -933,7 +959,7 @@ lw $s6, -32($fp)
 lw $s7, -36($fp)
 j L1 
 L1:
-lw $ra, 8($sp)
-lw $fp, 4($sp)
-addi $sp, $sp, 84
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 88
 jr $ra

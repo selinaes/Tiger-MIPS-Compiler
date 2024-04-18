@@ -3,7 +3,8 @@
 
 
 int *initArray(int size, int init)
-{int i, size = size + 1;
+{int i;
+ size = size + 1;
  int *a = (int *)malloc(size*sizeof(int));
 //  for(i=1;i<=size;i++) a[i]=init;
  return a + sizeof(int);

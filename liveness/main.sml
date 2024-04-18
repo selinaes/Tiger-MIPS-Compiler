@@ -40,7 +40,12 @@ structure Main = struct
               | NONE => ErrorMsg.impossible ("getTempAlloc: " ^ Temp.makestring temp)
         val format0 = Assem.format(getTempAlloc alloc)
         val format1 = Assem.format(Temp.makestring)
- 
+        (* val (progs,strs) =
+            List.partition
+                (fn (x) => case x of
+                               F.PROC(_) => true
+                             | _ => false) frags
+  *)
     in  
         (
             (* app (fn i => TextIO.output(out,format1 i)) instrs'; *)
@@ -54,15 +59,40 @@ structure Main = struct
       in (f out before TextIO.closeOut out) 
           handle e => (TextIO.closeOut out; raise e)
       end 
+      (* read file and output to out stream *)
+  fun readFileAndOut (out, fname) = 
+        let 
+            val instream = TextIO.openIn fname
+        in
+            (* TextIO.output(out, TextIO.inputLine instream); *)
+            TextIO.output(out, TextIO.inputAll instream);
+            TextIO.closeIn instream 
+        end
 
   fun compile filename = 
        let 
           val () = (Translate.resetfragLst(); Temp.resetLabs())
           val absyn = Parse.parse filename
           val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
+           val (progs,strs) =
+            List.partition
+                (fn (x) => case x of
+                               F.PROC(_) => true
+                             | _ => false) frags
+          val out = TextIO.openOut (filename ^ ".s")
+          val f = fn out => 
+          (readFileAndOut(out, "runtime-le.s");
+            readFileAndOut(out, "sysspim.s");
+            TextIO.output(out,".data\n");
+            app (emitproc out) strs;
+            TextIO.output(out,".text\n");
+            (* TextIO.output(out,"tig_main:\n"); *)
+            app (emitproc out) progs)
        in 
-            withOpenFile (filename ^ ".s") (fn out => (app (emitproc out) frags))
+            (f out before TextIO.closeOut out) 
+            handle e => (TextIO.closeOut out; raise e)
        end
+
 
 end
 

@@ -823,7 +823,8 @@ exit:
 	syscall
 	
 .data
-L1 : .ascii "var" 
+L1 : .ascii "abc" 
+L2 : .ascii "ac" 
 .text
 # ----- emit tig_main -----
 tig_main:
@@ -831,7 +832,7 @@ move $fp, $sp
 addi $sp, $sp, -44
 sw $ra, 4($sp)
 sw $fp, 0($sp)
-L3:
+L4:
 sw $a0, -4($fp)
 sw $s0, -8($fp)
 sw $s1, -12($fp)
@@ -841,8 +842,16 @@ sw $s4, -24($fp)
 sw $s5, -28($fp)
 sw $s6, -32($fp)
 sw $s7, -36($fp)
-la $t0, L1
-addi $v0, $t0, 3
+addi $t1, $0, 1
+addi $t0, $0, 2
+add $t0, $t1, $t0
+la $a0, L1
+jal tig_print
+la $a0, L2
+jal tig_print
+addi $t0, $0, 1
+addi $t0, $t0, 2
+jal tig_flush
 lw $s0, -8($fp)
 lw $s1, -12($fp)
 lw $s2, -16($fp)
@@ -851,8 +860,8 @@ lw $s4, -24($fp)
 lw $s5, -28($fp)
 lw $s6, -32($fp)
 lw $s7, -36($fp)
-j L2 
-L2:
+j L3 
+L3:
 lw $ra, 4($sp)
 lw $fp, 0($sp)
 addi $sp, $sp, 44

@@ -101,17 +101,12 @@ struct
                 | munchExp(T.BINOP(T.PLUS,e1,T.CONST 0)) = 
                     result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
                                                 src=munchExp e1, dst=r}))
-                | munchExp(T.BINOP(T.MINUS,T.CONST 0,e1)) = 
-                    result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
-                                                src=munchExp e1, dst=r}))
+                (* optimize *)
                 | munchExp(T.BINOP(T.MINUS,e1,T.CONST 0)) = 
                     result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
-                                                src=munchExp e1, dst=r}))
+                                                src=munchExp e1, dst=r})) 
                 (* Regular BINOP *)
                 | munchExp(T.BINOP(T.MINUS, e1,T.CONST i)) =
-                    result(fn r => emit(A.OPER {assem="addi `d0, `s0, " ^ intToString(~i) ^ "\n",
-                                                src=[munchExp e1], dst=[r], jump=NONE}))
-                | munchExp(T.BINOP(T.MINUS,T.CONST i,e1)) =
                     result(fn r => emit(A.OPER {assem="addi `d0, `s0, " ^ intToString(~i) ^ "\n",
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
                 | munchExp(T.BINOP(T.PLUS, e1,T.CONST i)) =

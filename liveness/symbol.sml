@@ -2,6 +2,7 @@ signature SYMBOL =
 sig
   eqtype symbol
   val symbol : string -> symbol
+  val symbol2 : string -> symbol
   val name : symbol -> string
   structure Table : TABLE 
   type 'a table
@@ -28,10 +29,22 @@ struct
       case H.find hashtable name
        of SOME i => (name,i)
         | NONE => let val i = !nextsym
-	           in nextsym := i+1;
+	           in 
+             nextsym := i+1;
 		      H.insert hashtable (name,i);
 		      (name,i)
 		  end
+  
+  fun symbol2 name =
+    case H.find hashtable name
+      of SOME i => (name,i)
+      | NONE => let val i = !nextsym
+            in 
+            print ("symbol: "^name^" not found, i is "^(Int.toString i)^"\n");
+            nextsym := i+1;
+        H.insert hashtable (name,i);
+        (name,i)
+    end
 
   fun name(s,n) = s
 

@@ -72,7 +72,7 @@ struct
                 (T7, "$t7"), (S0, "$s0"), (S1, "$s1"), (S2, "$s2"), (S3, "$s3"), (S4, "$s4"),
                 (S5, "$s5"), (S6, "$s6"), (S7, "$s7"), (T8, "$t8"), (T9, "$t9"), (FP, "$fp"),
                 (SP, "$sp"), (RA, "$ra"), (RV, "$v0"), (V1, "$v1"), (A0, "$a0"), (A1, "$a1"),
-                (A2, "$a2"), (A3, "$a3"), (GP, "$gp"), (ZERO, "$0")
+                (A2, "$a2"), (A3, "$a3")
             ]
         in
            foldr (fn ((s, t), acc) => Temp.Table.enter(acc, s, t)) Temp.Table.empty baseRegs 
@@ -91,7 +91,7 @@ struct
              foldr (fn ((s, t), acc) => Temp.Table.enter(acc, s, t)) Temp.Table.empty baseRegs 
         end 
 
-    fun string(label, str) = Symbol.name label ^ " : .ascii "^ str ^ " \n"
+    fun string(label, str) = Symbol.name label ^ " : .ascii \""^ str ^ "\" \n"
 
     fun tempToString (t: Temp.temp): string = 
         case Temp.Table.look(tempMap, t) of 
@@ -201,11 +201,11 @@ struct
             (* Allocate Frame *)
             val setnewFP = Assem.MOVE {assem ="move `d0, `s0\n",src =SP, dst=FP}
             val extendSP = Assem.OPER {assem="addi `d0, `s0, -" ^ Int.toString (!stackSize) ^ "\n", src=[SP], dst=[SP], jump=NONE}
-            val saveRA = Assem.OPER {assem="sw `s0, 8(`s1)\n", src=[RA,SP], dst=[], jump=NONE}
-            val saveFP = Assem.OPER {assem="sw `s0, 4(`s1)\n",src=[FP,SP], dst=[],jump=NONE}
+            val saveRA = Assem.OPER {assem="sw `s0, 4(`s1)\n", src=[RA,SP], dst=[], jump=NONE}
+            val saveFP = Assem.OPER {assem="sw `s0, 0(`s1)\n",src=[FP,SP], dst=[],jump=NONE}
             (* Deallocate Frame *)
-            val restoreRA = Assem.OPER {assem="lw `d0, 8(`s0)\n", src=[SP], dst=[RA], jump=NONE}
-            val restoreFP = Assem.OPER {assem="lw `d0, 4(`s0)\n", src=[SP], dst=[FP], jump=NONE}
+            val restoreRA = Assem.OPER {assem="lw `d0, 4(`s0)\n", src=[SP], dst=[RA], jump=NONE}
+            val restoreFP = Assem.OPER {assem="lw `d0, 0(`s0)\n", src=[SP], dst=[FP], jump=NONE}
             val resetSP = Assem.OPER {assem="addi `d0, `s0, " ^ Int.toString (!stackSize) ^ "\n", src=[SP], dst=[SP], jump=NONE}
             val jumpToRA = Assem.OPER {assem="jr $ra\n", src=[], dst=[], jump=SOME[]}
             (*  *)

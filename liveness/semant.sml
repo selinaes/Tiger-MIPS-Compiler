@@ -85,7 +85,8 @@ struct
                         then (Error.error pos ("Error: argument number mismatch"); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
                         else 
                             if checkArgs(formals, map (fn a => #ty a) args')
-                            then {exp=TS.callIR(label, map (fn a => #exp a) args', definedLevel, level),ty=result}
+                            then 
+                            {exp=TS.callIR(label, map (fn a => #exp a) args', definedLevel, level),ty=result}
                             else {exp=TS.dummy, ty=Types.IMPOSSIBLE}
                     end
                 | _ => (Error.error pos ("Error: undefined function: " ^ S.name func); {exp=TS.dummy,ty=Types.IMPOSSIBLE})
@@ -192,7 +193,8 @@ struct
         
         and trlet (decs,body:A.exp,pos) = 
             let 
-                val {venv=venv',tenv=tenv',explist=explist'} = foldl (fn (dec, {venv=v',tenv=t',explist = e'}) => transDec (v', t', e', level, dec,doneLbl)) {venv=venv, tenv=tenv, explist=[]} decs
+                val {venv=venv',tenv=tenv',explist=explist'} = 
+                    foldl (fn (dec, {venv=v',tenv=t',explist = e'}) => transDec (v', t', e', level, dec,doneLbl)) {venv=venv, tenv=tenv, explist=[]} decs
                 val {exp=bodyexp,ty} = transExp(venv',tenv',level,body,doneLbl)
             in
                 {exp=TS.letIR(explist',bodyexp),ty=ty}
@@ -467,9 +469,10 @@ struct
     fun transProg exp = 
         let 
             val () = LoopCounter.reset()
-            val startLabel = Temp.newlabel()
-            val startLevel = TS.newLevel{parent=TS.outmost, name=startLabel, formals=[]}
-            val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, startLevel, exp, startLabel)
+            val startLevel = TS.newLevel{parent=TS.outmost, name=Temp.namedlabel "tig_main", formals=[]}
+            val doneLabel = Temp.newlabel()
+            (* val _ = print ("doneLabel: " ^ (S.name doneLabel) ^ "\n") *)
+            val {exp=result, ty=ty}= transExp(E.base_venv,E.base_tenv, startLevel, exp, doneLabel)
         in
             (
             if T.matchType(Types.UNIT, ty)

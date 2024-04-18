@@ -1,732 +1,1109 @@
-L1 : .ascii aname 
-L2 : .ascii somewhere 
-L3 : .ascii  
-L4 : .ascii Kapoios 
-L5 : .ascii Kapou 
-L6 : .ascii Allos 
-L16 : .ascii kati 
-L23 : .ascii sfd 
-L24 : .ascii sdf 
-# ----- emit L0 -----
-# ----- linearize L0 -----
-LABEL L32
-MOVE(
- MEM(
-  BINOP(MINUS,
-   TEMP t100,
-   CONST 4)),
- TEMP t108)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~8)),
- TEMP t120)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~12)),
- TEMP t121)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~16)),
- TEMP t122)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~20)),
- TEMP t123)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~24)),
- TEMP t124)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~28)),
- TEMP t125)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~32)),
- TEMP t126)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~36)),
- TEMP t127)
-MOVE(
- TEMP t132,
- CALL(
-  NAME initArray,
-   CONST 10,
-   CONST 0))
-MOVE(
- TEMP t133,
- CALL(
-  NAME malloc,
-   CONST 16))
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t133,
-   CONST 0)),
- NAME L1)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t133,
-   CONST 4)),
- NAME L2)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t133,
-   CONST 8)),
- CONST 0)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t133,
-   CONST 12)),
- CONST 0)
-MOVE(
- TEMP t134,
- CALL(
-  NAME initArray,
-   CONST 5,
-   TEMP t133))
-MOVE(
- TEMP t135,
- CALL(
-  NAME initArray,
-   CONST 100,
-   NAME L3))
-MOVE(
- TEMP t136,
- CALL(
-  NAME malloc,
-   CONST 16))
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t136,
-   CONST 0)),
- NAME L4)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t136,
-   CONST 4)),
- NAME L5)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t136,
-   CONST 8)),
- CONST 2432)
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t136,
-   CONST 12)),
- CONST 44)
-MOVE(
- TEMP t137,
- TEMP t136)
-MOVE(
- TEMP t138,
- CALL(
-  NAME malloc,
-   CONST 8))
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t138,
-   CONST 0)),
- NAME L6)
-MOVE(
- TEMP t155,
- BINOP(PLUS,
-  TEMP t138,
-  CONST 4))
-MOVE(
- TEMP t154,
- CALL(
-  NAME initArray,
-   CONST 3,
-   CONST 1900))
-MOVE(
- MEM(
-  TEMP t155),
- TEMP t154)
-MOVE(
- TEMP t139,
- TEMP t138)
-MOVE(
- TEMP t140,
- CONST 0)
-MOVE(
- TEMP t141,
- MEM(
-  BINOP(PLUS,
-   TEMP t132,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t140,
- TEMP t141,
- L7,L8)
-LABEL L8
-CJUMP(LT,
- TEMP t140,
- CONST 0,
- L7,L9)
-LABEL L9
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t132,
-   BINOP(MUL,
-    CONST 0,
-    CONST 4))),
- CONST 1)
-MOVE(
- TEMP t142,
- CONST 9)
-MOVE(
- TEMP t143,
- MEM(
-  BINOP(PLUS,
-   TEMP t132,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t142,
- TEMP t143,
- L10,L11)
-LABEL L11
-CJUMP(LT,
- TEMP t142,
- CONST 0,
- L10,L12)
-LABEL L12
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t132,
-   BINOP(MUL,
-    CONST 9,
-    CONST 4))),
- CONST 3)
-MOVE(
- TEMP t144,
- CONST 3)
-MOVE(
- TEMP t145,
- MEM(
-  BINOP(PLUS,
-   TEMP t134,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t144,
- TEMP t145,
- L13,L14)
-LABEL L14
-CJUMP(LT,
- TEMP t144,
- CONST 0,
- L13,L15)
-LABEL L15
-MOVE(
- MEM(
-  MEM(
-   BINOP(PLUS,
-    TEMP t134,
-    BINOP(MUL,
-     CONST 3,
-     CONST 4)))),
- NAME L16)
-MOVE(
- TEMP t146,
- CONST 1)
-MOVE(
- TEMP t147,
- MEM(
-  BINOP(PLUS,
-   TEMP t134,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t146,
- TEMP t147,
- L17,L18)
-LABEL L18
-CJUMP(LT,
- TEMP t146,
- CONST 0,
- L17,L19)
-LABEL L19
-MOVE(
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t134,
-     BINOP(MUL,
-      CONST 1,
-      CONST 4))),
-   CONST 12)),
- CONST 23)
-MOVE(
- TEMP t148,
- CONST 34)
-MOVE(
- TEMP t149,
- MEM(
-  BINOP(PLUS,
-   TEMP t135,
-   CONST ~4)))
-CJUMP(GE,
- TEMP t148,
- TEMP t149,
- L20,L21)
-LABEL L21
-CJUMP(LT,
- TEMP t148,
- CONST 0,
- L20,L22)
-LABEL L22
-MOVE(
- MEM(
-  BINOP(PLUS,
-   TEMP t135,
-   BINOP(MUL,
-    CONST 34,
-    CONST 4))),
- NAME L23)
-MOVE(
- MEM(
-  TEMP t137),
- NAME L24)
-MOVE(
- TEMP t150,
- CONST 0)
-MOVE(
- TEMP t151,
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t139,
-     CONST 4)),
-   CONST ~4)))
-CJUMP(GE,
- TEMP t150,
- TEMP t151,
- L25,L26)
-LABEL L26
-CJUMP(LT,
- TEMP t150,
- CONST 0,
- L25,L27)
-LABEL L27
-MOVE(
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t139,
-     CONST 4)),
-   BINOP(MUL,
-    CONST 0,
-    CONST 4))),
- CONST 2323)
-MOVE(
- TEMP t152,
- CONST 2)
-MOVE(
- TEMP t153,
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t139,
-     CONST 4)),
-   CONST ~4)))
-CJUMP(GE,
- TEMP t152,
- TEMP t153,
- L28,L29)
-LABEL L29
-CJUMP(LT,
- TEMP t152,
- CONST 0,
- L28,L30)
-LABEL L30
-MOVE(
- MEM(
-  BINOP(PLUS,
-   MEM(
-    BINOP(PLUS,
-     TEMP t139,
-     CONST 4)),
-   BINOP(MUL,
-    CONST 2,
-    CONST 4))),
- CONST 2323)
-MOVE(
- TEMP t106,
- CONST 0)
-MOVE(
- TEMP t120,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~8)))
-MOVE(
- TEMP t121,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~12)))
-MOVE(
- TEMP t122,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~16)))
-MOVE(
- TEMP t123,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~20)))
-MOVE(
- TEMP t124,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~24)))
-MOVE(
- TEMP t125,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~28)))
-MOVE(
- TEMP t126,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~32)))
-MOVE(
- TEMP t127,
- MEM(
-  BINOP(PLUS,
-   TEMP t100,
-   CONST ~36)))
-JUMP(
- NAME L31)
-LABEL L7
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L9)
-LABEL L10
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L12)
-LABEL L13
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L15)
-LABEL L17
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L19)
-LABEL L20
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L22)
-LABEL L25
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L27)
-LABEL L28
-EXP(
- CALL(
-  NAME exit,
-   CONST 1))
-JUMP(
- NAME L30)
-LABEL L31
-# ----- Assembly L0 -----
-L0:
-move t100, t101
-addi t101, t101, -44
-sw t102, 8(t101)
-sw t100, 4(t101)
-L32:
-sw t108, -4(t100)
-sw t120, -8(t100)
-sw t121, -12(t100)
-sw t122, -16(t100)
-sw t123, -20(t100)
-sw t124, -24(t100)
-sw t125, -28(t100)
-sw t126, -32(t100)
-sw t127, -36(t100)
-addi t156, $0, 10
-add t108, t156, $0
-addi t157, $0, 0
-add t109, t157, $0
-jal initArray 
-add t132, t106, $0
-addi t158, $0, 16
-add t108, t158, $0
-jal malloc 
-add t133, t106, $0
-la t159, L1
-sw t159, 0(t133)
-la t160, L2
-sw t160, 4(t133)
-addi t161, $0, 0
-sw t161, 8(t133)
-addi t162, $0, 0
-sw t162, 12(t133)
-addi t163, $0, 5
-add t108, t163, $0
-add t109, t133, $0
-jal initArray 
-add t134, t106, $0
-addi t164, $0, 100
-add t108, t164, $0
-la t165, L3
-add t109, t165, $0
-jal initArray 
-add t135, t106, $0
-addi t166, $0, 16
-add t108, t166, $0
-jal malloc 
-add t136, t106, $0
-la t167, L4
-sw t167, 0(t136)
-la t168, L5
-sw t168, 4(t136)
-addi t169, $0, 2432
-sw t169, 8(t136)
-addi t170, $0, 44
-sw t170, 12(t136)
-add t137, t136, $0
-addi t171, $0, 8
-add t108, t171, $0
-jal malloc 
-add t138, t106, $0
-la t172, L6
-sw t172, 0(t138)
-addi t173, t138, 4
-add t155, t173, $0
-addi t174, $0, 3
-add t108, t174, $0
-addi t175, $0, 1900
-add t109, t175, $0
-jal initArray 
-add t154, t106, $0
-sw t154, 0(t155)
-add t139, t138, $0
-addi t176, $0, 0
-add t140, t176, $0
-lw t177, -4(t132)
-add t141, t177, $0
-bge t140, t141, L7
+	#.file	1 "runtime.c"
+	.option pic2
+	.text
+	.align 4
+	.globl	tig_initArray
+	.ent	tig_initArray
+tig_initArray:
+.LFB1:
+	.frame	$fp,64,$ra		# vars= 16, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,64
+.LCFI0:
+	sd	$ra,48($sp)
+.LCFI1:
+	sd	$fp,40($sp)
+.LCFI2:
+.LCFI3:
+	move	$fp,$sp
+.LCFI4:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	sw	$a1,20($fp)
+	lw	$v1,16($fp)
+	addu	$v0,$v1,1
+	move	$v1,$v0
+	sll	$v0,$v1,2
+	move	$a0,$v0
+	la	$t9,malloc
+	jal	$ra,$t9
+	sw	$v0,28($fp)
+	lw	$v0,28($fp)
+	lw	$v1,16($fp)
+	sw	$v1,0($v0)
+	li	$v0,1			# 0x1
+	sw	$v0,24($fp)
+.L3:
+	lw	$v1,16($fp)
+	addu	$v0,$v1,1
+	lw	$v1,24($fp)
+	slt	$v0,$v1,$v0
+	bne	$v0,$zero,.L6
+	b	.L4
+.L6:
+	lw	$v0,24($fp)
+	move	$v1,$v0
+	sll	$v0,$v1,2
+	lw	$v1,28($fp)
+	addu	$v0,$v0,$v1
+	lw	$v1,20($fp)
+	sw	$v1,0($v0)
+.L5:
+	lw	$v0,24($fp)
+	addu	$v1,$v0,1
+	sw	$v1,24($fp)
+	b	.L3
+.L4:
+	lw	$v1,28($fp)
+	move	$v0,$v1
+	b	.L2
+.L2:
+	move	$sp,$fp
+	ld	$ra,48($sp)
+	ld	$fp,40($sp)
+	addu	$sp,$sp,64
+	j	$ra
+.LFE1:
+	.end	tig_initArray
+	.align 4
+	.globl	tig_allocRecord
+	.ent	tig_allocRecord
+tig_allocRecord:
+.LFB2:
+	.frame	$fp,64,$ra		# vars= 16, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,64
+.LCFI5:
+	sd	$ra,48($sp)
+.LCFI6:
+	sd	$fp,40($sp)
+.LCFI7:
+.LCFI8:
+	move	$fp,$sp
+.LCFI9:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	lw	$a0,16($fp)
+	la	$t9,malloc
+	jal	$ra,$t9
+	move	$v1,$v0
+	move	$v0,$v1
+	sw	$v0,28($fp)
+	sw	$v0,24($fp)
+	sw	$zero,20($fp)
+.L8:
+	lw	$v0,20($fp)
+	lw	$v1,16($fp)
+	slt	$v0,$v0,$v1
+	bne	$v0,$zero,.L11
+	b	.L9
+.L11:
+	addu	$v0,$fp,24
+	lw	$v1,0($v0)
+	sw	$zero,0($v1)
+	addu	$v1,$v1,4
+	sw	$v1,0($v0)
+.L10:
+	lw	$v0,20($fp)
+	addu	$v1,$v0,4
+	sw	$v1,20($fp)
+	b	.L8
+.L9:
+	lw	$v1,28($fp)
+	move	$v0,$v1
+	b	.L7
+.L7:
+	move	$sp,$fp
+	ld	$ra,48($sp)
+	ld	$fp,40($sp)
+	addu	$sp,$sp,64
+	j	$ra
+.LFE2:
+	.end	tig_allocRecord
+	.align 4
+	.globl	tig_stringEqual
+	.ent	tig_stringEqual
+tig_stringEqual:
+.LFB3:
+	.frame	$fp,48,$ra		# vars= 16, regs= 2/0, args= 0, extra= 16
+	.mask	0x50000000,-8
+	.fmask	0x00000000,0
+	subu	$sp,$sp,48
+.LCFI10:
+	sd	$fp,40($sp)
+.LCFI11:
+.LCFI12:
+	move	$fp,$sp
+.LCFI13:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	sw	$a1,20($fp)
+	lw	$v0,16($fp)
+	lw	$v1,20($fp)
+	bne	$v0,$v1,.L13
+	li	$v0,1			# 0x1
+	b	.L12
+.L13:
+	lw	$v0,16($fp)
+	lw	$v1,20($fp)
+	lw	$v0,0($v0)
+	lw	$v1,0($v1)
+	beq	$v0,$v1,.L14
+	move	$v0,$zero
+	b	.L12
+.L14:
+	.set	noreorder
+	nop
+	.set	reorder
+	sw	$zero,24($fp)
+.L15:
+	lw	$v0,16($fp)
+	lw	$v1,24($fp)
+	lw	$v0,0($v0)
+	slt	$v1,$v1,$v0
+	bne	$v1,$zero,.L18
+	b	.L16
+.L18:
+	lw	$v0,16($fp)
+	addu	$v1,$v0,4
+	lw	$a0,24($fp)
+	addu	$v0,$v1,$a0
+	lw	$v1,20($fp)
+	addu	$a0,$v1,4
+	lw	$v1,24($fp)
+	addu	$a0,$a0,$v1
+	lbu	$v0,0($v0)
+	lbu	$v1,0($a0)
+	beq	$v0,$v1,.L17
+	move	$v0,$zero
+	b	.L12
+.L19:
+.L17:
+	lw	$v0,24($fp)
+	addu	$v1,$v0,1
+	sw	$v1,24($fp)
+	b	.L15
+.L16:
+	li	$v0,1			# 0x1
+	b	.L12
+.L12:
+	move	$sp,$fp
+	ld	$fp,40($sp)
+	addu	$sp,$sp,48
+	j	$ra
+.LFE3:
+	.end	tig_stringEqual
+	.align 4
+	.globl	tig_print
+	.ent	tig_print
+tig_print:
+.LFB4:
+	.frame	$fp,64,$ra		# vars= 16, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,64
+.LCFI14:
+	sd	$ra,48($sp)
+.LCFI15:
+	sd	$fp,40($sp)
+.LCFI16:
+.LCFI17:
+	move	$fp,$sp
+.LCFI18:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	lw	$v0,16($fp)
+	addu	$v1,$v0,4
+	sw	$v1,24($fp)
+	sw	$zero,20($fp)
+.L21:
+	lw	$v0,16($fp)
+	lw	$v1,20($fp)
+	lw	$v0,0($v0)
+	slt	$v1,$v1,$v0
+	bne	$v1,$zero,.L24
+	b	.L22
+.L24:
+	lw	$v0,24($fp)
+	lbu	$v1,0($v0)
+	move	$a0,$v1
+	la	$t9,putchar
+	jal	$ra,$t9
+.L23:
+	lw	$v0,20($fp)
+	addu	$v1,$v0,1
+	sw	$v1,20($fp)
+	lw	$v0,24($fp)
+	addu	$v1,$v0,1
+	sw	$v1,24($fp)
+	b	.L21
+.L22:
+.L20:
+	move	$sp,$fp
+	ld	$ra,48($sp)
+	ld	$fp,40($sp)
+	addu	$sp,$sp,64
+	j	$ra
+.LFE4:
+	.end	tig_print
+	.globl	consts
+	.data
+	.align 4
+consts:
+	.word	0
+
+	.byte	0x0
+	.space	3
+	.space	2040
+	.globl	empty
+	.align 4
+empty:
+	.word	0
+
+	.byte	0x0
+	.space	3
+	.text
+	.align 4
+	.globl	main
+	.ent	main
+main:
+.LFB5:
+	.frame	$fp,64,$ra		# vars= 16, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,64
+.LCFI19:
+	sd	$ra,48($sp)
+.LCFI20:
+	sd	$fp,40($sp)
+.LCFI21:
+.LCFI22:
+	move	$fp,$sp
+.LCFI23:
+	.set	noat
+	.set	at
+	.set	noreorder
+	nop
+	.set	reorder
+	sw	$zero,16($fp)
+.L26:
+	lw	$v0,16($fp)
+	slt	$v1,$v0,256
+	bne	$v1,$zero,.L29
+	b	.L27
+.L29:
+	lw	$v0,16($fp)
+	move	$v1,$v0
+	sll	$v0,$v1,3
+	la	$v1,consts
+	addu	$v0,$v1,$v0
+	li	$v1,1			# 0x1
+	sw	$v1,0($v0)
+	lw	$v0,16($fp)
+	move	$v1,$v0
+	sll	$v0,$v1,3
+	la	$v1,consts
+	addu	$v0,$v0,$v1
+	lbu	$v1,16($fp)
+	sb	$v1,4($v0)
+.L28:
+	lw	$v0,16($fp)
+	addu	$v1,$v0,1
+	sw	$v1,16($fp)
+	b	.L26
+.L27:
+	move	$a0,$zero
+	la	$t9,tig_main
+	jal	$ra,$t9
+	move	$v1,$v0
+	move	$v0,$v1
+	b	.L25
+.L25:
+	move	$sp,$fp
+	ld	$ra,48($sp)
+	ld	$fp,40($sp)
+	addu	$sp,$sp,64
+	j	$ra
+.LFE5:
+	.end	main
+	.align 4
+	.globl	tig_ord
+	.ent	tig_ord
+tig_ord:
+.LFB6:
+	.frame	$fp,48,$ra		# vars= 16, regs= 2/0, args= 0, extra= 16
+	.mask	0x50000000,-8
+	.fmask	0x00000000,0
+	subu	$sp,$sp,48
+.LCFI24:
+	sd	$fp,40($sp)
+.LCFI25:
+.LCFI26:
+	move	$fp,$sp
+.LCFI27:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	lw	$v0,16($fp)
+	lw	$v1,0($v0)
+	bne	$v1,$zero,.L31
+	li	$v0,-1			# 0xffffffff
+	b	.L30
+	b	.L32
+.L31:
+	lw	$v0,16($fp)
+	lbu	$v1,4($v0)
+	move	$v0,$v1
+	b	.L30
+.L32:
+.L30:
+	move	$sp,$fp
+	ld	$fp,40($sp)
+	addu	$sp,$sp,48
+	j	$ra
+.LFE6:
+	.end	tig_ord
+	.align 4
+	.globl	tig_chr
+	.ent	tig_chr
+tig_chr:
+.LFB7:
+	.frame	$fp,64,$ra		# vars= 16, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,64
+.LCFI28:
+	sd	$ra,48($sp)
+.LCFI29:
+	sd	$fp,40($sp)
+.LCFI30:
+.LCFI31:
+	move	$fp,$sp
+.LCFI32:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	lw	$v0,16($fp)
+	bltz	$v0,.L35
+	lw	$v0,16($fp)
+	slt	$v1,$v0,256
+	beq	$v1,$zero,.L35
+	b	.L34
+.L35:
+	li	$a0,1			# 0x1
+	la	$t9,exit
+	jal	$ra,$t9
+.L34:
+	lw	$v0,16($fp)
+	move	$v1,$v0
+	sll	$v0,$v1,3
+	la	$a0,consts
+	addu	$v1,$v0,$a0
+	move	$v0,$v1
+	b	.L33
+.L33:
+	move	$sp,$fp
+	ld	$ra,48($sp)
+	ld	$fp,40($sp)
+	addu	$sp,$sp,64
+	j	$ra
+.LFE7:
+	.end	tig_chr
+	.align 4
+	.globl	tig_size
+	.ent	tig_size
+tig_size:
+.LFB8:
+	.frame	$fp,48,$ra		# vars= 16, regs= 2/0, args= 0, extra= 16
+	.mask	0x50000000,-8
+	.fmask	0x00000000,0
+	subu	$sp,$sp,48
+.LCFI33:
+	sd	$fp,40($sp)
+.LCFI34:
+.LCFI35:
+	move	$fp,$sp
+.LCFI36:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	lw	$v0,16($fp)
+	lw	$v1,0($v0)
+	move	$v0,$v1
+	b	.L36
+.L36:
+	move	$sp,$fp
+	ld	$fp,40($sp)
+	addu	$sp,$sp,48
+	j	$ra
+.LFE8:
+	.end	tig_size
+.data
+	.align 4
+.LC0:
+
+	.byte	0x73,0x75,0x62,0x73,0x74,0x72,0x69,0x6e
+	.byte	0x67,0x28,0x5b,0x25,0x64,0x5d,0x2c,0x25
+	.byte	0x64,0x2c,0x25,0x64,0x29,0x20,0x6f,0x75
+	.byte	0x74,0x20,0x6f,0x66,0x20,0x72,0x61,0x6e
+	.byte	0x67,0x65,0xa,0x0
+	.text
+	.align 4
+	.globl	tig_substring
+	.ent	tig_substring
+tig_substring:
+.LFB9:
+	.frame	$fp,80,$ra		# vars= 32, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,80
+.LCFI37:
+	sd	$ra,64($sp)
+.LCFI38:
+	sd	$fp,56($sp)
+.LCFI39:
+.LCFI40:
+	move	$fp,$sp
+.LCFI41:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	sw	$a1,20($fp)
+	sw	$a2,24($fp)
+	lw	$v0,20($fp)
+	bltz	$v0,.L39
+	lw	$v0,20($fp)
+	lw	$v1,24($fp)
+	addu	$v0,$v0,$v1
+	lw	$v1,16($fp)
+	lw	$a0,0($v1)
+	slt	$v0,$a0,$v0
+	bne	$v0,$zero,.L39
+	b	.L38
+.L39:
+	lw	$v0,16($fp)
+	la	$a0,.LC0
+	lw	$a1,0($v0)
+	lw	$a2,20($fp)
+	lw	$a3,24($fp)
+	la	$t9,printf
+	jal	$ra,$t9
+	li	$a0,1			# 0x1
+	la	$t9,exit
+	jal	$ra,$t9
+.L38:
+	lw	$v0,24($fp)
+	li	$v1,1			# 0x1
+	bne	$v0,$v1,.L40
+	lw	$v0,16($fp)
+	addu	$v1,$v0,4
+	lw	$v0,20($fp)
+	addu	$v1,$v1,$v0
+	lbu	$v0,0($v1)
+	move	$v1,$v0
+	sll	$v0,$v1,3
+	la	$a0,consts
+	addu	$v1,$v0,$a0
+	move	$v0,$v1
+	b	.L37
+.L40:
+	lw	$v1,24($fp)
+	addu	$v0,$v1,4
+	move	$a0,$v0
+	la	$t9,malloc
+	jal	$ra,$t9
+	sw	$v0,28($fp)
+	lw	$v0,28($fp)
+	lw	$v1,24($fp)
+	sw	$v1,0($v0)
+	sw	$zero,32($fp)
+.L41:
+	lw	$v0,32($fp)
+	lw	$v1,24($fp)
+	slt	$v0,$v0,$v1
+	bne	$v0,$zero,.L44
+	b	.L42
+.L44:
+	lw	$v0,28($fp)
+	addu	$v1,$v0,4
+	lw	$a0,32($fp)
+	addu	$v0,$v1,$a0
+	lw	$v1,16($fp)
+	lw	$a0,20($fp)
+	lw	$a1,32($fp)
+	addu	$a0,$a0,$a1
+	addu	$v1,$v1,4
+	addu	$a0,$v1,$a0
+	lbu	$v1,0($a0)
+	sb	$v1,0($v0)
+.L43:
+	lw	$v0,32($fp)
+	addu	$v1,$v0,1
+	sw	$v1,32($fp)
+	b	.L41
+.L42:
+	lw	$v1,28($fp)
+	move	$v0,$v1
+	b	.L37
+.L37:
+	move	$sp,$fp
+	ld	$ra,64($sp)
+	ld	$fp,56($sp)
+	addu	$sp,$sp,80
+	j	$ra
+.LFE9:
+	.end	tig_substring
+	.align 4
+	.globl	tig_concat
+	.ent	tig_concat
+tig_concat:
+.LFB10:
+	.frame	$fp,80,$ra		# vars= 32, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,80
+.LCFI42:
+	sd	$ra,64($sp)
+.LCFI43:
+	sd	$fp,56($sp)
+.LCFI44:
+.LCFI45:
+	move	$fp,$sp
+.LCFI46:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	sw	$a1,20($fp)
+	lw	$v0,16($fp)
+	lw	$v1,0($v0)
+	bne	$v1,$zero,.L46
+	lw	$v1,20($fp)
+	move	$v0,$v1
+	b	.L45
+	b	.L47
+.L46:
+	lw	$v0,20($fp)
+	lw	$v1,0($v0)
+	bne	$v1,$zero,.L48
+	lw	$v1,16($fp)
+	move	$v0,$v1
+	b	.L45
+	b	.L47
+.L48:
+	lw	$v0,16($fp)
+	lw	$v1,20($fp)
+	lw	$v0,0($v0)
+	lw	$v1,0($v1)
+	addu	$v0,$v0,$v1
+	sw	$v0,28($fp)
+	lw	$v1,28($fp)
+	addu	$v0,$v1,4
+	move	$a0,$v0
+	la	$t9,malloc
+	jal	$ra,$t9
+	sw	$v0,32($fp)
+	lw	$v0,32($fp)
+	lw	$v1,28($fp)
+	sw	$v1,0($v0)
+	sw	$zero,24($fp)
+.L50:
+	lw	$v0,16($fp)
+	lw	$v1,24($fp)
+	lw	$v0,0($v0)
+	slt	$v1,$v1,$v0
+	bne	$v1,$zero,.L53
+	b	.L51
+.L53:
+	lw	$v0,32($fp)
+	addu	$v1,$v0,4
+	lw	$a0,24($fp)
+	addu	$v0,$v1,$a0
+	lw	$v1,16($fp)
+	addu	$a0,$v1,4
+	lw	$v1,24($fp)
+	addu	$a0,$a0,$v1
+	lbu	$v1,0($a0)
+	sb	$v1,0($v0)
+.L52:
+	lw	$v0,24($fp)
+	addu	$v1,$v0,1
+	sw	$v1,24($fp)
+	b	.L50
+.L51:
+	.set	noreorder
+	nop
+	.set	reorder
+	sw	$zero,24($fp)
+.L54:
+	lw	$v0,20($fp)
+	lw	$v1,24($fp)
+	lw	$v0,0($v0)
+	slt	$v1,$v1,$v0
+	bne	$v1,$zero,.L57
+	b	.L55
+.L57:
+	lw	$v0,32($fp)
+	lw	$v1,16($fp)
+	lw	$a0,24($fp)
+	lw	$a1,0($v1)
+	addu	$v1,$a0,$a1
+	addu	$a0,$v0,4
+	addu	$v0,$a0,$v1
+	lw	$v1,20($fp)
+	addu	$a0,$v1,4
+	lw	$v1,24($fp)
+	addu	$a0,$a0,$v1
+	lbu	$v1,0($a0)
+	sb	$v1,0($v0)
+.L56:
+	lw	$v0,24($fp)
+	addu	$v1,$v0,1
+	sw	$v1,24($fp)
+	b	.L54
+.L55:
+	lw	$v1,32($fp)
+	move	$v0,$v1
+	b	.L45
+.L49:
+.L47:
+.L45:
+	move	$sp,$fp
+	ld	$ra,64($sp)
+	ld	$fp,56($sp)
+	addu	$sp,$sp,80
+	j	$ra
+.LFE10:
+	.end	tig_concat
+	.align 4
+	.globl	tig_not
+	.ent	tig_not
+tig_not:
+.LFB11:
+	.frame	$fp,48,$ra		# vars= 16, regs= 2/0, args= 0, extra= 16
+	.mask	0x50000000,-8
+	.fmask	0x00000000,0
+	subu	$sp,$sp,48
+.LCFI47:
+	sd	$fp,40($sp)
+.LCFI48:
+.LCFI49:
+	move	$fp,$sp
+.LCFI50:
+	.set	noat
+	.set	at
+	sw	$a0,16($fp)
+	lw	$v0,16($fp)
+	xori	$a0,$v0,0x0
+	sltu	$v1,$a0,1
+	move	$v0,$v1
+	b	.L58
+.L58:
+	move	$sp,$fp
+	ld	$fp,40($sp)
+	addu	$sp,$sp,48
+	j	$ra
+.LFE11:
+	.end	tig_not
+	.align 4
+	.globl	tig_getchar
+	.ent	tig_getchar
+tig_getchar:
+.LFB12:
+	.frame	$fp,48,$ra		# vars= 0, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,48
+.LCFI51:
+	sd	$ra,32($sp)
+.LCFI52:
+	sd	$fp,24($sp)
+.LCFI53:
+.LCFI54:
+	move	$fp,$sp
+.LCFI55:
+	.set	noat
+	.set	at
+	la	$t9,getchar
+	jal	$ra,$t9
+	move	$a0,$v0
+	la	$t9,tig_chr
+	jal	$ra,$t9
+	move	$v1,$v0
+	move	$v0,$v1
+	b	.L59
+.L59:
+	move	$sp,$fp
+	ld	$ra,32($sp)
+	ld	$fp,24($sp)
+	addu	$sp,$sp,48
+	j	$ra
+.LFE12:
+	.end	tig_getchar
+tig_flush:
+  j $ra
+  .end tig_flush
+tig_exit:
+  j exit
+  .end tig_exit
+# system calls for Tiger, when running on SPIM
+#
+# $Id: sysspim.s,v 1.1 2002/08/25 05:06:41 shivers Exp $
+
+	.globl malloc
+	.ent malloc
+	.text
+malloc:
+	# round up the requested amount to a multiple of 4
+	add $a0, $a0, 3
+	srl $a0, $a0, 2
+	sll $a0, $a0, 2
+
+	# allocate the memory with sbrk()
+	li $v0, 9
+	syscall
+	
+	j $ra
+
+	.end malloc
+
+	
+
+	.data
+	.align 4
+getchar_buf:	.byte 0, 0
+
+	.text
+getchar:
+	# read the character
+	la $a0, getchar_buf
+	li $a1, 2
+	li $v0, 8
+	syscall
+
+	# return it
+	lb $v0, ($a0)
+	j $ra
+	
+
+	.data
+	.align 4
+putchar_buf:	.byte 0, 0
+
+	.text
+putchar:
+	# save the character so that it is NUL-terminated 
+	la $t0, putchar_buf
+	sb $a0, ($t0)
+
+	# print it out
+	la $a0, putchar_buf
+	li $v0, 4
+	syscall
+
+	j $ra
+
+
+	.text	
+# just prints the format string, not the arguments
+printf:
+	li $v0, 4
+	syscall
+	j $ra
+
+
+	.text
+exit:
+	li $v0, 10
+	syscall
+	
+.data
+L4 : .ascii "aname" 
+L5 : .ascii "somewhere" 
+L9 : .ascii "" 
+L13 : .ascii "Kapoios" 
+L14 : .ascii "Kapou" 
+L15 : .ascii "Allos" 
+L31 : .ascii "kati" 
+L38 : .ascii "sfd" 
+L39 : .ascii "sdf" 
+.text
+# ----- emit tig_main -----
+tig_main:
+move $fp, $sp
+addi $sp, $sp, -44
+sw $ra, 4($sp)
+sw $fp, 0($sp)
+L47:
+sw $a0, -4($fp)
+sw $s0, -8($fp)
+sw $s1, -12($fp)
+sw $s2, -16($fp)
+sw $s3, -20($fp)
+sw $s4, -24($fp)
+sw $s5, -28($fp)
+sw $s6, -32($fp)
+sw $s7, -36($fp)
+addi $t1, $0, 10
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+addi $a0, $t0, 4
+jal malloc
+addi $t0, $0, 0
+L3:
+addi $t2, $0, 10
+sub $t3, $t2, $t0
+addi $t2, $0, 0
+bne $t3, $t2, L2
+L1:
+sw $t1, 0($v0)
+addi $t6, $v0, 4
+addi $t2, $0, 5
+addi $t0, $0, 4
+mul $t0, $t2, $t0
+addi $a0, $t0, 4
+jal malloc
+move $t3, $v0
+addi $t1, $0, 0
 L8:
-addi t178, $0, 0
-blt t140, t178, L7
-L9:
-addi t181, $0, 0
-addi t182, $0, 4
-mul t180, t181, t182
-add t179, t132, t180
-addi t183, $0, 1
-sw t183, 0(t179)
-addi t184, $0, 9
-add t142, t184, $0
-lw t185, -4(t132)
-add t143, t185, $0
-bge t142, t143, L10
-L11:
-addi t186, $0, 0
-blt t142, t186, L10
+addi $t0, $0, 5
+sub $t4, $t0, $t1
+addi $t0, $0, 0
+bne $t4, $t0, L7
+L6:
+sw $t2, 0($t3)
+addi $t5, $t3, 4
+addi $t1, $0, 100
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+addi $a0, $t0, 4
+jal malloc
+addi $t0, $0, 0
 L12:
-addi t189, $0, 9
-addi t190, $0, 4
-mul t188, t189, t190
-add t187, t132, t188
-addi t191, $0, 3
-sw t191, 0(t187)
-addi t192, $0, 3
-add t144, t192, $0
-lw t193, -4(t134)
-add t145, t193, $0
-bge t144, t145, L13
-L14:
-addi t194, $0, 0
-blt t144, t194, L13
-L15:
-addi t198, $0, 3
-addi t199, $0, 4
-mul t197, t198, t199
-add t196, t134, t197
-lw t195, 0(t196)
-la t200, L16
-sw t200, 0(t195)
-addi t201, $0, 1
-add t146, t201, $0
-lw t202, -4(t134)
-add t147, t202, $0
-bge t146, t147, L17
-L18:
-addi t203, $0, 0
-blt t146, t203, L17
-L19:
-addi t207, $0, 1
-addi t208, $0, 4
-mul t206, t207, t208
-add t205, t134, t206
-lw t204, 0(t205)
-addi t209, $0, 23
-sw t209, 12(t204)
-addi t210, $0, 34
-add t148, t210, $0
-lw t211, -4(t135)
-add t149, t211, $0
-bge t148, t149, L20
-L21:
-addi t212, $0, 0
-blt t148, t212, L20
-L22:
-addi t215, $0, 34
-addi t216, $0, 4
-mul t214, t215, t216
-add t213, t135, t214
-la t217, L23
-sw t217, 0(t213)
-la t218, L24
-sw t218, 0(t137)
-addi t219, $0, 0
-add t150, t219, $0
-lw t221, 4(t139)
-lw t220, -4(t221)
-add t151, t220, $0
-bge t150, t151, L25
-L26:
-addi t222, $0, 0
-blt t150, t222, L25
-L27:
-lw t224, 4(t139)
-addi t226, $0, 0
-addi t227, $0, 4
-mul t225, t226, t227
-add t223, t224, t225
-addi t228, $0, 2323
-sw t228, 0(t223)
-addi t229, $0, 2
-add t152, t229, $0
-lw t231, 4(t139)
-lw t230, -4(t231)
-add t153, t230, $0
-bge t152, t153, L28
-L29:
-addi t232, $0, 0
-blt t152, t232, L28
-L30:
-lw t234, 4(t139)
-addi t236, $0, 2
-addi t237, $0, 4
-mul t235, t236, t237
-add t233, t234, t235
-addi t238, $0, 2323
-sw t238, 0(t233)
-addi t239, $0, 0
-add t106, t239, $0
-lw t240, -8(t100)
-add t120, t240, $0
-lw t241, -12(t100)
-add t121, t241, $0
-lw t242, -16(t100)
-add t122, t242, $0
-lw t243, -20(t100)
-add t123, t243, $0
-lw t244, -24(t100)
-add t124, t244, $0
-lw t245, -28(t100)
-add t125, t245, $0
-lw t246, -32(t100)
-add t126, t246, $0
-lw t247, -36(t100)
-add t127, t247, $0
-j L31 
-L7:
-addi t248, $0, 1
-add t108, t248, $0
-jal exit 
-j L9 
+addi $t2, $0, 100
+sub $t3, $t2, $t0
+addi $t2, $0, 0
+bne $t3, $t2, L11
 L10:
-addi t249, $0, 1
-add t108, t249, $0
-jal exit 
+sw $t1, 0($v0)
+addi $t4, $v0, 4
+addi $a0, $0, 16
+jal malloc
+la $t0, L13
+sw $t0, 0($v0)
+la $t0, L14
+sw $t0, 4($v0)
+addi $t0, $0, 2432
+sw $t0, 8($v0)
+addi $t0, $0, 44
+sw $t0, 12($v0)
+move $t3, $v0
+addi $a0, $0, 8
+jal malloc
+move $t2, $v0
+la $t0, L15
+sw $t0, 0($t2)
+addi $t0, $t2, 4
+addi $t7, $0, 3
+addi $t1, $0, 4
+mul $t1, $t7, $t1
+addi $a0, $t1, 4
+jal malloc
+addi $t1, $0, 0
+L21:
+addi $t8, $0, 3
+sub $t9, $t8, $t1
+addi $t8, $0, 0
+bne $t9, $t8, L20
+L19:
+sw $t7, 0($v0)
+addi $t1, $v0, 4
+sw $t1, 0($t0)
+addi $t1, $0, 0
+lw $t0, -4($t6)
+bge $t1, $t0, L22
+L23:
+addi $t0, $0, 0
+blt $t1, $t0, L22
+L24:
+addi $t1, $0, 0
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t1, $t6, $t0
+addi $t0, $0, 1
+sw $t0, 0($t1)
+addi $t1, $0, 9
+lw $t0, -4($t6)
+bge $t1, $t0, L25
+L26:
+addi $t0, $0, 0
+blt $t1, $t0, L25
+L27:
+addi $t1, $0, 9
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t1, $t6, $t0
+addi $t0, $0, 3
+sw $t0, 0($t1)
+addi $t1, $0, 3
+lw $t0, -4($t5)
+bge $t1, $t0, L28
+L29:
+addi $t0, $0, 0
+blt $t1, $t0, L28
+L30:
+addi $t1, $0, 3
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t0, $t5, $t0
+lw $t1, 0($t0)
+la $t0, L31
+sw $t0, 0($t1)
+addi $t1, $0, 1
+lw $t0, -4($t5)
+bge $t1, $t0, L32
+L33:
+addi $t0, $0, 0
+blt $t1, $t0, L32
+L34:
+addi $t1, $0, 1
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t0, $t5, $t0
+lw $t1, 0($t0)
+addi $t0, $0, 23
+sw $t0, 12($t1)
+addi $t1, $0, 34
+lw $t0, -4($t4)
+bge $t1, $t0, L35
+L36:
+addi $t0, $0, 0
+blt $t1, $t0, L35
+L37:
+addi $t1, $0, 34
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t1, $t4, $t0
+la $t0, L38
+sw $t0, 0($t1)
+la $t0, L39
+sw $t0, 0($t3)
+addi $t1, $0, 0
+lw $t0, 4($t2)
+lw $t0, -4($t0)
+bge $t1, $t0, L40
+L41:
+addi $t0, $0, 0
+blt $t1, $t0, L40
+L42:
+lw $t3, 4($t2)
+addi $t1, $0, 0
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t1, $t3, $t0
+addi $t0, $0, 2323
+sw $t0, 0($t1)
+addi $t1, $0, 2
+lw $t0, 4($t2)
+lw $t0, -4($t0)
+bge $t1, $t0, L43
+L44:
+addi $t0, $0, 0
+blt $t1, $t0, L43
+L45:
+lw $t2, 4($t2)
+addi $t1, $0, 2
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t1, $t2, $t0
+addi $t0, $0, 2323
+sw $t0, 0($t1)
+addi $v0, $0, 0
+lw $s0, -8($fp)
+lw $s1, -12($fp)
+lw $s2, -16($fp)
+lw $s3, -20($fp)
+lw $s4, -24($fp)
+lw $s5, -28($fp)
+lw $s6, -32($fp)
+lw $s7, -36($fp)
+j L46 
+L2:
+addi $t2, $0, 4
+mul $t2, $t0, $t2
+add $t3, $v0, $t2
+addi $t2, $0, 0
+sw $t2, 0($t3)
+addi $t0, $t0, 1
+j L3 
+L7:
+addi $t0, $0, 4
+mul $t0, $t1, $t0
+add $t0, $t3, $t0
+addi $a0, $0, 16
+jal malloc
+la $t4, L4
+sw $t4, 0($v0)
+la $t4, L5
+sw $t4, 4($v0)
+addi $t4, $0, 0
+sw $t4, 8($v0)
+addi $t4, $0, 0
+sw $t4, 12($v0)
+sw $v0, 0($t0)
+addi $t1, $t1, 1
+j L8 
+L11:
+addi $t2, $0, 4
+mul $t2, $t0, $t2
+add $t3, $v0, $t2
+la $t2, L9
+sw $t2, 0($t3)
+addi $t0, $t0, 1
 j L12 
-L13:
-addi t250, $0, 1
-add t108, t250, $0
-jal exit 
-j L15 
-L17:
-addi t251, $0, 1
-add t108, t251, $0
-jal exit 
-j L19 
 L20:
-addi t252, $0, 1
-add t108, t252, $0
-jal exit 
-j L22 
+addi $t8, $0, 4
+mul $t8, $t1, $t8
+add $t9, $v0, $t8
+addi $t8, $0, 1900
+sw $t8, 0($t9)
+addi $t1, $t1, 1
+j L21 
+L22:
+addi $a0, $0, 1
+jal exit
+j L24 
 L25:
-addi t253, $0, 1
-add t108, t253, $0
-jal exit 
+addi $a0, $0, 1
+jal exit
 j L27 
 L28:
-addi t254, $0, 1
-add t108, t254, $0
-jal exit 
+addi $a0, $0, 1
+jal exit
 j L30 
-L31:
-lw t102, 8(t101)
-lw t100, 4(t101)
-addi t101, t101, 44
-jr t102
+L32:
+addi $a0, $0, 1
+jal exit
+j L34 
+L35:
+addi $a0, $0, 1
+jal exit
+j L37 
+L40:
+addi $a0, $0, 1
+jal exit
+j L42 
+L43:
+addi $a0, $0, 1
+jal exit
+j L45 
+L46:
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 44
+jr $ra
