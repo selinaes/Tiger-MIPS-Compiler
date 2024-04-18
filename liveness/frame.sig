@@ -23,6 +23,7 @@ signature FRAME = sig
     val printFrag: TextIO.outstream * frag list -> unit
 
     val tempToString : Temp.temp -> string
+    (* val colorableTempMap : register Temp.Table.table *)
     val tempMap: register Temp.Table.table
     val registers: register list
     val getAccessOffset: access -> int

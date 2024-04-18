@@ -51,8 +51,8 @@ struct
 
             (* 3 node *) 
                 | munchStm(T.MOVE(T.MEM(T.CONST i),e2)) =
-                    emit(A.OPER{assem="sw `s0, " ^ intToString(i) ^ "($0)\n",
-                    src=[munchExp e2], dst=[],jump=NONE})
+                    emit(A.OPER{assem="sw `s0, " ^ intToString(i) ^ "(`s1)\n",
+                    src=[munchExp e2, Frame.ZERO], dst=[],jump=NONE})
 
             (* 2 node *)
                 | munchStm(T.MOVE(T.MEM(e1),e2)) =
@@ -92,8 +92,8 @@ struct
                     result (fn r => emit (A.OPER{assem= "lw `d0," ^ intToString(~i) ^ "(`s0)\n",
                                                  src= [munchExp e1], dst=[r], jump=NONE}))
                 | munchExp(T.MEM(T.CONST i)) =
-                    result(fn r => emit(A.OPER {assem="lw `d0," ^ intToString(i) ^ "($0)\n",
-                                                src=[], dst=[r], jump=NONE}))
+                    result(fn r => emit(A.OPER {assem="lw `d0," ^ intToString(i) ^ "(`s0)\n",
+                                                src=[Frame.ZERO], dst=[r], jump=NONE}))
                 (* Optimize for coalesce *)
                 | munchExp(T.BINOP(T.PLUS,T.CONST 0,e1)) = 
                     result(fn r => emit(A.MOVE {assem="addi `d0, `s0\n",
@@ -144,8 +144,8 @@ struct
                     result(fn r => emit(A.OPER {assem="lw `d0, 0(`s0)\n",
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
                 | munchExp(T.CONST i) =
-                    result(fn r => emit(A.OPER{assem="addi `d0, $0, " ^ intToString(i) ^ "\n",
-                                            src=[], dst=[r], jump=NONE}))
+                    result(fn r => emit(A.OPER{assem="addi `d0, `s0, " ^ intToString(i) ^ "\n",
+                                            src=[Frame.ZERO], dst=[r], jump=NONE}))
                 | munchExp(T.BINOP(binop,e1,e2)) =
                     result(fn r => emit(A.OPER{assem=binopTrAsmMap binop ^ " `d0, `s0, `s1\n",
                                             src=[munchExp e1, munchExp e2], dst=[r],
