@@ -43,8 +43,8 @@ structure Main = struct
  
     in  
         (
-            app (fn i => TextIO.output(out,format1 i)) instrs';
-            TextIO.output(out,"# -------------------\n");    
+            (* app (fn i => TextIO.output(out,format1 i)) instrs'; *)
+            (* TextIO.output(out,"# -------------------\n");     *)
         app (fn i => TextIO.output(out,format0 i)) body'')
     end
     | emitproc out (F.STRING(lab,s)) = (TextIO.output(out,F.string(lab,s)))

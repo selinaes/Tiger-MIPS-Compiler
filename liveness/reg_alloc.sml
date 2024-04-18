@@ -101,7 +101,7 @@ struct
         in
             let
                 val _ =  app allocSpill spill;
-                val x = foldr changeSpillInstrs [] instrs
+                val x = foldl changeSpillInstrs [] instrs
                 val format1 = Assem.format(Temp.makestring)
             in
                 (* print spill access map *)
@@ -136,8 +136,8 @@ struct
             (* val filteredInstrs = List.filter removeRedundantMove instrs *)
         in
             if spills = [] then
-                (* (List.filter removeRedundantMove  *)
-                (instrs, allocMapping)
+                (List.filter removeRedundantMove 
+                instrs, allocMapping)
             else 
                 let
                     val x = rewriteProgram(instrs, spills, frame)
