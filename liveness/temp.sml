@@ -21,7 +21,7 @@ local structure F = Format
  in
     fun resetLabs() = (resetLocal labs; resetTemp())
     fun newlabel() = Symbol.symbol(F.format "L%d" [F.INT(postinc labs)])
-    val namedlabel = Symbol.symbol2
+    val namedlabel = Symbol.symbol
 end
 
 

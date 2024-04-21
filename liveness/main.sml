@@ -20,7 +20,7 @@ structure Main = struct
         (* val _ = TextIO.output(out,"# ----- linearize " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
         val stms = Canon.linearize body
         val stms' = Canon.traceSchedule(Canon.basicBlocks stms)
-        (* val _ = app (fn s => Printtree.printtree(out,s)) stms'; *)
+        (* val _ = app (fn s => Printtree.printtree(TextIO.stdOut,s)) stms'; *)
 
         (* val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
         val instrs = List.concat(map (MipsGen.codegen frame) stms') 
@@ -48,7 +48,7 @@ structure Main = struct
   *)
     in  
         (
-            (* app (fn i => TextIO.output(out,format1 i)) instrs'; *)
+            (* app (fn i => TextIO.output(TextIO.stdOut,format1 i)) instrs'; *)
             (* TextIO.output(out,"# -------------------\n");     *)
         app (fn i => TextIO.output(out,format0 i)) body'')
     end
@@ -84,6 +84,7 @@ structure Main = struct
           (readFileAndOut(out, "runtime-le.s");
             readFileAndOut(out, "sysspim.s");
             TextIO.output(out,".data\n");
+            (* TextIO.output(out,".align 4\n"); *)
             app (emitproc out) strs;
             TextIO.output(out,".text\n");
             (* TextIO.output(out,"tig_main:\n"); *)

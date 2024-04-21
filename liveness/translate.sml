@@ -68,15 +68,15 @@ struct
         (Err.impossible  "followLink: does not find matched frame. definedLevel reach to outmost"; dummyTree)
     | followLink(_, OUTMOST): Tr.exp = 
         (Err.impossible "followLink: does not find matched frame. currentLevel reach to outmost"; dummyTree)
-    | followLink(definedParentLevel, currentLevel): Tr.exp = 
-        let val (LEVEL{parent=_, frame=_, unique=unique'}) = definedParentLevel    
+    | followLink(targetLevel, currentLevel): Tr.exp = 
+        let val (LEVEL{parent=_, frame=_, unique=unique'}) = targetLevel    
             val (LEVEL{parent=parentLevel, frame=_, unique=unique}) = currentLevel
         in
           if unique = unique'
                 then 
                     Tr.TEMP Frame.FP
                 else
-                    Tr.MEM(followLink(definedParentLevel, parentLevel))
+                    Tr.MEM(followLink(targetLevel, parentLevel))
         end
 
     
@@ -87,9 +87,10 @@ struct
         in
             Ex(Tr.CALL(Tr.NAME callLabel, exArgs))
         end
-    | callIR(callLabel: Temp.label, args: exp list, LEVEL {parent, frame, unique}, callLevel: level): exp =
+    | callIR(callLabel: Temp.label, args: exp list, LEVEL {parent=definedParent, frame, unique}, callLevel: level): exp =
         let
-            val foundLink = followLink(parent, callLevel)
+            (* SL = enclosing's FP = definedParent's fp *)
+            val foundLink = followLink(definedParent, callLevel) (* definedParent can be as low as self (callLevel) *)
             val exArgs: Tr.exp list = map unEx args
         in
             Ex(Tr.CALL(Tr.NAME callLabel, foundLink :: exArgs))

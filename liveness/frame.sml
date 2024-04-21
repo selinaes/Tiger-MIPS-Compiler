@@ -91,7 +91,7 @@ struct
              foldr (fn ((s, t), acc) => Temp.Table.enter(acc, s, t)) Temp.Table.empty baseRegs 
         end 
 
-    fun string(label, str) = Symbol.name label ^ " : .ascii \""^ str ^ "\" \n"
+    fun string(label, str) = ".align 4\n" ^ Symbol.name label ^ ": .asciiz \""^ str ^ "\" \n"
 
     fun tempToString (t: Temp.temp): string = 
         case Temp.Table.look(tempMap, t) of 
@@ -128,8 +128,13 @@ struct
                                     | 3 => Tree.TEMP A3
                                     | _ => Tree.MEM(Tree.BINOP(Tree.MINUS, Tree.TEMP (FP), Tree.CONST ((index-3)*4))))
                     val (to, toIR) = (case escape of 
-                                    true => (curSize := !curSize + wordSize; 
-                                             (InFrame(~(!curSize)), Tree.MEM(Tree.BINOP(Tree.MINUS, Tree.TEMP FP, Tree.CONST (!curSize)))))
+                                    true => (let
+                                                val res = (InFrame(~(!curSize)), Tree.MEM(Tree.BINOP(Tree.MINUS, Tree.TEMP FP, Tree.CONST (!curSize))))
+                                            in
+                                                curSize := !curSize + wordSize; 
+                                                res
+                                            end)
+                                          
                                     | false => 
                                         let
                                             val newReg = Temp.newtemp()
@@ -150,10 +155,15 @@ struct
     fun formals(frame: frame): access list = #formals frame
 
     fun allocLocal ({name, formals, stackSize, instrs}: frame) (escape:bool) : access = 
-        if escape then
-            (stackSize := !stackSize + wordSize; InFrame(~(!stackSize)))
-        else
-            InReg(Temp.newtemp())
+        let
+            val currAccess = InFrame(~(!stackSize))
+        in
+            if escape then
+                (stackSize := !stackSize + wordSize; currAccess)
+            else
+                InReg(Temp.newtemp())
+        end
+        
 
     fun exp(InFrame offset) fp = Tree.MEM(Tree.BINOP(Tree.PLUS, fp, Tree.CONST offset))
       | exp(InReg reg) fp = Tree.TEMP reg
@@ -199,19 +209,20 @@ struct
             (* Allocate more space for RA + FP, (sallee-save is done at procEntryExit1's allocLocal) *)
             val () = stackSize := !stackSize + 2 * wordSize
             (* Allocate Frame *)
-            val setnewFP = Assem.MOVE {assem ="move `d0, `s0\n",src =SP, dst=FP}
             val extendSP = Assem.OPER {assem="addi `d0, `s0, -" ^ Int.toString (!stackSize) ^ "\n", src=[SP], dst=[SP], jump=NONE}
-            val saveRA = Assem.OPER {assem="sw `s0, 4(`s1)\n", src=[RA,SP], dst=[], jump=NONE}
-            val saveFP = Assem.OPER {assem="sw `s0, 0(`s1)\n",src=[FP,SP], dst=[],jump=NONE}
+            val saveFP = Assem.OPER {assem="sw `s0, 4(`s1)\n",src=[FP,SP], dst=[],jump=NONE} (* save old fp *)
+            val saveRA = Assem.OPER {assem="sw `s0, 8(`s1)\n", src=[RA,SP], dst=[], jump=NONE}
+            val setnewFP = Assem.OPER {assem ="add `d0, `s0, " ^ Int.toString (!stackSize) ^"\n",src =[SP], dst=[FP], jump=NONE}
+            
             (* Deallocate Frame *)
-            val restoreRA = Assem.OPER {assem="lw `d0, 4(`s0)\n", src=[SP], dst=[RA], jump=NONE}
-            val restoreFP = Assem.OPER {assem="lw `d0, 0(`s0)\n", src=[SP], dst=[FP], jump=NONE}
+            val restoreRA = Assem.OPER {assem="lw `d0, 8(`s0)\n", src=[SP], dst=[RA], jump=NONE}
+            val restoreFP = Assem.OPER {assem="lw `d0, 4(`s0)\n", src=[SP], dst=[FP], jump=NONE}
             val resetSP = Assem.OPER {assem="addi `d0, `s0, " ^ Int.toString (!stackSize) ^ "\n", src=[SP], dst=[SP], jump=NONE}
             val jumpToRA = Assem.OPER {assem="jr $ra\n", src=[], dst=[], jump=SOME[]}
             (*  *)
         in
             {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
-            body = [labeling, setnewFP, extendSP, saveRA, saveFP]
+            body = [labeling, extendSP, saveFP, saveRA, setnewFP]
                     @body
                     @[restoreRA, restoreFP, resetSP, jumpToRA],
             epilog = "END " ^ Symbol.name name ^ "\n"}
