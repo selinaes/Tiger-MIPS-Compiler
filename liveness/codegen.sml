@@ -129,10 +129,16 @@ struct
                                                 src=[munchExp e1], dst=[r], jump=NONE}))
                 
                 | munchExp(T.CALL(T.NAME clbl, args)) = 
-                    (emit(A.OPER{assem="jal " ^ S.name clbl ^ "\n",
-                                    src=munchArgs (0, args),
-                                    dst=[Frame.RV],jump=NONE});
-                    Frame.RV)
+                    let
+                        val calluses = Frame.callersaves @ Frame.argregs
+                        val calldefs = [Frame.RV, Frame.V1, Frame.RA]
+                    in
+                        emit(A.OPER{assem="jal " ^ S.name clbl ^ "\n",
+                                    src=munchArgs (0, args) @ calluses,
+                                    dst=calldefs, jump=NONE});
+                        Frame.RV
+                    end
+                   
                 
                 (* 1 node *)
                 | munchExp(T.MEM(e1)) =

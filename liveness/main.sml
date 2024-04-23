@@ -48,7 +48,7 @@ structure Main = struct
   *)
     in  
         (
-            (* app (fn i => TextIO.output(TextIO.stdOut,format1 i)) instrs'; *)
+            (* app (fn i => TextIO.output(TextIO.stdOut,format1 i)) body''; *)
             (* TextIO.output(out,"# -------------------\n");     *)
         app (fn i => TextIO.output(out,format0 i)) body'')
     end

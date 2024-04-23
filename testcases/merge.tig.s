@@ -851,14 +851,14 @@ sw $s4, -20($fp)
 sw $s5, -24($fp)
 sw $s6, -28($fp)
 sw $s7, -32($fp)
-lw $t0, 0($fp)
-lw $t0, 0($t0)
-lw $a0, -4($t0)
+lw $s0, 0($fp)
+lw $s0, 0($s0)
+lw $a0, -4($s0)
 jal tig_ord
-move $t0, $v0
+move $s0, $v0
 la $a0, L1
 jal tig_ord
-bge $t0, $v0, L5
+bge $s0, $v0, L5
 L6:
 addi $v0, $0, 0
 L7:
@@ -872,19 +872,19 @@ lw $s6, -28($fp)
 lw $s7, -32($fp)
 j L43 
 L5:
-addi $t1, $0, 1
-lw $t0, 0($fp)
-lw $t0, 0($t0)
-lw $a0, -4($t0)
+addi $s1, $0, 1
+lw $s0, 0($fp)
+lw $s0, 0($s0)
+lw $a0, -4($s0)
 jal tig_ord
-move $t0, $v0
+move $s0, $v0
 la $a0, L2
 jal tig_ord
-ble $t0, $v0, L3
+ble $s0, $v0, L3
 L4:
-addi $t1, $0, 0
+addi $s1, $0, 0
 L3:
-move $v0, $t1
+move $v0, $s1
 j L7 
 L43:
 lw $ra, 8($sp)
@@ -908,22 +908,22 @@ sw $s5, -24($fp)
 sw $s6, -28($fp)
 sw $s7, -32($fp)
 L15:
-lw $t0, 0($fp)
-lw $t0, 0($t0)
-lw $a0, -4($t0)
+lw $s0, 0($fp)
+lw $s0, 0($s0)
+lw $a0, -4($s0)
 la $a1, L9
 jal tig_stringEqual
-addi $t0, $0, 0
-bne $v0, $t0, L11
+addi $s0, $0, 0
+bne $v0, $s0, L11
 L12:
-lw $t0, 0($fp)
-lw $t0, 0($t0)
-lw $a0, -4($t0)
+lw $s0, 0($fp)
+lw $s0, 0($s0)
+lw $a0, -4($s0)
 la $a1, L10
 jal tig_stringEqual
 L13:
-addi $t0, $0, 0
-bne $v0, $t0, L14
+addi $s0, $0, 0
+bne $v0, $s0, L14
 L8:
 addi $v0, $0, 0
 lw $s0, -4($fp)
@@ -936,11 +936,11 @@ lw $s6, -28($fp)
 lw $s7, -32($fp)
 j L45 
 L14:
-lw $t0, 0($fp)
-lw $t0, 0($t0)
-addi $t0, $t0, -4
+lw $s0, 0($fp)
+lw $s0, 0($s0)
+addi $s0, $s0, -4
 jal tig_getchar
-sw $v0, 0($t0)
+sw $v0, 0($s0)
 j L15 
 L11:
 addi $v0, $0, 1
@@ -957,6 +957,7 @@ sw $fp, 4($sp)
 sw $ra, 8($sp)
 add $fp, $sp, 44
 L48:
+move $ra, $a1
 sw $a0, 0($fp)
 sw $s0, -4($fp)
 sw $s1, -8($fp)
@@ -966,24 +967,23 @@ sw $s4, -20($fp)
 sw $s5, -24($fp)
 sw $s6, -28($fp)
 sw $s7, -32($fp)
-addi $t1, $0, 0
+addi $s1, $0, 0
 move $a0, $fp
 jal skipto
-move $t0, $a1
 move $a0, $fp
-lw $t2, 0($fp)
-lw $a1, -4($t2)
+lw $s0, 0($fp)
+lw $a1, -4($s0)
 jal isdigit
-sw $v0, 0($t0)
+sw $v0, 0($ra)
 L18:
 move $a0, $fp
-lw $t0, 0($fp)
-lw $a1, -4($t0)
+lw $s0, 0($fp)
+lw $a1, -4($s0)
 jal isdigit
-addi $t0, $0, 0
-bne $v0, $t0, L17
+addi $s0, $0, 0
+bne $v0, $s0, L17
 L16:
-move $v0, $t1
+move $v0, $s1
 lw $s0, -4($fp)
 lw $s1, -8($fp)
 lw $s2, -12($fp)
@@ -994,19 +994,22 @@ lw $s6, -28($fp)
 lw $s7, -32($fp)
 j L47 
 L17:
-addi $t0, $0, 10
-mul $t0, $t1, $t0
-lw $t1, 0($fp)
-lw $a0, -4($t1)
+addi $s0, $0, 10
+mul $s0, $s1, $s0
+lw $s1, 0($fp)
+lw $a0, -4($s1)
 jal tig_ord
-add $t0, $t0, $v0
+add $s0, $s0, $v0
 la $a0, L1
 jal tig_ord
-sub $t1, $t0, $v0
-lw $t0, 0($fp)
-addi $t0, $t0, -4
+sub $s1, $s0, $v0
+lw $s0, 0($fp)
+addi $s0, $s0, -4
 jal tig_getchar
-sw $v0, 0($t0)
+sw $v0, 0($s0)
+lw $s0, 0($fp)
+lw $a0, -4($s0)
+jal tig_print
 j L18 
 L47:
 lw $ra, 8($sp)
@@ -1031,16 +1034,16 @@ sw $s6, -28($fp)
 sw $s7, -32($fp)
 addi $a0, $0, 4
 jal malloc
-addi $t0, $0, 0
-sw $t0, 0($v0)
-move $t1, $v0
+addi $s0, $0, 0
+sw $s0, 0($v0)
+move $s1, $v0
 lw $a0, 0($fp)
-move $a1, $t1
+move $a1, $s1
 jal readint
-move $t0, $v0
-lw $t2, 0($t1)
-addi $t1, $0, 0
-bne $t2, $t1, L19
+move $s0, $v0
+lw $s2, 0($s1)
+addi $s1, $0, 0
+bne $s2, $s1, L19
 L20:
 addi $v0, $0, 0
 L21:
@@ -1056,13 +1059,13 @@ j L49
 L19:
 addi $a0, $0, 8
 jal malloc
-move $t1, $v0
-sw $t0, 0($t1)
-addi $t0, $t1, 4
+move $s1, $v0
+sw $s0, 0($s1)
+addi $s0, $s1, 4
 lw $a0, 0($fp)
 jal readlist
-sw $v0, 0($t0)
-move $v0, $t1
+sw $v0, 0($s0)
+move $v0, $s1
 j L21 
 L49:
 lw $ra, 8($sp)
@@ -1071,11 +1074,14 @@ addi $sp, $sp, 44
 jr $ra
 # ----- emit merge -----
 merge:
-addi $sp, $sp, -44
+addi $sp, $sp, -48
 sw $fp, 4($sp)
 sw $ra, 8($sp)
-add $fp, $sp, 44
+add $fp, $sp, 48
 L52:
+move $v0, $a2
+sw $v0, -36($fp)
+move $v1, $a1
 sw $a0, 0($fp)
 sw $s0, -4($fp)
 sw $s1, -8($fp)
@@ -1085,30 +1091,35 @@ sw $s4, -20($fp)
 sw $s5, -24($fp)
 sw $s6, -28($fp)
 sw $s7, -32($fp)
-addi $t0, $0, 0
-beq $a1, $t0, L28
+addi $s0, $0, 0
+beq $v1, $s0, L28
 L29:
-addi $t0, $0, 0
-beq $a2, $t0, L25
+addi $s1, $0, 0
+lw $s0, -36($fp)
+beq $s0, $s1, L25
 L26:
-lw $t1, 0($a1)
-lw $t0, 0($a2)
-blt $t1, $t0, L22
+lw $s1, 0($v1)
+lw $s0, -36($fp)
+lw $s0, 0($s0)
+blt $s1, $s0, L22
 L23:
 addi $a0, $0, 8
 jal malloc
-move $t1, $v0
-lw $t0, 0($a2)
-sw $t0, 0($t1)
-addi $t0, $t1, 4
+move $s1, $v0
+lw $s0, -36($fp)
+lw $s0, 0($s0)
+sw $s0, 0($s1)
+addi $s0, $s1, 4
 lw $a0, 0($fp)
-lw $a2, 4($a2)
+move $a1, $v1
+lw $s2, -36($fp)
+lw $a2, 4($s2)
 jal merge
-sw $v0, 0($t0)
+sw $v0, 0($s0)
 L24:
-move $a1, $t1
+move $v1, $s1
 L27:
-move $v0, $a1
+move $v0, $v1
 L30:
 lw $s0, -4($fp)
 lw $s1, -8($fp)
@@ -1120,26 +1131,27 @@ lw $s6, -28($fp)
 lw $s7, -32($fp)
 j L51 
 L28:
-move $v0, $a2
+lw $v0, -36($fp)
 j L30 
 L25:
 j L27 
 L22:
 addi $a0, $0, 8
 jal malloc
-move $t1, $v0
-lw $t0, 0($a1)
-sw $t0, 0($t1)
-addi $t0, $t1, 4
+move $s1, $v0
+lw $s0, 0($v1)
+sw $s0, 0($s1)
+addi $s0, $s1, 4
 lw $a0, 0($fp)
-lw $a1, 4($a1)
+lw $a1, 4($v1)
+lw $a2, -36($fp)
 jal merge
-sw $v0, 0($t0)
+sw $v0, 0($s0)
 j L24 
 L51:
 lw $ra, 8($sp)
 lw $fp, 4($sp)
-addi $sp, $sp, 44
+addi $sp, $sp, 48
 jr $ra
 # ----- emit f -----
 f:
@@ -1148,7 +1160,7 @@ sw $fp, 4($sp)
 sw $ra, 8($sp)
 add $fp, $sp, 44
 L54:
-move $t0, $a1
+move $v0, $a1
 sw $a0, 0($fp)
 sw $s0, -4($fp)
 sw $s1, -8($fp)
@@ -1158,8 +1170,8 @@ sw $s4, -20($fp)
 sw $s5, -24($fp)
 sw $s6, -28($fp)
 sw $s7, -32($fp)
-addi $t1, $0, 0
-bgt $t0, $t1, L31
+addi $s0, $0, 0
+bgt $v0, $s0, L31
 L32:
 addi $v0, $0, 0
 lw $s0, -4($fp)
@@ -1173,17 +1185,17 @@ lw $s7, -32($fp)
 j L53 
 L31:
 lw $a0, 0($fp)
-addi $t1, $0, 10
-div $a1, $t0, $t1
+addi $s0, $0, 10
+div $a1, $v0, $s0
 jal f
-addi $t1, $0, 10
-div $t2, $t0, $t1
-addi $t1, $0, 10
-mul $t1, $t2, $t1
-sub $t0, $t0, $t1
+addi $s0, $0, 10
+div $s1, $v0, $s0
+addi $s0, $0, 10
+mul $s0, $s1, $s0
+sub $s0, $v0, $s0
 la $a0, L1
 jal tig_ord
-add $a0, $t0, $v0
+add $a0, $s0, $v0
 jal tig_chr
 move $a0, $v0
 jal tig_print
@@ -1200,6 +1212,7 @@ sw $fp, 4($sp)
 sw $ra, 8($sp)
 add $fp, $sp, 44
 L56:
+move $ra, $a1
 sw $a0, 0($fp)
 sw $s0, -4($fp)
 sw $s1, -8($fp)
@@ -1209,11 +1222,11 @@ sw $s4, -20($fp)
 sw $s5, -24($fp)
 sw $s6, -28($fp)
 sw $s7, -32($fp)
-addi $t0, $0, 0
-blt $a1, $t0, L37
+addi $s0, $0, 0
+blt $ra, $s0, L37
 L38:
-addi $t0, $0, 0
-bgt $a1, $t0, L34
+addi $s0, $0, 0
+bgt $ra, $s0, L34
 L35:
 la $a0, L1
 jal tig_print
@@ -1232,12 +1245,13 @@ L37:
 la $a0, L33
 jal tig_print
 move $a0, $fp
-addi $t0, $0, 0
-sub $a1, $t0, $a1
+addi $s0, $0, 0
+sub $a1, $s0, $ra
 jal f
 j L39 
 L34:
 move $a0, $fp
+move $a1, $ra
 jal f
 j L36 
 L55:
@@ -1252,7 +1266,7 @@ sw $fp, 4($sp)
 sw $ra, 8($sp)
 add $fp, $sp, 44
 L58:
-move $t0, $a1
+move $ra, $a1
 sw $a0, 0($fp)
 sw $s0, -4($fp)
 sw $s1, -8($fp)
@@ -1262,16 +1276,16 @@ sw $s4, -20($fp)
 sw $s5, -24($fp)
 sw $s6, -28($fp)
 sw $s7, -32($fp)
-addi $t1, $0, 0
-beq $t0, $t1, L40
+addi $s0, $0, 0
+beq $ra, $s0, L40
 L41:
 lw $a0, 0($fp)
-lw $a1, 0($t0)
+lw $a1, 0($ra)
 jal printint
 la $a0, L9
 jal tig_print
 lw $a0, 0($fp)
-lw $a1, 4($t0)
+lw $a1, 4($ra)
 jal printlist
 L42:
 lw $s0, -4($fp)
@@ -1308,23 +1322,26 @@ sw $s4, -24($fp)
 sw $s5, -28($fp)
 sw $s6, -32($fp)
 sw $s7, -36($fp)
-addi $t0, $fp, -4
+addi $s0, $fp, -4
 jal tig_getchar
-sw $v0, 0($t0)
+sw $v0, 0($s0)
+lw $a0, -4($fp)
+jal tig_print
 move $a0, $fp
 jal readlist
-move $a1, $v0
-addi $t0, $fp, -4
+move $s1, $v0
+addi $s0, $fp, -4
 jal tig_getchar
-sw $v0, 0($t0)
+sw $v0, 0($s0)
 move $a0, $fp
 jal readlist
 move $a2, $v0
-move $t0, $fp
+move $s0, $fp
 move $a0, $fp
+move $a1, $s1
 jal merge
 move $a1, $v0
-move $a0, $t0
+move $a0, $s0
 jal printlist
 lw $s0, -8($fp)
 lw $s1, -12($fp)
