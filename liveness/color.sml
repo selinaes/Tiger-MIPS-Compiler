@@ -304,8 +304,9 @@ struct
                         )
                     );
                     
-                    coalescedNodes := NodeSet.add(!coalescedNodes, v);
-                    alias := Graph.Table.enter(!alias, v, u);
+                    coalescedNodes := NodeSet.add(!coalescedNodes, v); (* v = n32*)
+                    alias := Graph.Table.enter(!alias, v, u);  (* alias key=n=n32, value=n184 *)
+                    print ("combined " ^ Graph.nodename(v) ^ " into " ^ Graph.nodename u ^ "\n");
                     moveList := Graph.Table.enter (!moveList, u, 
                                EdgeSet.union(nodeMoves(u), nodeMoves(v)));
                     NodeSet.app handleAdjacent (adjacent v);
@@ -417,14 +418,17 @@ struct
                                         | NONE => ()
                                 else ()
                             (* val () = Graph.Table.appi (fn (k,i:NodeSet.set)=> print ((Int.toString k) ^ ", ")) (!adjList) *)
+                            val _ = print (Graph.nodename n ^"'s adjList: \n")
                             val ws: NodeSet.set = case Graph.Table.look(!adjList, n) of
-                                        SOME ws => ws
+                                        SOME ws => (NodeSet.app (fn w => print((Graph.nodename w) ^ ", ")) ws; ws)
                                         | NONE => NodeSet.empty
                                         (* ErrorMsg.impossible ("assignColors cannot find node in adjList, given: " ^ (Graph.nodename n)) *)
                         in
                             NodeSet.app forEachW ws;
                             if List.null (!okColors) then
+                                (print ("no available color for " ^(Graph.nodename n)^ "\n");
                                 spilledNodes := NodeSet.add(!spilledNodes, n)
+                                )
                             else
                                 
                                 (
@@ -432,17 +436,25 @@ struct
                                 (* (app (fn c => print (c ^ ", ")) (!okColors));
                                 print "\n"; *)
                                     color := Graph.Table.enter(!color, n, hd (!okColors));
-
-                                (* print ("Now coloring: " ^ Graph.nodename n ^ " to " ^ hd (!okColors) ^ "\n"); *)
+                                print ("Now coloring: " ^ Graph.nodename n ^ " to " ^ hd (!okColors) ^ "\n");
                                 coloredNodes := NodeSet.add(!coloredNodes, n))
                         end
                     fun colorOneCoalesce (n: Graph.node) = 
                         let
                             val nAlias = getAlias n
+                            
                         in
-                            case Graph.Table.look(!color, nAlias) of
+                            print ("nAlias in freezeworklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist, nAlias)) ^ "\n"); 
+                            print ("nAlias in spillWorklist - " ^ Bool.toString (NodeSet.member(!spillWorklist, nAlias)) ^ "\n"); 
+                            print ("nAlias in initial - " ^ Bool.toString (NodeSet.member(!initial, nAlias)) ^ "\n"); 
+                            print ("nAlias in simplifyWorklist - " ^ Bool.toString (NodeSet.member(!simplifyWorklist, nAlias)) ^ "\n"); 
+                            print ("nAlias in precolored - " ^ Bool.toString (NodeSet.member(!precolored, nAlias)) ^ "\n"); 
+                            print ("nAlias in spilledNodes - " ^ Bool.toString (NodeSet.member(!spilledNodes, nAlias)) ^ "\n"); 
+                            print ("nAlias in coalescedNodes - " ^ Bool.toString (NodeSet.member(!coalescedNodes, nAlias)) ^ "\n"); 
+                            print ("nAlias in coloredNodes - " ^ Bool.toString (NodeSet.member(!coloredNodes, nAlias)) ^ "\n"); 
+                            (case Graph.Table.look(!color, nAlias) of
                                 SOME c => (color := Graph.Table.enter(!color, n, c); coloredNodes := NodeSet.add(!coloredNodes, n))
-                                | NONE => ErrorMsg.impossible ("assignColors cannot find alias color, given: " ^ (Graph.nodename nAlias))
+                                | NONE => ErrorMsg.impossible ("assignColors cannot find alias color, given: orig-" ^ (Graph.nodename n) ^ ", alias-"^ (Graph.nodename nAlias)))
                         end
                 in
                     app forNinStack (rev(!selectStack));

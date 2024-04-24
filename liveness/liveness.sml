@@ -153,27 +153,38 @@ struct
                 end
 
             (* add edge to igraph, process 1 liveout set at a moment *)
-            fun addEdgesAtOneLiveset (ls : liveSet, gr: Graph.graph) = 
+            fun addEdgesAtOneLiveset (k: int, ls : liveSet, gr: Graph.graph) = 
                 let
+                    val instrNode = List.nth(G.nodes control, k)
+
+                    val defba = Option.getOpt(Graph.Table.look(def, instrNode), BitArray.bits (N, []))            
+                    val defidxs = BitArray.getBits defba
+
+                    val _ = print ("f" ^ (Int.toString k) ^ ":"^ livesetToString(ls) ^ "    ;   ");
+                    val _ = print ("defidxs are ")
+                    val _ = app (fn x => print("n"^Int.toString x ^ ", ")) defidxs 
+                    val _ = print ("\n")
+
                     val nodes = G.nodes gr
-                    val oneIdLst = BitArray.getBits(ls) 
-                    val num = length oneIdLst
+                    val oneIdLst = BitArray.getBits(ls) (* ids whose bit=1 *)
+                    (* val num = length oneIdLst *)
                     fun createEdge oneId = 
                         let
                             val n1 = List.nth(nodes, oneId)
-                            val lst = List.filter (fn x => x <> oneId) oneIdLst
+                            val lst = List.filter (fn x => x <> oneId) defidxs
                             fun secondLoop (i) = 
                                 let
                                     val n2 = List.nth(nodes, i)
                                 in
                                     G.mk_edge {from = n1, to = n2};
                                     G.mk_edge {from = n2, to = n1}
+                                    (* print ("n1, n2: " ^ Graph.nodename n1 ^ ", " ^ Graph.nodename n2 ^ "\n") *)
                                 end
                         in
                             app secondLoop lst
                         end
                 in
-                    (* print (livesetToString(ls) ^ "\n"); *)
+                    
                     app createEdge oneIdLst
                 end
                 
@@ -183,7 +194,7 @@ struct
             val gr = G.newGraph()
             val igraph = addAllINodes(gr)
             val igraph' = addAllMoves(igraph)
-            val _ = app (fn (k: int,v) => (addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap))
+            val _ = app (fn (k: int,v) => (addEdgesAtOneLiveset(k, v, gr))) (G.Table.listItemsi(!liveOutMap))
             (* val _ = app (fn (k: int,v) => (print ("n"^(Int.toString k)^": ");addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
 
         in

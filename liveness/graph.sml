@@ -108,7 +108,7 @@ struct
   structure Table = IntMapTable(type key = node
 				fun getInt(g,n) = n)
 
-
+  fun nodenum(g,i:int) = i
   fun nodename(g,i:int) = "n" ^ Int.toString(i)
   fun printNode (graph,i) = 
         let

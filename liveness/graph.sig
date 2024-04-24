@@ -33,6 +33,7 @@ sig
     sharing type Table.key = node
 
     val nodename: node -> string  (* for debugging only *)
+    val nodenum: node -> int
 
     val printGraph: TextIO.outstream * graph -> unit
     val printNode: graph * int-> unit

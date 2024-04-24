@@ -130,15 +130,21 @@ struct
                 
                 | munchExp(T.CALL(T.NAME clbl, args)) = 
                     let
-                        val calluses = Frame.callersaves @ Frame.argregs
-                        val calldefs = [Frame.RV, Frame.V1, Frame.RA]
+                        val calldefs = Frame.callersaves @ Frame.argregs @ [Frame.RV, Frame.V1, Frame.RA]
+
+                        val pairs = map (fn r => (Temp.newtemp (), r)) Frame.callersaves
+                        val srcs = map #1 pairs
+                        fun fetch a r = T.MOVE(T.TEMP r, T.TEMP a)
+                        fun store a r = T.MOVE(T.TEMP a, T.TEMP r)
                     in
+                        (* app (fn (a,r) => munchStm(store a r)) pairs; *)
                         emit(A.OPER{assem="jal " ^ S.name clbl ^ "\n",
-                                    src=munchArgs (0, args) @ calluses,
+                                    src=munchArgs (0, args),
                                     dst=calldefs, jump=NONE});
+                        emit(A.OPER{assem="", src =calldefs, dst=[], jump=NONE});
+                        (* app (fn (a,r) => munchStm(fetch a r)) (List.rev pairs); *) 
                         Frame.RV
                     end
-                   
                 
                 (* 1 node *)
                 | munchExp(T.MEM(e1)) =

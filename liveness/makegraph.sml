@@ -32,9 +32,19 @@ struct
                 let
                     
                     val node = G.newNode control
-                    val format0 = Assem.format(Temp.makestring)
-                    val str = format0 instr
-                    (* val _ = print ( G.nodename node ^ " : " ^String.substring(str,0,String.size(str)-1)^ "\n") *)
+
+                    val instrlst = [21, 16, 17, 18, 19, 20 , 22, 23]
+                    val _ = if (G.nodenum node = 21)
+                            then (
+                                let
+                                val format0 = Assem.format(Temp.makestring)
+                                val str = format0 instr
+                                in print ( G.nodename node ^ " : " ^String.substring(str,0,String.size(str)-1)^ "\n")
+                                end
+                            )
+                            else ()
+                    
+                    
 
                     val (srcs, dsts) = getInstrSrcDst instr
                     val bitDsts = BitArray.bits(N, map (fn x => x - 100) dsts)

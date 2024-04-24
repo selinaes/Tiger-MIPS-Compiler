@@ -136,7 +136,7 @@ struct
                 let
                     val x = rewriteProgram(instrs, spills, frame)
                 in
-                    (* print("rewrite program done\n"); *)
+                    print("rewrite program done\n");
                     alloc(x, frame)
                 end
             (* (List.filter removeRedundantMove instrs, allocMapping) *)

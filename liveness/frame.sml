@@ -91,7 +91,13 @@ struct
              foldr (fn ((s, t), acc) => Temp.Table.enter(acc, s, t)) Temp.Table.empty baseRegs 
         end 
 
-    fun string(label, str) = ".align 4\n" ^ Symbol.name label ^ ": .asciiz \""^ str ^ "\" \n"
+
+    fun escapeChar #"\n" = "\\n"
+      | escapeChar #"\t" = "\\t"
+      | escapeChar c = Char.toString c
+    fun string(lab, s) = (Symbol.name lab) ^ ":\n .word " ^ Int.toString(String.size(s)) ^ "\n .ascii \"" ^ (String.translate escapeChar s) ^ "\"\n"
+    
+    (* fun string(label, str) = ".align 4\n" ^ Symbol.name label ^ ": .asciiz \""^ str ^ "\" \n" *)
 
     fun tempToString (t: Temp.temp): string = 
         case Temp.Table.look(tempMap, t) of 
@@ -188,7 +194,7 @@ struct
                 end
             val tupleList = map (fn reg => (for1reg reg)) calleesaves
             val store = map #1 tupleList
-            val restore = map #2 tupleList
+            val restore = rev(map #2 tupleList)
             val lst = (!instrs@store@[body]@restore)
         in
             Tree.seq(lst)
