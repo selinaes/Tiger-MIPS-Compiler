@@ -823,46 +823,36 @@ exit:
 	syscall
 	
 .data
-L1 : .ascii "abc" 
-L2 : .ascii "ac" 
 .text
+# ----- emit xx -----
+xx:
+addi $sp, $sp, -48
+sw $fp, 4($sp)
+add $fp, $sp, 48
+L2:
+sw $a0, 0($fp)
+addi $v0, $a1, 1
+j L1 
+L1:
+lw $fp, 4($sp)
+addi $sp, $sp, 48
+jr $ra
 # ----- emit tig_main -----
 tig_main:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -52
+sw $fp, 4($sp)
+add $fp, $sp, 52
 L4:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
-addi $t1, $0, 1
-addi $t0, $0, 2
-add $t0, $t1, $t0
-la $a0, L1
-jal tig_print
-la $a0, L2
-jal tig_print
+sw $a0, 0($fp)
+sw $ra, -40($fp)
 addi $t0, $0, 1
-addi $t0, $t0, 2
-jal tig_flush
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
+addi $t0, $0, 2
+move $a0, $fp
+addi $a1, $0, 1
+jal xx
+lw $ra, -40($fp)
 j L3 
 L3:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+lw $fp, 4($sp)
+addi $sp, $sp, 52
 jr $ra

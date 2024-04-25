@@ -826,120 +826,102 @@ exit:
 .text
 # ----- emit tig_main -----
 tig_main:
-move $fp, $sp
-addi $sp, $sp, -88
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -120
+sw $fp, 4($sp)
+add $fp, $sp, 120
 L2:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
+sw $a0, 0($fp)
 addi $t0, $0, 1
 sw $t0, -40($fp)
 addi $t0, $0, 2
-sw $t0, -44($fp)
-addi $t0, $0, 3
-sw $t0, -48($fp)
-addi $t0, $0, 4
-sw $t0, -52($fp)
-addi $t0, $0, 5
-sw $t0, -56($fp)
-addi $t0, $0, 6
-sw $t0, -60($fp)
-addi $t0, $0, 7
-sw $t0, -64($fp)
-addi $t0, $0, 8
-sw $t0, -68($fp)
-addi $t0, $0, 9
-sw $t0, -72($fp)
-addi $t0, $0, 10
-sw $t0, -76($fp)
-addi $t0, $0, 11
-sw $t0, -80($fp)
-addi $t0, $0, 12
-move $v1, $t0
-addi $t0, $0, 13
-move $a3, $t0
-addi $t0, $0, 14
-move $a2, $t0
-addi $t0, $0, 15
-move $a1, $t0
-addi $t0, $0, 16
-move $a0, $t0
-addi $t0, $0, 17
-move $s7, $t0
-addi $t0, $0, 18
-move $s6, $t0
-addi $t0, $0, 19
-move $s5, $t0
-addi $t0, $0, 20
-move $s4, $t0
-addi $t0, $0, 21
-move $s3, $t0
-addi $t0, $0, 22
-move $s2, $t0
-addi $t0, $0, 23
-move $s1, $t0
-addi $t0, $0, 24
-move $s0, $t0
-addi $t0, $0, 25
-move $t9, $t0
-addi $t0, $0, 26
-move $t8, $t0
-addi $t0, $0, 27
-move $t7, $t0
-addi $t0, $0, 28
-move $t6, $t0
-addi $t0, $0, 29
-move $t5, $t0
-addi $t0, $0, 30
-move $t4, $t0
-addi $t0, $0, 31
-move $t3, $t0
-addi $t0, $0, 32
-move $t2, $t0
-addi $t0, $0, 33
-move $t1, $t0
-lw $t0, -40($fp)
-lw $v0, -44($fp)
-add $v0, $t0, $v0
+addi $t1, $0, 3
+sw $t1, -44($fp)
+addi $t1, $0, 4
+sw $t1, -48($fp)
+addi $t1, $0, 5
+sw $t1, -52($fp)
+addi $t1, $0, 6
+sw $t1, -56($fp)
+addi $t1, $0, 7
+sw $t1, -60($fp)
+addi $t1, $0, 8
+sw $t1, -64($fp)
+addi $t1, $0, 9
+sw $t1, -68($fp)
+addi $t1, $0, 10
+sw $t1, -72($fp)
+addi $t1, $0, 11
+sw $t1, -76($fp)
+addi $t1, $0, 12
+sw $t1, -80($fp)
+addi $t1, $0, 13
+sw $t1, -84($fp)
+addi $t1, $0, 14
+sw $t1, -88($fp)
+addi $t1, $0, 15
+sw $t1, -92($fp)
+addi $t1, $0, 16
+sw $t1, -96($fp)
+addi $t1, $0, 17
+sw $t1, -100($fp)
+addi $t1, $0, 18
+sw $t1, -104($fp)
+addi $t1, $0, 19
+sw $t1, -108($fp)
+addi $a3, $0, 20
+addi $a2, $0, 21
+addi $a1, $0, 22
+addi $a0, $0, 23
+addi $t9, $0, 24
+addi $t8, $0, 25
+addi $t7, $0, 26
+addi $t6, $0, 27
+addi $t5, $0, 28
+addi $t4, $0, 29
+addi $t3, $0, 30
+addi $t2, $0, 31
+addi $t1, $0, 32
+addi $v0, $0, 33
+lw $v1, -40($fp)
+add $v1, $v1, $t0
+lw $t0, -44($fp)
+add $v1, $v1, $t0
 lw $t0, -48($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -52($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -56($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -60($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -64($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -68($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -72($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -76($fp)
-add $v0, $v0, $t0
+add $v1, $v1, $t0
 lw $t0, -80($fp)
-add $t0, $v0, $t0
-add $t0, $t0, $v1
+add $v1, $v1, $t0
+lw $t0, -84($fp)
+add $v1, $v1, $t0
+lw $t0, -88($fp)
+add $v1, $v1, $t0
+lw $t0, -92($fp)
+add $v1, $v1, $t0
+lw $t0, -96($fp)
+add $v1, $v1, $t0
+lw $t0, -100($fp)
+add $v1, $v1, $t0
+lw $t0, -104($fp)
+add $v1, $v1, $t0
+lw $t0, -108($fp)
+add $t0, $v1, $t0
 add $t0, $t0, $a3
 add $t0, $t0, $a2
 add $t0, $t0, $a1
 add $t0, $t0, $a0
-add $t0, $t0, $s7
-add $t0, $t0, $s6
-add $t0, $t0, $s5
-add $t0, $t0, $s4
-add $t0, $t0, $s3
-add $t0, $t0, $s2
-add $t0, $t0, $s1
-add $t0, $t0, $s0
 add $t0, $t0, $t9
 add $t0, $t0, $t8
 add $t0, $t0, $t7
@@ -948,18 +930,10 @@ add $t0, $t0, $t5
 add $t0, $t0, $t4
 add $t0, $t0, $t3
 add $t0, $t0, $t2
-add $v0, $t0, $t1
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
+add $t0, $t0, $t1
+add $v0, $t0, $v0
 j L1 
 L1:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 88
+lw $fp, 4($sp)
+addi $sp, $sp, 120
 jr $ra
