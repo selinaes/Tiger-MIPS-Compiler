@@ -51,9 +51,14 @@ struct
             val color: Frame.register Graph.Table.table ref = ref Graph.Table.empty
             
             fun getDegree n = 
-                case Graph.Table.look(!degree, n) of
-                    SOME d => d
-                    | NONE => 0
+                    if (NodeSet.member(!precolored, n)) 
+                    then 
+                        (K)
+                    else
+                        (case Graph.Table.look(!degree, n) of
+                        SOME d => d
+                        | NONE => 0) (* No interference edge, won't add to degree *)
+                
             (* constructs the interference graph (and bit matrix) using the results of static liveness analysis, and also initializes the worklistMoves to contain all the moves in the program. *)
             fun build() = 
                 let    
@@ -110,12 +115,10 @@ struct
                                 addMove(n2, (n1, n2)) else ();
                             workListMoves := EdgeSet.add(!workListMoves, (n1, n2)))
                 in
-                    (List.app initColor (Graph.nodes graph); buildAdjSetAdjList (); computeDegree();  app addMoves moves
-
-                    (* print "moveList: ";
-                    List.app (fn (i,es) => print ((Int.toString i) ^ ",")) (Graph.Table.listItemsi(!moveList)) *)
-                    )
-                    
+                    (List.app initColor (Graph.nodes graph); 
+                    buildAdjSetAdjList (); 
+                    computeDegree();  
+                    app addMoves moves)
                 end
             
             fun nodeMoves (n: Graph.node) = 
@@ -129,8 +132,7 @@ struct
                 in
                     (* print ("moveRelated: " ^ (Graph.nodename n) ^ " is - " ^ Bool.toString res ^ "\n"); *)
                     res
-                end
-                )
+                end)
                 
             fun addNodeToWL n = 
                 if ((getDegree n) >= K) 
@@ -191,8 +193,8 @@ struct
                         fun forEachM m = 
                             if EdgeSet.member(!activeMoves, m) then
                                 (
-                                    (* print ("enableMoves: m in active moves - " ^ Bool.toString (EdgeSet.member(!activeMoves, m)) ^ "\n"); *)
-                                    activeMoves := EdgeSet.delete(!activeMoves, m);
+                                (* print ("enableMoves: m in active moves - " ^ Bool.toString (EdgeSet.member(!activeMoves, m)) ^ "\n"); *)
+                                activeMoves := EdgeSet.delete(!activeMoves, m);
                                 workListMoves := EdgeSet.add(!workListMoves, m))
                             else ()
                     in
@@ -235,9 +237,8 @@ struct
             fun simplify() = 
                 let
                     fun simplifyOneNode n = 
-                        (
-                            (* print ("simplify: n in simplifyWorklist - " ^ Bool.toString (NodeSet.member(!simplifyWorklist, n)) ^ "\n"); *)
-                            simplifyWorklist := NodeSet.delete(!simplifyWorklist, n);
+                        ((* print ("simplify: n in simplifyWorklist - " ^ Bool.toString (NodeSet.member(!simplifyWorklist, n)) ^ "\n"); *)
+                        simplifyWorklist := NodeSet.delete(!simplifyWorklist, n);
                         selectStack := !selectStack@[n];
                         NodeSet.app (fn m => decrementDegree m) (adjacent n))
                 in
@@ -251,7 +252,8 @@ struct
                         | NONE => ErrorMsg.impossible "getAlias node not exist"
                     )
                 else n
-
+            
+            (*George: t neigh either trivial, or shared, or precolored *)
             fun OK(t: Graph.node, r: Graph.node): bool = 
                 let
                     val tDegree = getDegree t
@@ -259,6 +261,7 @@ struct
                     tDegree < K orelse NodeSet.member(!precolored, t) orelse EdgeSet.member(!adjSet, (t, r))
                 end
 
+            (* Briggs: <K combined neighbors have significant degree *)
             fun conservative(nodes: NodeSet.set) = 
                 let
                     val k = ref 0
@@ -277,7 +280,6 @@ struct
                 let
                     val uDegree = getDegree u
                 in
-                    (* (print "enter addWorkList"); *)
                     if (not (NodeSet.member(!precolored, u)) andalso not (moveRelated(u)) andalso uDegree < K)
                     then
                         (
@@ -306,7 +308,7 @@ struct
                     
                     coalescedNodes := NodeSet.add(!coalescedNodes, v); (* v = n32*)
                     alias := Graph.Table.enter(!alias, v, u);  (* alias key=n=n32, value=n184 *)
-                    print ("combined " ^ Graph.nodename(v) ^ " into " ^ Graph.nodename u ^ "\n");
+                    (* print ("combined " ^ Graph.nodename(v) ^ " into " ^ Graph.nodename u ^ "\n"); *)
                     moveList := Graph.Table.enter (!moveList, u, 
                                EdgeSet.union(nodeMoves(u), nodeMoves(v)));
                     NodeSet.app handleAdjacent (adjacent v);
@@ -321,10 +323,17 @@ struct
                             val x' = getAlias(x)
                             val y' = getAlias(y)
                             val (u, v) = if NodeSet.member(!precolored, y') then (y',x') else (x',y')
+                            (* George, fulfill using v *)
                             fun checkVadjAllOK v = 
                                 let val tlist = adjacent(v)
                                 in NodeSet.all (fn t => OK(t, u)) tlist
                                 end  
+                            val vneighs: NodeSet.set = (case Graph.Table.look(!adjList, v) of
+                                                                SOME ws => ws
+                                                                | NONE => NodeSet.empty)
+                            val uneighs: NodeSet.set = (case Graph.Table.look(!adjList, u) of
+                                                                SOME ws => ws
+                                                                | NONE => NodeSet.empty)
                         in
                             (* print ("coalesce: m in worklistmoves - " ^ Bool.toString (EdgeSet.member(!workListMoves, m)) ^ "\n"); *)
                             workListMoves := EdgeSet.delete(!workListMoves, m);
@@ -334,12 +343,20 @@ struct
                                 if NodeSet.member(!precolored, v) orelse EdgeSet.member(!adjSet, (u,v))
                                 then (constrainedMoves := EdgeSet.add(!constrainedMoves, m); addWorkList(u); addWorkList(v))
                                 else 
-                                    if (NodeSet.member(!precolored, u) andalso checkVadjAllOK v 
-                                        orelse (not (NodeSet.member(!precolored, u))) 
-                                            andalso conservative(NodeSet.union(adjacent(u), adjacent(v))))
-                                    then (coalescedMoves := EdgeSet.add(!coalescedMoves,m); combine(u,v); addWorkList(u))
-                                    else
-                                        (activeMoves := EdgeSet.add(!activeMoves, m))
+                                    let
+                                        val isGeorge = (NodeSet.member(!precolored, u) andalso checkVadjAllOK v)
+                                        val isBriggs = (not (NodeSet.member(!precolored, u))) 
+                                                 andalso conservative(NodeSet.union(adjacent(u), adjacent(v)))
+                                    in
+                                        if (isGeorge orelse isBriggs)
+                                        then (
+                                            coalescedMoves := EdgeSet.add(!coalescedMoves,m); 
+                                            combine(u,v); 
+                                            addWorkList(u))
+                                        else
+                                            (activeMoves := EdgeSet.add(!activeMoves, m)) 
+
+                                    end
                         end
                         (* val (n1,n2) = EdgeSet.minItem (!workListMoves) *)
                 in
@@ -372,8 +389,7 @@ struct
                         print ("EdgeSet.numItems(nodeMoves v) = 0:"^Bool.toString (EdgeSet.numItems(nodeMoves v) = 0)); *)
                         (if (EdgeSet.isEmpty(nodeMoves v) andalso (getDegree v < K) andalso not (NodeSet.member(!precolored,v)))
                         then (
-                            print (Graph.nodename v); 
-                            freezeWorklist := NodeSet.delete(!freezeWorklist, v); (*问题在这*)
+                            freezeWorklist := NodeSet.delete(!freezeWorklist, v);
                             simplifyWorklist := NodeSet.add(!simplifyWorklist, v))
                         else ())
                     end
@@ -418,25 +434,28 @@ struct
                                         | NONE => ()
                                 else ()
                             (* val () = Graph.Table.appi (fn (k,i:NodeSet.set)=> print ((Int.toString k) ^ ", ")) (!adjList) *)
-                            val _ = print (Graph.nodename n ^"'s adjList: \n")
                             val ws: NodeSet.set = case Graph.Table.look(!adjList, n) of
-                                        SOME ws => (NodeSet.app (fn w => print((Graph.nodename w) ^ ", ")) ws; ws)
+                                        SOME ws => ws
                                         | NONE => NodeSet.empty
                                         (* ErrorMsg.impossible ("assignColors cannot find node in adjList, given: " ^ (Graph.nodename n)) *)
                         in
                             NodeSet.app forEachW ws;
+                            
                             if List.null (!okColors) then
-                                (print ("no available color for " ^(Graph.nodename n)^ "\n");
+                                (
+                                    (* (print (Graph.nodename n ^"'s adjList: \n");
+                                    NodeSet.app (fn w => print((Graph.nodename w) ^ ", ")) ws;
+                                    print ("no available color for " ^(Graph.nodename n)^ "\n"); *)
                                 spilledNodes := NodeSet.add(!spilledNodes, n)
                                 )
                             else
                                 
                                 (
-                                    (* print ("ok color for " ^ Graph.nodename n); *)
+                                (* print ("ok color for " ^ Graph.nodename n); *)
                                 (* (app (fn c => print (c ^ ", ")) (!okColors));
                                 print "\n"; *)
-                                    color := Graph.Table.enter(!color, n, hd (!okColors));
-                                print ("Now coloring: " ^ Graph.nodename n ^ " to " ^ hd (!okColors) ^ "\n");
+                                color := Graph.Table.enter(!color, n, hd (!okColors));
+                                (* print ("Now coloring: " ^ Graph.nodename n ^ " to " ^ hd (!okColors) ^ "\n"); *)
                                 coloredNodes := NodeSet.add(!coloredNodes, n))
                         end
                     fun colorOneCoalesce (n: Graph.node) = 
@@ -444,14 +463,14 @@ struct
                             val nAlias = getAlias n
                             
                         in
-                            print ("nAlias in freezeworklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist, nAlias)) ^ "\n"); 
+                            (* print ("nAlias in freezeworklist - " ^ Bool.toString (NodeSet.member(!freezeWorklist, nAlias)) ^ "\n"); 
                             print ("nAlias in spillWorklist - " ^ Bool.toString (NodeSet.member(!spillWorklist, nAlias)) ^ "\n"); 
                             print ("nAlias in initial - " ^ Bool.toString (NodeSet.member(!initial, nAlias)) ^ "\n"); 
                             print ("nAlias in simplifyWorklist - " ^ Bool.toString (NodeSet.member(!simplifyWorklist, nAlias)) ^ "\n"); 
                             print ("nAlias in precolored - " ^ Bool.toString (NodeSet.member(!precolored, nAlias)) ^ "\n"); 
                             print ("nAlias in spilledNodes - " ^ Bool.toString (NodeSet.member(!spilledNodes, nAlias)) ^ "\n"); 
                             print ("nAlias in coalescedNodes - " ^ Bool.toString (NodeSet.member(!coalescedNodes, nAlias)) ^ "\n"); 
-                            print ("nAlias in coloredNodes - " ^ Bool.toString (NodeSet.member(!coloredNodes, nAlias)) ^ "\n"); 
+                            print ("nAlias in coloredNodes - " ^ Bool.toString (NodeSet.member(!coloredNodes, nAlias)) ^ "\n");  *)
                             (case Graph.Table.look(!color, nAlias) of
                                 SOME c => (color := Graph.Table.enter(!color, n, c); coloredNodes := NodeSet.add(!coloredNodes, n))
                                 | NONE => ErrorMsg.impossible ("assignColors cannot find alias color, given: orig-" ^ (Graph.nodename n) ^ ", alias-"^ (Graph.nodename nAlias)))
@@ -499,10 +518,8 @@ struct
             (
             build();
             makeWorklist();
-            (* simplify(); *)
             iterateOptimizeStep();
             assignColors();
-            (* print ("spilledNodes: " ^ Int.toString(NodeSet.numItems(!spilledNodes)) ^ "\n"); *)
             (colorToAllocation(), List.map gtemp (NodeSet.toList(!spilledNodes)))
             )
         end

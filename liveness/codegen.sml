@@ -138,9 +138,11 @@ struct
                         fun store a r = T.MOVE(T.TEMP a, T.TEMP r)
                     in
                         (* app (fn (a,r) => munchStm(store a r)) pairs; *)
+                        
                         emit(A.OPER{assem="jal " ^ S.name clbl ^ "\n",
                                     src=munchArgs (0, args),
-                                    dst=calldefs, jump=NONE});
+                                    dst=[], jump=NONE});
+                        emit(A.OPER{assem="", src =[], dst=calldefs, jump=NONE});
                         emit(A.OPER{assem="", src =calldefs, dst=[], jump=NONE});
                         (* app (fn (a,r) => munchStm(fetch a r)) (List.rev pairs); *) 
                         Frame.RV

@@ -159,11 +159,11 @@ struct
 
                     val defba = Option.getOpt(Graph.Table.look(def, instrNode), BitArray.bits (N, []))            
                     val defidxs = BitArray.getBits defba
-
+(* 
                     val _ = print ("f" ^ (Int.toString k) ^ ":"^ livesetToString(ls) ^ "    ;   ");
                     val _ = print ("defidxs are ")
                     val _ = app (fn x => print("n"^Int.toString x ^ ", ")) defidxs 
-                    val _ = print ("\n")
+                    val _ = print ("\n") *)
 
                     val nodes = G.nodes gr
                     val oneIdLst = BitArray.getBits(ls) (* ids whose bit=1 *)

@@ -32,20 +32,18 @@ struct
                 let
                     
                     val node = G.newNode control
-
-                    val instrlst = [21, 16, 17, 18, 19, 20 , 22, 23]
-                    val _ = if (G.nodenum node = 21)
+                    (* val instrlst = [21, 16, 17, 18, 19, 20 , 22, 23] *)
+                    val instrlst = [25]
+                    (* String.substring(str,0,String.size(str)-1) *)
+                    (* val _ = if (List.exists (fn f => (f = G.nodenum node)) instrlst)
                             then (
                                 let
                                 val format0 = Assem.format(Temp.makestring)
                                 val str = format0 instr
-                                in print ( G.nodename node ^ " : " ^String.substring(str,0,String.size(str)-1)^ "\n")
+                                in print ( G.nodename node ^ " : " ^ str ^ "\n")
                                 end
                             )
-                            else ()
-                    
-                    
-
+                            else () *)
                     val (srcs, dsts) = getInstrSrcDst instr
                     val bitDsts = BitArray.bits(N, map (fn x => x - 100) dsts)
                     val bitSrcs = BitArray.bits(N, map (fn x => x - 100) srcs)
