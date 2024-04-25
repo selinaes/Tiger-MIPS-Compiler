@@ -823,39 +823,23 @@ exit:
 	syscall
 	
 .data
-.align 4
-L1: .asciiz "xqw" 
+L1:
+ .word 3
+ .ascii "xqw"
 .text
 # ----- emit tig_main -----
 tig_main:
-addi $sp, $sp, -44
+addi $sp, $sp, -12
 sw $fp, 4($sp)
 sw $ra, 8($sp)
-add $fp, $sp, 44
+add $fp, $sp, 12
 L3:
-sw $a0, 0($fp)
-sw $s0, -4($fp)
-sw $s1, -8($fp)
-sw $s2, -12($fp)
-sw $s3, -16($fp)
-sw $s4, -20($fp)
-sw $s5, -24($fp)
-sw $s6, -28($fp)
-sw $s7, -32($fp)
-addi $s0, $0, 0
+addi $t0, $0, 0
 la $a0, L1
 jal tig_print
-lw $s0, -4($fp)
-lw $s1, -8($fp)
-lw $s2, -12($fp)
-lw $s3, -16($fp)
-lw $s4, -20($fp)
-lw $s5, -24($fp)
-lw $s6, -28($fp)
-lw $s7, -32($fp)
-j L2 
+updownj L2 
 L2:
 lw $ra, 8($sp)
 lw $fp, 4($sp)
-addi $sp, $sp, 44
+addi $sp, $sp, 12
 jr $ra

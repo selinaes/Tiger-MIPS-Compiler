@@ -13,7 +13,7 @@ function readint(any: any) : int =
   in skipto();
      any.any := isdigit(buffer);
      while isdigit(buffer)
-       do (i := i*10+ord(buffer)-ord("0"); buffer := getchar());
+       do (i := i*10+ord(buffer)-ord("0"); buffer := getchar(); print(buffer));
      i
  end
 
@@ -31,20 +31,12 @@ function readint(any: any) : int =
    if a=nil then b
    else if b=nil then a
    else if a.first < b.first 
-      then (list{first=a.first,rest=merge(a.rest,b)})
-      else (list{first=b.first,rest=merge(a,b.rest)})
+      then list{first=a.first,rest=merge(a.rest,b)}
+      else list{first=b.first,rest=merge(a,b.rest)}
 
  function printint(i: int) =
- /* f(135) f(13) f(1) */
   let function f(i:int) = if i>0 
-	     then (f(i/10); 
-       print(
-        chr(
-          i-i/10*10
-          +ord("0")
-          )
-        )
-       )
+	     then (f(i/10); print(chr(i-i/10*10+ord("0"))))
    in if i<0 then (print("-"); f(-i))
       else if i>0 then f(i)
       else print("0")
@@ -54,15 +46,11 @@ function readint(any: any) : int =
    if l=nil then print("\n")
    else (printint(l.first); print(" "); printlist(l.rest))
 
-
- var list1 := (readlist())
+ var list1 := (print(buffer);readlist())
  var list2 := (buffer:=getchar(); readlist())
 
-  var sublist := list{first=357,rest=nil}
- var list3 := (list{first=135,rest=sublist})
+
   /* BODY OF MAIN PROGRAM */
- in 
-    /* printlist(list3); */
-    printlist(merge(list1,list2))
+ in printlist(merge(list1,list2))
 end
 

@@ -823,571 +823,336 @@ exit:
 	syscall
 	
 .data
-L18:
- .word 2
- .ascii " O"
-L19:
- .word 2
- .ascii " ."
-L25:
- .word 1
- .ascii "\n"
+.align 4
+L1 : .asciiz "0" 
+L2 : .asciiz "9" 
+L9 : .asciiz " " 
+L10 : .asciiz "
+" 
+L21 : .asciiz "-" 
 .text
-# ----- emit printboard -----
-printboard:
-addi $sp, $sp, -52
-sw $fp, 4($sp)
-sw $ra, 8($sp)
-add $fp, $sp, 52
-L77:
-sw $a0, 0($fp)
-addi $t0, $0, 0
-sw $t0, -36($fp)
+# ----- emit isdigit -----
+isdigit:
+move $fp, $sp
+addi $sp, $sp, -44
+sw $ra, 4($sp)
+sw $fp, 0($sp)
+L29:
+sw $a0, -4($fp)
+sw $s0, -8($fp)
+sw $s1, -12($fp)
+sw $s2, -16($fp)
+sw $s3, -20($fp)
+sw $s4, -24($fp)
+sw $s5, -28($fp)
+sw $s6, -32($fp)
+sw $s7, -36($fp)
 lw $t0, 0($fp)
-lw $t0, -4($t0)
-addi $t1, $t0, -1
-lw $t0, -36($fp)
-ble $t0, $t1, L26
+lw $t0, 0($t0)
+lw $a0, -8($t0)
+jal tig_ord
+move $t0, $v0
+la $a0, L1
+jal tig_ord
+bge $t0, $v0, L5
+L6:
+addi $v0, $0, 0
+L7:
+lw $s0, -8($fp)
+lw $s1, -12($fp)
+lw $s2, -16($fp)
+lw $s3, -20($fp)
+lw $s4, -24($fp)
+lw $s5, -28($fp)
+lw $s6, -32($fp)
+lw $s7, -36($fp)
+j L28 
+L5:
+addi $t1, $0, 1
+lw $t0, 0($fp)
+lw $t0, 0($t0)
+lw $a0, -8($t0)
+jal tig_ord
+move $t0, $v0
+la $a0, L2
+jal tig_ord
+ble $t0, $v0, L3
+L4:
+addi $t1, $0, 0
+L3:
+move $v0, $t1
+j L7 
+L28:
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 44
+jr $ra
+# ----- emit skipto -----
+skipto:
+move $fp, $sp
+addi $sp, $sp, -44
+sw $ra, 4($sp)
+sw $fp, 0($sp)
+L31:
+sw $a0, -4($fp)
+sw $s0, -8($fp)
+sw $s1, -12($fp)
+sw $s2, -16($fp)
+sw $s3, -20($fp)
+sw $s4, -24($fp)
+sw $s5, -28($fp)
+sw $s6, -32($fp)
+sw $s7, -36($fp)
+L15:
+lw $t0, 0($fp)
+lw $t0, 0($t0)
+lw $a0, -8($t0)
+la $a1, L9
+jal tig_stringEqual
+addi $t0, $0, 0
+bne $v0, $t0, L11
+L12:
+lw $t0, 0($fp)
+lw $t0, 0($t0)
+lw $a0, -8($t0)
+la $a1, L10
+jal tig_stringEqual
 L13:
-la $a0, L25
+addi $t0, $0, 0
+bne $v0, $t0, L14
+L8:
+addi $v0, $0, 0
+lw $s0, -8($fp)
+lw $s1, -12($fp)
+lw $s2, -16($fp)
+lw $s3, -20($fp)
+lw $s4, -24($fp)
+lw $s5, -28($fp)
+lw $s6, -32($fp)
+lw $s7, -36($fp)
+j L30 
+L14:
+lw $t0, 0($fp)
+lw $t0, 0($t0)
+addi $t0, $t0, -8
+jal tig_getchar
+sw $v0, 0($t0)
+j L15 
+L11:
+addi $v0, $0, 1
+j L13 
+L30:
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 44
+jr $ra
+# ----- emit readint -----
+readint:
+move $fp, $sp
+addi $sp, $sp, -44
+sw $ra, 4($sp)
+sw $fp, 0($sp)
+L33:
+sw $a0, -4($fp)
+sw $s0, -8($fp)
+sw $s1, -12($fp)
+sw $s2, -16($fp)
+sw $s3, -20($fp)
+sw $s4, -24($fp)
+sw $s5, -28($fp)
+sw $s6, -32($fp)
+sw $s7, -36($fp)
+addi $t1, $0, 0
+move $a0, $fp
+jal skipto
+move $t0, $a1
+move $a0, $fp
+lw $t2, 0($fp)
+lw $a1, -8($t2)
+jal isdigit
+sw $v0, 0($t0)
+L18:
+move $a0, $fp
+lw $t0, 0($fp)
+lw $a1, -8($t0)
+jal isdigit
+addi $t0, $0, 0
+bne $v0, $t0, L17
+L16:
+move $v0, $t1
+lw $s0, -8($fp)
+lw $s1, -12($fp)
+lw $s2, -16($fp)
+lw $s3, -20($fp)
+lw $s4, -24($fp)
+lw $s5, -28($fp)
+lw $s6, -32($fp)
+lw $s7, -36($fp)
+j L32 
+L17:
+addi $t0, $0, 10
+mul $t0, $t1, $t0
+lw $t1, 0($fp)
+lw $a0, -8($t1)
+jal tig_ord
+add $t0, $t0, $v0
+la $a0, L1
+jal tig_ord
+sub $t1, $t0, $v0
+lw $t0, 0($fp)
+addi $t0, $t0, -8
+jal tig_getchar
+sw $v0, 0($t0)
+j L18 
+L32:
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 44
+jr $ra
+# ----- emit f -----
+f:
+move $fp, $sp
+addi $sp, $sp, -44
+sw $ra, 4($sp)
+sw $fp, 0($sp)
+L35:
+move $t0, $a1
+sw $a0, -4($fp)
+sw $s0, -8($fp)
+sw $s1, -12($fp)
+sw $s2, -16($fp)
+sw $s3, -20($fp)
+sw $s4, -24($fp)
+sw $s5, -28($fp)
+sw $s6, -32($fp)
+sw $s7, -36($fp)
+addi $t1, $0, 0
+bgt $t0, $t1, L19
+L20:
+addi $v0, $0, 0
+lw $s0, -8($fp)
+lw $s1, -12($fp)
+lw $s2, -16($fp)
+lw $s3, -20($fp)
+lw $s4, -24($fp)
+lw $s5, -28($fp)
+lw $s6, -32($fp)
+lw $s7, -36($fp)
+j L34 
+L19:
+lw $a0, 0($fp)
+addi $t1, $0, 10
+div $a1, $t0, $t1
+jal f
+addi $t1, $0, 10
+div $t2, $t0, $t1
+addi $t1, $0, 10
+mul $t1, $t2, $t1
+sub $t0, $t0, $t1
+la $a0, L1
+jal tig_ord
+add $a0, $t0, $v0
+jal tig_chr
+move $a0, $v0
 jal tig_print
-j L76 
-L27:
-lw $t0, -36($fp)
-addi $t0, $t0, 1
-sw $t0, -36($fp)
+j L20 
+L34:
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 44
+jr $ra
+# ----- emit printint -----
+printint:
+move $fp, $sp
+addi $sp, $sp, -44
+sw $ra, 4($sp)
+sw $fp, 0($sp)
+L37:
+sw $a0, -4($fp)
+sw $s0, -8($fp)
+sw $s1, -12($fp)
+sw $s2, -16($fp)
+sw $s3, -20($fp)
+sw $s4, -24($fp)
+sw $s5, -28($fp)
+sw $s6, -32($fp)
+sw $s7, -36($fp)
+addi $t0, $0, 0
+blt $a1, $t0, L25
 L26:
 addi $t0, $0, 0
-sw $t0, -40($fp)
-lw $t0, 0($fp)
-lw $t0, -4($t0)
-addi $t1, $t0, -1
-lw $t0, -40($fp)
-ble $t0, $t1, L23
-L14:
-la $a0, L25
-jal tig_print
-lw $t0, 0($fp)
-lw $t0, -4($t0)
-addi $t1, $t0, -1
-lw $t0, -36($fp)
-blt $t0, $t1, L27
-L78:
-j L13 
-L24:
-lw $t0, -40($fp)
-addi $t0, $t0, 1
-sw $t0, -40($fp)
+bgt $a1, $t0, L22
 L23:
-lw $t1, -36($fp)
-lw $t0, 0($fp)
-lw $t0, -12($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L15
-L16:
-addi $t0, $0, 0
-blt $t1, $t0, L15
-L17:
-lw $t0, 0($fp)
-lw $t2, -12($t0)
-addi $t1, $0, 4
-lw $t0, -36($fp)
-mul $t0, $t0, $t1
-add $t0, $t2, $t0
-lw $t1, 0($t0)
-lw $t0, -40($fp)
-beq $t1, $t0, L20
-L21:
-la $a0, L19
-L22:
+la $a0, L1
 jal tig_print
-lw $t0, 0($fp)
-lw $t0, -4($t0)
-addi $t1, $t0, -1
-lw $t0, -40($fp)
-blt $t0, $t1, L24
-L79:
-j L14 
-L15:
-addi $a0, $0, 1
-jal exit
-j L17 
-L20:
-la $a0, L18
-j L22 
-L76:
-lw $ra, 8($sp)
-lw $fp, 4($sp)
-addi $sp, $sp, 52
-jr $ra
-# ----- emit try -----
-try:
-addi $sp, $sp, -60
-sw $fp, 4($sp)
-sw $ra, 8($sp)
-add $fp, $sp, 60
-L81:
-sw $a1, -36($fp)
-sw $a0, 0($fp)
-lw $t0, 0($fp)
-lw $t1, -4($t0)
-lw $t0, -36($fp)
-beq $t0, $t1, L73
-L74:
+L24:
+L27:
+lw $s0, -8($fp)
+lw $s1, -12($fp)
+lw $s2, -16($fp)
+lw $s3, -20($fp)
+lw $s4, -24($fp)
+lw $s5, -28($fp)
+lw $s6, -32($fp)
+lw $s7, -36($fp)
+j L36 
+L25:
+la $a0, L21
+jal tig_print
+move $a0, $fp
 addi $t0, $0, 0
-sw $t0, -40($fp)
-lw $t0, 0($fp)
-lw $t0, -4($t0)
-addi $t1, $t0, -1
-lw $t0, -40($fp)
-ble $t0, $t1, L71
-L28:
-addi $v0, $0, 0
-L75:
-j L80 
-L73:
-lw $a0, 0($fp)
-jal printboard
-j L75 
-L72:
-lw $t0, -40($fp)
-addi $t0, $t0, 1
-sw $t0, -40($fp)
-L71:
-lw $t1, -40($fp)
-lw $t0, 0($fp)
-lw $t0, -8($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L29
-L30:
-addi $t0, $0, 0
-blt $t1, $t0, L29
-L31:
-lw $t0, 0($fp)
-lw $t2, -8($t0)
-addi $t1, $0, 4
-lw $t0, -40($fp)
-mul $t0, $t0, $t1
-add $t0, $t2, $t0
-lw $t1, 0($t0)
-addi $t0, $0, 0
-beq $t1, $t0, L37
-L38:
-addi $t0, $0, 0
-L39:
-addi $t1, $0, 0
-bne $t0, $t1, L45
-L46:
-addi $t0, $0, 0
-L47:
-addi $t1, $0, 0
-bne $t0, $t1, L69
-L70:
-lw $t0, 0($fp)
-lw $t0, -4($t0)
-addi $t1, $t0, -1
-lw $t0, -40($fp)
-blt $t0, $t1, L72
-L82:
-j L28 
-L29:
-addi $a0, $0, 1
-jal exit
-j L31 
-L37:
-addi $t0, $0, 1
-sw $t0, -44($fp)
-lw $t0, -40($fp)
-lw $t1, -36($fp)
-add $t1, $t0, $t1
-lw $t0, 0($fp)
-lw $t0, -16($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L32
-L33:
-addi $t0, $0, 0
-blt $t1, $t0, L32
-L34:
-lw $t0, 0($fp)
-lw $t2, -16($t0)
-lw $t0, -40($fp)
-lw $t1, -36($fp)
-add $t1, $t0, $t1
-addi $t0, $0, 4
-mul $t0, $t1, $t0
-add $t0, $t2, $t0
-lw $t1, 0($t0)
-addi $t0, $0, 0
-beq $t1, $t0, L35
+sub $a1, $t0, $a1
+jal f
+j L27 
+L22:
+move $a0, $fp
+jal f
+j L24 
 L36:
-addi $t0, $0, 0
-sw $t0, -44($fp)
-L35:
-lw $t0, -44($fp)
-j L39 
-L32:
-addi $a0, $0, 1
-jal exit
-j L34 
-L45:
-addi $t0, $0, 1
-sw $t0, -48($fp)
-lw $t0, -40($fp)
-addi $t1, $t0, 7
-lw $t0, -36($fp)
-sub $t1, $t1, $t0
-lw $t0, 0($fp)
-lw $t0, -20($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L40
-L41:
-addi $t0, $0, 0
-blt $t1, $t0, L40
-L42:
-lw $t0, 0($fp)
-lw $t2, -20($t0)
-lw $t0, -40($fp)
-addi $t1, $t0, 7
-lw $t0, -36($fp)
-sub $t1, $t1, $t0
-addi $t0, $0, 4
-mul $t0, $t1, $t0
-add $t0, $t2, $t0
-lw $t1, 0($t0)
-addi $t0, $0, 0
-beq $t1, $t0, L43
-L44:
-addi $t0, $0, 0
-sw $t0, -48($fp)
-L43:
-lw $t0, -48($fp)
-j L47 
-L40:
-addi $a0, $0, 1
-jal exit
-j L42 
-L69:
-lw $t1, -40($fp)
-lw $t0, 0($fp)
-lw $t0, -8($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L48
-L49:
-addi $t0, $0, 0
-blt $t1, $t0, L48
-L50:
-lw $t0, 0($fp)
-lw $t2, -8($t0)
-addi $t1, $0, 4
-lw $t0, -40($fp)
-mul $t0, $t0, $t1
-add $t1, $t2, $t0
-addi $t0, $0, 1
-sw $t0, 0($t1)
-lw $t0, -40($fp)
-lw $t1, -36($fp)
-add $t1, $t0, $t1
-lw $t0, 0($fp)
-lw $t0, -16($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L51
-L52:
-addi $t0, $0, 0
-blt $t1, $t0, L51
-L53:
-lw $t0, 0($fp)
-lw $t2, -16($t0)
-lw $t0, -40($fp)
-lw $t1, -36($fp)
-add $t1, $t0, $t1
-addi $t0, $0, 4
-mul $t0, $t1, $t0
-add $t1, $t2, $t0
-addi $t0, $0, 1
-sw $t0, 0($t1)
-lw $t0, -40($fp)
-addi $t1, $t0, 7
-lw $t0, -36($fp)
-sub $t1, $t1, $t0
-lw $t0, 0($fp)
-lw $t0, -20($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L54
-L55:
-addi $t0, $0, 0
-blt $t1, $t0, L54
-L56:
-lw $t0, 0($fp)
-lw $t2, -20($t0)
-lw $t0, -40($fp)
-addi $t1, $t0, 7
-lw $t0, -36($fp)
-sub $t1, $t1, $t0
-addi $t0, $0, 4
-mul $t0, $t1, $t0
-add $t1, $t2, $t0
-addi $t0, $0, 1
-sw $t0, 0($t1)
-lw $t1, -36($fp)
-lw $t0, 0($fp)
-lw $t0, -12($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L57
-L58:
-addi $t0, $0, 0
-blt $t1, $t0, L57
-L59:
-lw $t0, 0($fp)
-lw $t2, -12($t0)
-addi $t1, $0, 4
-lw $t0, -36($fp)
-mul $t0, $t0, $t1
-add $t1, $t2, $t0
-lw $t0, -40($fp)
-sw $t0, 0($t1)
-lw $a0, 0($fp)
-lw $t0, -36($fp)
-addi $a1, $t0, 1
-jal try
-lw $t1, -40($fp)
-lw $t0, 0($fp)
-lw $t0, -8($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L60
-L61:
-addi $t0, $0, 0
-blt $t1, $t0, L60
-L62:
-lw $t0, 0($fp)
-lw $t2, -8($t0)
-addi $t1, $0, 4
-lw $t0, -40($fp)
-mul $t0, $t0, $t1
-add $t1, $t2, $t0
-addi $t0, $0, 0
-sw $t0, 0($t1)
-lw $t0, -40($fp)
-lw $t1, -36($fp)
-add $t1, $t0, $t1
-lw $t0, 0($fp)
-lw $t0, -16($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L63
-L64:
-addi $t0, $0, 0
-blt $t1, $t0, L63
-L65:
-lw $t0, 0($fp)
-lw $t2, -16($t0)
-lw $t0, -40($fp)
-lw $t1, -36($fp)
-add $t1, $t0, $t1
-addi $t0, $0, 4
-mul $t0, $t1, $t0
-add $t1, $t2, $t0
-addi $t0, $0, 0
-sw $t0, 0($t1)
-lw $t0, -40($fp)
-addi $t1, $t0, 7
-lw $t0, -36($fp)
-sub $t1, $t1, $t0
-lw $t0, 0($fp)
-lw $t0, -20($t0)
-lw $t0, -4($t0)
-bge $t1, $t0, L66
-L67:
-addi $t0, $0, 0
-blt $t1, $t0, L66
-L68:
-lw $t0, 0($fp)
-lw $t2, -20($t0)
-lw $t0, -40($fp)
-addi $t1, $t0, 7
-lw $t0, -36($fp)
-sub $t1, $t1, $t0
-addi $t0, $0, 4
-mul $t0, $t1, $t0
-add $t1, $t2, $t0
-addi $t0, $0, 0
-sw $t0, 0($t1)
-j L70 
-L48:
-addi $a0, $0, 1
-jal exit
-j L50 
-L51:
-addi $a0, $0, 1
-jal exit
-j L53 
-L54:
-addi $a0, $0, 1
-jal exit
-j L56 
-L57:
-addi $a0, $0, 1
-jal exit
-j L59 
-L60:
-addi $a0, $0, 1
-jal exit
-j L62 
-L63:
-addi $a0, $0, 1
-jal exit
-j L65 
-L66:
-addi $a0, $0, 1
-jal exit
-j L68 
-L80:
-lw $ra, 8($sp)
-lw $fp, 4($sp)
-addi $sp, $sp, 60
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 44
 jr $ra
 # ----- emit tig_main -----
 tig_main:
-addi $sp, $sp, -96
-sw $fp, 4($sp)
-sw $ra, 8($sp)
-add $fp, $sp, 96
-L84:
-sw $a0, 0($fp)
-addi $t0, $0, 8
-sw $t0, -4($fp)
+move $fp, $sp
+addi $sp, $sp, -48
+sw $ra, 4($sp)
+sw $fp, 0($sp)
+L39:
+sw $a0, -4($fp)
+sw $s0, -12($fp)
+sw $s1, -16($fp)
+sw $s2, -20($fp)
+sw $s3, -24($fp)
+sw $s4, -28($fp)
+sw $s5, -32($fp)
+sw $s6, -36($fp)
+sw $s7, -40($fp)
 addi $t0, $fp, -8
-sw $t0, -72($fp)
-lw $t0, -4($fp)
-sw $t0, -56($fp)
-addi $t1, $0, 4
-lw $t0, -56($fp)
-mul $t0, $t0, $t1
-addi $a0, $t0, 4
+jal tig_getchar
+sw $v0, 0($t0)
+addi $a0, $0, 4
 jal malloc
 addi $t0, $0, 0
-L3:
-lw $t1, -4($fp)
-sub $t2, $t1, $t0
-addi $t1, $0, 0
-bne $t2, $t1, L2
-L1:
-lw $t0, -56($fp)
 sw $t0, 0($v0)
-addi $t1, $v0, 4
-lw $t0, -72($fp)
-sw $t1, 0($t0)
-addi $t0, $fp, -12
-sw $t0, -76($fp)
-lw $t0, -4($fp)
-sw $t0, -60($fp)
-addi $t1, $0, 4
-lw $t0, -60($fp)
-mul $t0, $t0, $t1
-addi $a0, $t0, 4
-jal malloc
-addi $t0, $0, 0
-L6:
-lw $t1, -4($fp)
-sub $t2, $t1, $t0
-addi $t1, $0, 0
-bne $t2, $t1, L5
-L4:
-lw $t0, -60($fp)
-sw $t0, 0($v0)
-addi $t1, $v0, 4
-lw $t0, -76($fp)
-sw $t1, 0($t0)
-addi $t0, $fp, -16
-sw $t0, -80($fp)
-lw $t1, -4($fp)
-lw $t0, -4($fp)
-add $t0, $t1, $t0
-addi $t0, $t0, -1
-sw $t0, -64($fp)
-addi $t1, $0, 4
-lw $t0, -64($fp)
-mul $t0, $t0, $t1
-addi $a0, $t0, 4
-jal malloc
-addi $t0, $0, 0
-L9:
-lw $t2, -4($fp)
-lw $t1, -4($fp)
-add $t1, $t2, $t1
-addi $t1, $t1, -1
-sub $t2, $t1, $t0
-addi $t1, $0, 0
-bne $t2, $t1, L8
-L7:
-lw $t0, -64($fp)
-sw $t0, 0($v0)
-addi $t1, $v0, 4
-lw $t0, -80($fp)
-sw $t1, 0($t0)
-addi $t0, $fp, -20
-sw $t0, -84($fp)
-lw $t1, -4($fp)
-lw $t0, -4($fp)
-add $t0, $t1, $t0
-addi $t0, $t0, -1
-sw $t0, -68($fp)
-addi $t1, $0, 4
-lw $t0, -68($fp)
-mul $t0, $t0, $t1
-addi $a0, $t0, 4
-jal malloc
-addi $t0, $0, 0
-L12:
-lw $t2, -4($fp)
-lw $t1, -4($fp)
-add $t1, $t2, $t1
-addi $t1, $t1, -1
-sub $t2, $t1, $t0
-addi $t1, $0, 0
-bne $t2, $t1, L11
-L10:
-lw $t0, -68($fp)
-sw $t0, 0($v0)
-addi $t1, $v0, 4
-lw $t0, -84($fp)
-sw $t1, 0($t0)
+move $a1, $v0
 move $a0, $fp
-addi $a1, $0, 0
-jal try
-j L83 
-L2:
-addi $t1, $0, 4
-mul $t1, $t0, $t1
-add $t2, $v0, $t1
-addi $t1, $0, 0
-sw $t1, 0($t2)
-addi $t0, $t0, 1
-j L3 
-L5:
-addi $t1, $0, 4
-mul $t1, $t0, $t1
-add $t2, $v0, $t1
-addi $t1, $0, 0
-sw $t1, 0($t2)
-addi $t0, $t0, 1
-j L6 
-L8:
-addi $t1, $0, 4
-mul $t1, $t0, $t1
-add $t2, $v0, $t1
-addi $t1, $0, 0
-sw $t1, 0($t2)
-addi $t0, $t0, 1
-j L9 
-L11:
-addi $t1, $0, 4
-mul $t1, $t0, $t1
-add $t2, $v0, $t1
-addi $t1, $0, 0
-sw $t1, 0($t2)
-addi $t0, $t0, 1
-j L12 
-L83:
-lw $ra, 8($sp)
-lw $fp, 4($sp)
-addi $sp, $sp, 96
+jal readint
+move $a1, $v0
+move $a0, $fp
+jal printint
+lw $s0, -12($fp)
+lw $s1, -16($fp)
+lw $s2, -20($fp)
+lw $s3, -24($fp)
+lw $s4, -28($fp)
+lw $s5, -32($fp)
+lw $s6, -36($fp)
+lw $s7, -40($fp)
+j L38 
+L38:
+lw $ra, 4($sp)
+lw $fp, 0($sp)
+addi $sp, $sp, 48
 jr $ra
