@@ -17,7 +17,9 @@
 - Spill is supported, if out of register, put it onto stack and load it back every use. No matter how many parameters and locals a Tiger program has, our compiler can still compile it. Use `../testcases/spillTest.tig` to check the spilling implementation.
 - Unfreeze is supported, try `../testcases/spillTest.tig`.(we still named it freeze in code)
 - For ArrayCreateIR (in translate.sml), we optimized the code, so that we call "malloc" directly instead of "initArray." This way, we manually put the size into the first allocated int space, and return a pointer to the first array content. This solves the "I LOVE PYTHON" problem, so each initialized slot will be different, instead of copies of the same pointer. try `../testcases/test42.tig`. It will print two different names.
-- After implementing spills, we no longer save and store all calleesave("s") registers. In procEntryExit1, we move each calleesave into a new temp, then after the body, move them back. This way, used calleesaves will be spilled automatically, and unused calleesaves won't be stored/restored, saving instructions. The difference could be shown in `../testcases/merge.tig`.
+- After implementing spills, we no longer save and store all calleesave("s")+RA registers. In procEntryExit1, we move each calleesave into a new temp, then after the body, move them back. This way, 
+    - Used calleesaves will be spilled automatically, and unused calleesaves won't be stored/restored, saving instructions. The difference could be shown in `../testcases/merge.tig`.
+    - Only non-leaf functions will save and restore RA. Could be shown in `../testcases/simpleTest.tig`.
 
 
 
