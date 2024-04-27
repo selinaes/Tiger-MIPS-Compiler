@@ -5,6 +5,20 @@ struct
     structure G = Graph
     structure Err = ErrorMsg
 
+    fun printInstrs(instrs) = 
+        let
+            val len = length instrs
+            fun printOne(index) = 
+                let
+                    val format0 = Assem.format(Temp.makestring)
+                    val str = format0 (List.nth (instrs, index))
+                in
+                    print ( "n" ^ Int.toString index ^ " : " ^ String.substring(str,0,String.size(str)-1)  ^ "\n");
+                    if (index + 1 = len) then () else printOne(index+1)
+                end
+        in  
+            printOne(0)
+        end
 
     fun instrs2graph(instrs: A.instr list): Flow.flowgraph * Graph.node list = 
         let
@@ -17,7 +31,6 @@ struct
                   | A.MOVE{assem, dst, src} => ([src], [dst])
             
             (* label -> node, use to fast search node with given jump label  *)
-            val labelNodeMap: Graph.node Symbol.table ref = ref Symbol.empty
             
 
             (*'a * 'b -> 'b *)
@@ -28,7 +41,7 @@ struct
                   | A.LABEL{lab, ...} => "LABEL"
                   | A.MOVE{assem, dst, src} => "MOVE"
 
-            fun addNode (instr, F.FGRAPH {control,def,use,ismove,rdgen,rdkill}): F.flowgraph = 
+            fun addNode (instr, F.FGRAPH {control,nodeToInstr, labelNodeMap,def,use,ismove,rdgen,rdkill}): F.flowgraph = 
                 let
                     
                     val node = G.newNode control
@@ -43,28 +56,24 @@ struct
                                 in print ( G.nodename node ^ " : " ^ str ^ "\n")
                                 end
                             )
-                            else ()
-                    let
-                                
-                                end *)
-
-                    val format0 = Assem.format(Temp.makestring)
-                    val str = format0 instr
-                    val  _ =  print ( G.nodename node ^ " : " ^ String.substring(str,0,String.size(str)-1)  ^ "\n")
+                            else ()*)
 
 
                     val (srcs, dsts) = getInstrSrcDst instr
                     val bitDsts = BitArray.bits(N, map (fn x => x - 100) dsts)
                     val bitSrcs = BitArray.bits(N, map (fn x => x - 100) srcs)
+                    val nodeToInstr = G.Table.enter(nodeToInstr, node, instr)
                     val def = G.Table.enter(def, node, bitDsts)
                     val use = G.Table.enter(use, node, bitSrcs)
                     val ismove' = G.Table.enter(ismove, node, case instr of A.MOVE _ => true | _ => false)
-                    val _ = case instr of
-                        A.LABEL{lab, ...} => (labelNodeMap := Symbol.enter(!labelNodeMap, lab, node))
-                      | _ => ()
+                    val labelNodeMap' = case instr of
+                        A.LABEL{lab: Symbol.symbol, ...} => (let val labelNodeMap' = Symbol.enter(labelNodeMap, lab, node) in labelNodeMap' end)
+                      | _ => labelNodeMap
 
                 in
                     F.FGRAPH {control = control,
+                              nodeToInstr = nodeToInstr,
+                              labelNodeMap = labelNodeMap',
                               def = def,
                               use = use,
                               ismove = ismove',
@@ -73,31 +82,26 @@ struct
                 end 
 
             
-            fun addEdge ([i], [n], index) = ()
-            | addEdge (instr::restI, (n1::n2::nodes): G.node list, index) = 
+            fun addEdge ([i], [n], index, fg as F.FGRAPH{labelNodeMap,...}) = ()
+            | addEdge (instr::restI, (n1::n2::nodes): G.node list, index, fg as F.FGRAPH{labelNodeMap,...}) = 
                 (case instr of
                     (* has jump label, add edge to nodes with those label *)
                     A.OPER{assem, dst, src, jump=SOME labs} => 
                         let
                             fun mkJumpEdge lab = 
-                                case Symbol.look(!labelNodeMap, lab) of
+                                case Symbol.look(labelNodeMap, lab) of
                                     NONE => Err.impossible ("not found jump label " ^ Symbol.name lab ^ " node in labelNodeMap")
                                   | SOME node => G.mk_edge({from=n1, to=node})
                         in
                             app mkJumpEdge labs;
-                            addEdge(restI, n2::nodes, index + 1)
+                            addEdge(restI, n2::nodes, index + 1, fg)
                         end
                     (* fall through, add edge to the next instruction node *)
                   |  _ => 
                         (G.mk_edge({from=n1, to=n2}); 
-                        addEdge(restI, n2::nodes, index + 1))
-                  (* | A.LABEL{lab, ...} => 
-                        (G.mk_edge({from=n1, to=n2}); 
-                        addEdge(restI, n2::nodes, index + 1))
-                
-                  | _ => addEdge(restI, n2::nodes, index + 1)) *)
+                        addEdge(restI, n2::nodes, index + 1, fg))
                 )
-            | addEdge (_, _, _) = Err.impossible "addEdge: instrs and nodes length not match"
+            | addEdge (_, _, _, _) = Err.impossible "addEdge: instrs and nodes length not match"
 
             (* unambiguous definition: Assems with content in def[] *)
             val rdDefs: BitArray.array Temp.Table.table ref = ref Temp.Table.empty
@@ -119,7 +123,7 @@ struct
                     computeRdDefs (rest, index + 1)
                 end
                 
-            fun addRdInfo (instrs) (F.FGRAPH {control,def,use,ismove,rdgen,rdkill}) = 
+            fun addRdInfo (instrs) (F.FGRAPH {control,nodeToInstr,labelNodeMap,def,use,ismove,rdgen,rdkill}) = 
                 let
                     fun addOneRdInfo ([], _) = (rdgen,rdkill)
                     | addOneRdInfo (instr::rest, index) = 
@@ -148,6 +152,8 @@ struct
                     val (rdgen', rdkill') = addOneRdInfo (instrs,0)
                 in
                     F.FGRAPH {control = control,
+                              nodeToInstr = nodeToInstr,
+                              labelNodeMap = labelNodeMap,
                               def = def,
                               use = use,
                               ismove = ismove,
@@ -158,6 +164,8 @@ struct
 
             val control = G.newGraph()
             val emptyGraph = F.FGRAPH {control = control,
+                        nodeToInstr = Graph.Table.empty,
+                        labelNodeMap = Symbol.empty,
                         def = Graph.Table.empty,
                         use = Graph.Table.empty,
                         rdgen = Graph.Table.empty,
@@ -170,7 +178,7 @@ struct
         in
             
             (* print (Int.toString(length (Symbol.listItems(!labelNodeMap)))); *)
-            addEdge(instrs, G.nodes control, 0);
+            addEdge(instrs, G.nodes control, 0, flowGraph);
             (* G.printGraph (TextIO.stdOut,control); *)
             (flowGraph, G.nodes control)
         end

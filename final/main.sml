@@ -26,7 +26,17 @@ structure Main = struct
         val instrs = List.concat(map (MipsGen.codegen frame) stms') 
         val instrs' = Frame.procEntryExit2(frame, instrs)
 
-        val (body', alloc) = Reg_Alloc.alloc(instrs', frame)
+        (* Optimization *)
+        val (fgr, ndlist) = MakeGraph.instrs2graph instrs'
+        val _ = print("makegraph done\n")
+        val rdInMap: Reaching_Def.rdMap = Reaching_Def.handleReachingDef(fgr)
+        val _ = MakeGraph.printInstrs(instrs')
+        val _ = print("reaching done\n")
+        val instrs'' = Dominator.loopReachDefOptimize(fgr, instrs', rdInMap)
+        val _ = MakeGraph.printInstrs(instrs'')
+        val _ = print("dominator done\n")
+
+        val (body', alloc) = Reg_Alloc.alloc(instrs'', frame)
 
         (* exit 3 malloc the frame size, thus call at last, alloc may spill the extra node to alloc on the stack which increase stack size *)
         val {prolog, body=body'', epilog} = Frame.procEntryExit3(frame, body')

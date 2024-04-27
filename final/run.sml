@@ -69,13 +69,13 @@ fun clear() =
 (* clear(); *)
 (* runAllTests (); *)
 (* Main.compile "../testcases/1syscall.tig"; *)
-(* Main.compile "../testcases/merge.tig"; *)
+Main.compile "../testcases/merge.tig";
 (* Main.compile "../testcases/queens.tig"; *)
 (* Main.compile "../testcases/test1.tig"; *)
 (* Main.compile "../testcases/test4.tig"; *)
 (* Main.compile "../testcases/simpleTest.tig"; *)
 (* Main.compile "../testcases/rdtest.tig"; *)
-Main.compile "../testcases/dominateTest.tig";
+(* Main.compile "../testcases/dominateTest.tig"; *)
 (* Main.compile "../testcases/spillTest.tig"; *)
 (* Main.compile "../testcases/coalesceTest.tig"; *)
 (* Main.compile "../testcases/livenessTest.tig"; *)

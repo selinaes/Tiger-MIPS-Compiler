@@ -115,9 +115,13 @@ struct
             val precoloredInit : allocation = Frame.tempMap
 
             val (fgr, ndlist) = MakeGraph.instrs2graph instrs
+            (* val _ = print("makegraph done\n")
+            val rdInMap: Reaching_Def.rdMap = Reaching_Def.handleReachingDef(fgr)
+            val _ = print("reaching done\n")
+            val (fgr', ndlist) = Dominator.loopReachDefOptimize(fgr, instrs, rdInMap)
+            val _ = print("dominator done\n") *)
             val (igraph, liveOut) = Liveness.interferenceGraph(fgr)
-            (* val _ = Reaching_Def.handleReachingDef(fgr) *)
-            val _ = Dominator.handleDominators(fgr)
+            
             val (allocMapping, spills): allocation * Temp.temp list = Color.color ({interference=igraph, initial=precoloredInit, spillCost=getSpillCost, registers=Frame.registers})
             fun removeRedundantMove instr = 
                 (case instr of 

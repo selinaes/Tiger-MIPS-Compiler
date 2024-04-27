@@ -1,6 +1,8 @@
 structure Flow =
 struct
     datatype flowgraph = FGRAPH of {control: Graph.graph,
+                            nodeToInstr: Assem.instr Graph.Table.table,
+                            labelNodeMap: Graph.node Symbol.table,
 				    def: BitArray.array Graph.Table.table, (* temp bitarray *)
 				    use: BitArray.array Graph.Table.table, (* temp bitarray *)
                             rdgen: BitArray.array Graph.Table.table, (* instr bitarray *)
