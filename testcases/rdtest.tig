@@ -1,0 +1,16 @@
+let 
+    var x1 := 0 
+    var bool := 1
+    var x2 := 1
+    
+    /*function xx() = 
+        if bool
+        then
+            (x2 := x1 + 1;
+            bool := 0)
+        else
+            x2 := 3 */
+        
+in
+    x2 := x1 + bool
+end

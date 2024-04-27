@@ -1,8 +1,10 @@
 structure Flow =
 struct
     datatype flowgraph = FGRAPH of {control: Graph.graph,
-				    def: BitArray.array Graph.Table.table,
-				    use: BitArray.array Graph.Table.table,
+				    def: BitArray.array Graph.Table.table, (* temp bitarray *)
+				    use: BitArray.array Graph.Table.table, (* temp bitarray *)
+                            rdgen: BitArray.array Graph.Table.table, (* instr bitarray *)
+                            rdkill: BitArray.array Graph.Table.table, (* instr bitarray *)
 				    ismove: bool Graph.Table.table}
 
   (* Note:  any "use" within the block is assumed to be BEFORE a "def" 

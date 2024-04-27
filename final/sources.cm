@@ -38,6 +38,10 @@ makegraph.sig
 makegraph.sml 
 liveness.sig
 liveness.sml
+reachingDef.sig
+reachingDef.sml
+dominator.sig
+dominator.sml
 color.sig
 color.sml
 reg_alloc.sig

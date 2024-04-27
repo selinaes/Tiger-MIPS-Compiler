@@ -199,7 +199,7 @@ struct
 
     (* Append sink instruction, mark regs still live at exit, prevent allocator from reuse *)
     fun procEntryExit2(frame, body) = 
-        body @ [Assem.OPER{assem="", src =[SP], dst=[], jump=NONE}]
+        body @ [Assem.OPER{assem="\n", src =[SP], dst=[], jump=NONE}]
 
     (* Rest of prologue / epilogue 
     1: peudo-announce start 2: function name label 3: adjust SP 

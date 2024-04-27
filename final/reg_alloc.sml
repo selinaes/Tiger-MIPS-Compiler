@@ -116,6 +116,8 @@ struct
 
             val (fgr, ndlist) = MakeGraph.instrs2graph instrs
             val (igraph, liveOut) = Liveness.interferenceGraph(fgr)
+            (* val _ = Reaching_Def.handleReachingDef(fgr) *)
+            val _ = Dominator.handleDominators(fgr)
             val (allocMapping, spills): allocation * Temp.temp list = Color.color ({interference=igraph, initial=precoloredInit, spillCost=getSpillCost, registers=Frame.registers})
             fun removeRedundantMove instr = 
                 (case instr of 

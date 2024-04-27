@@ -1,4 +1,4 @@
-structure Liveness : LIVENESS = 
+structure Reaching_Def : REACHING_DEF = 
 struct
     (* TODO: may improve *)
     (* type liveSet = unit Temp.Table.table * temp list  *)
@@ -8,9 +8,10 @@ struct
                     gtemp: Graph.node -> Temp.temp,
                     moves: (Graph.node * Graph.node) list}
                     
-    type liveSet = BitArray.array
-    (* InstrNode -> liveSet: set of live temporaries at that node*)
-    type liveMap = liveSet Graph.Table.table
+                    
+    type rdSet = BitArray.array
+    (* InstrNode -> rdSet: set of reachable definition instr # *)
+    type rdMap = rdSet Graph.Table.table
     structure G = Graph
     
 
@@ -30,58 +31,64 @@ struct
             printMoves (out, moves)
         end
     (* igraph * (Graph.node -> Temp.temp list) *)
-    fun interferenceGraph (Flow.FGRAPH {control, def, use, ismove, ...}) : igraph * (Graph.node -> liveSet) = 
+    fun handleReachingDef (Flow.FGRAPH {control, def, use, rdgen, rdkill, ismove}) = 
         let
-            val N = Temp.getTemps() - 100
-            val reversedNodes = rev (Graph.nodes control)
-            val liveInMap: liveMap ref  = ref Graph.Table.empty
-            (* flow-graph node -> set of temps that are live-out at that node *)
-            val liveOutMap: liveMap ref  = ref Graph.Table.empty
+            val nodes = G.nodes control
+            val N = length nodes
+            val rdInMap: rdMap ref  = ref Graph.Table.empty
+            val rdOutMap: rdMap ref  = ref Graph.Table.empty
 
-            (* Ret: 1. an igraph 2. flow-graph node -> set of temps that are live-out at that node *)
-            
-            fun computeLiveness () = 
+            fun rdsetToString(rs:rdSet) = 
                 let
-                    val hasChanged = ref false
-                    fun computeOneNodeLivesness node = 
-                        let
-                            fun lookupLiveSet (liveMap, node) = Option.getOpt(Graph.Table.look (liveMap, node), BitArray.bits (N, []))
-                            val successors = Graph.succ node
-                            (* LiveOut[B] = (U, for each S of B's succ) LiveIn[S] *)
-                            val liveout: liveSet = foldl (fn (succ, acc) => BitArray.orb (acc, (lookupLiveSet (!liveInMap, succ)), N)) (BitArray.bits (N, [])) successors
-                            val () = liveOutMap := Graph.Table.enter (!liveOutMap, node, liveout)
-
-                            val genSet =  Option.getOpt(Graph.Table.look(use, node), BitArray.bits (N, []))
-                            val killSet =  Option.getOpt(Graph.Table.look(def, node), BitArray.bits (N, []))
-                            
-                            (* LiveIn[B] = (LiveOut[B] - Kill[B]) U Gen[B] *)
-                            (* Perform AND NOT operation: clear bits set in Kill[B] *)
-                            (* Perform OR operation: add bits set in Gen[B] *)
-                            val liveIn = BitArray.orb (BitArray.andb (liveout, BitArray.notb killSet, N), genSet, N)
-
-                            (* this is to compare the old and new *)
-                            val oldLiveInMap = lookupLiveSet (!liveInMap, node)
-                        in
-                            if not (BitArray.isZero (BitArray.xorb (liveIn, oldLiveInMap, N))) then
-                                (liveInMap := Graph.Table.enter (!liveInMap,node,liveIn); hasChanged := true)
-                            else
-                                ()
-                        end
-                in
-                    (app computeOneNodeLivesness reversedNodes;
-                    if !hasChanged then
-                        computeLiveness()
-                    else
-                        ())
-                end
-
-            fun livesetToString(ls:liveSet) = 
-                let
-                    val oneIdLst = BitArray.getBits(ls)
+                    val oneIdLst = BitArray.getBits(rs)
                     fun oneIdToString (id) = Int.toString id ^ " "
                 in
                     foldl (fn (id, acc) => acc ^ oneIdToString id) "" oneIdLst
                 end
+
+            (* Compute inSet and outSet *)
+            fun computeReaching () = 
+                let
+                    val hasChanged = ref false
+                    fun computeOneNodeReaching node = 
+                        let
+                            fun lookupRdSet (rdMap, node) = Option.getOpt(Graph.Table.look (rdMap, node), BitArray.bits (N, []))
+                            val predecessors = Graph.pred node
+                            (* RD-In[B] = (U, for each P of B's pred) RD-Out[p] *)
+                            val rdIn: rdSet = foldl (fn (pred, acc) => BitArray.orb (acc, (lookupRdSet (!rdOutMap, pred)), N)) (BitArray.bits (N, [])) predecessors
+
+                            val genSet =  Option.getOpt(Graph.Table.look(rdgen, node), BitArray.bits (N, []))
+                            val killSet =  Option.getOpt(Graph.Table.look(rdkill, node), BitArray.bits (N, []))
+                            
+                            (* RD-Out[B] = (RD-In[B] - Kill[B]) U Gen[B] *)
+                            (* Perform AND NOT operation: clear bits set in Kill[B] *)
+                            (* Perform OR operation: add bits set in Gen[B] *)
+                            val rdOut = BitArray.orb (BitArray.andb (rdIn, BitArray.notb killSet, N), genSet, N)
+
+                            (* this is to compare the old and new *)
+                            val oldRdOut = lookupRdSet (!rdOutMap, node)
+                            val oldRdIn = lookupRdSet (!rdInMap, node)
+
+                        in
+                            if (not (BitArray.isZero (BitArray.xorb (rdIn, oldRdIn, N)))) orelse 
+                                (not (BitArray.isZero (BitArray.xorb (rdOut, oldRdOut, N))))
+                             then
+                                (   rdInMap := Graph.Table.enter (!rdInMap, node, rdIn);
+                                    rdOutMap := Graph.Table.enter (!rdOutMap,node,rdOut); 
+                                    hasChanged := true)
+                            else
+                                ()
+                        end
+                in
+                    (app computeOneNodeReaching (Graph.nodes control);
+                    if !hasChanged then
+                        computeReaching()
+                    else
+                        app (fn (k: int,v) => (print ("Instr" ^ (Int.toString k) ^ ":"^ rdsetToString(v) ^ "\n"))) (G.Table.listItemsi(!rdInMap))
+                    )
+                end
+
+            
             
             fun addAllINodes (graph: G.graph) = 
                 let
@@ -153,7 +160,7 @@ struct
                 end
 
             (* add edge to igraph, process 1 liveout set at a moment *)
-            fun addEdgesAtOneLiveset (k: int, ls : liveSet, gr: Graph.graph) = 
+            (* fun addEdgesAtOneLiveset (k: int, ls : liveSet, gr: Graph.graph) = 
                 let
                     val instrNode = List.nth(G.nodes control, k)
 
@@ -186,21 +193,22 @@ struct
                 in
                     
                     app createEdge oneIdLst
-                end
+                end *)
                 
             val _ = gtempMap := Graph.Table.empty
             val _ = tnodeMap := Temp.Table.empty
-            val _ = computeLiveness()
-            val gr = G.newGraph()
+            val _ = computeReaching()
+            (* val gr = G.newGraph()
             val igraph = addAllINodes(gr)
             val igraph' = addAllMoves(igraph)
-            val _ = app (fn (k: int,v) => (addEdgesAtOneLiveset(k, v, gr))) (G.Table.listItemsi(!liveOutMap))
+            val _ = app (fn (k: int,v) => (addEdgesAtOneLiveset(k, v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
             (* val _ = app (fn (k: int,v) => (print ("n"^(Int.toString k)^": ");addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
 
         in
-            (igraph', 
+            (* (igraph', 
             fn node => Option.getOpt(Graph.Table.look(!liveOutMap, node), 
-                    ErrorMsg.impossible "interferenceGraph: liveOutMap can't find"))
+                    ErrorMsg.impossible "interferenceGraph: liveOutMap can't find")) *)
+            ()
         end 
 
    

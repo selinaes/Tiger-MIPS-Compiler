@@ -824,38 +824,25 @@ exit:
 	
 .data
 .text
-# ----- emit xx -----
-xx:
+# ----- emit tig_main -----
+tig_main:
 addi $sp, $sp, -12
 sw $fp, 4($sp)
 add $fp, $sp, 12
-L2:
+L5:
 sw $a0, 0($fp)
-addi $v0, $a1, 1
-j L1 
+addi $t0, $0, 1
+L3:
+addi $t1, $0, 20
+blt $t0, $t1, L2
 L1:
+addi $v0, $0, 0
+j L4 
+L2:
+addi $t0, $t0, 5
+j L3 
+L4:
 
 lw $fp, 4($sp)
 addi $sp, $sp, 12
-jr $ra
-# ----- emit tig_main -----
-tig_main:
-addi $sp, $sp, -16
-sw $fp, 4($sp)
-add $fp, $sp, 16
-L4:
-sw $a0, 0($fp)
-sw $ra, -4($fp)
-addi $t0, $0, 1
-addi $t0, $0, 2
-move $a0, $fp
-addi $a1, $0, 1
-jal xx
-
-lw $ra, -4($fp)
-j L3 
-L3:
-
-lw $fp, 4($sp)
-addi $sp, $sp, 16
 jr $ra

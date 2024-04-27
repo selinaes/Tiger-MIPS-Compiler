@@ -139,7 +139,7 @@ struct
                                     src=munchArgs (0, args),
                                     dst=[], jump=NONE});
                         (* Kill all possibly changed regs *)
-                        emit(A.OPER{assem="", src =[], dst=calldefs, jump=NONE});
+                        emit(A.OPER{assem="\n", src =[], dst=calldefs, jump=NONE});
                         Frame.RV
                     end
                 

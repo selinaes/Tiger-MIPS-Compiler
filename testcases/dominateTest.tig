@@ -1,0 +1,9 @@
+let
+    var acc := 1
+in
+    while(acc < 20) do (
+            let var x := 5
+            in
+               acc := acc + x
+            end)
+end
