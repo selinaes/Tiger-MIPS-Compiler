@@ -1,4 +1,4 @@
-# Full runnable Compiler
+# Full runnable Compiler + Added Optimization
 
 ## Get Started
 - `run.sml` contains script to run the test, it will generate `.s` file containing assmebly code. 
@@ -6,6 +6,15 @@
 
 
 ## Extra Credits
+- NEW: Loop Optimization
+    - Reaching Definition: in `Reaching_Def` module, we implemented dataflow analysis for reaching definition
+    - Dominators: In ` Dominator` module, we implemented dominator analysis to find the dominators of each instruction.
+        - Loop Range + Back Edge: Based on the constructed domination relationship, we identified the back edge and range of each loop.
+    - Hoisting: We used the result of Reaching Definition & Dominators, to implement hoisting of certain instructions outside of the loop, so that they don't need to be executed every time into the loop
+        - If all definitions of an instruction `d` 's uses are outside the loop, we will hoist it
+        - We avoided pitfalls mentioned in textbook pg.412 by checking each condition seperately
+        - Test for while loop hoisting and pitfall 2 using `../testcases/dominateTest.tig`, test pitfall 1 at `../testcases/dominateTest2.tig`, test pitfall 3 at  `../testcases/dominateTest3.tig`, test for loop at  `../testcases/dominateTest4.tig`, test nested-loop at `../testcases/queen.tig`
+    - Note: Because of added dataflow analyses, running certain test will be slower (eg. `queen.tig`), but it will end and the result is correct.
 - We used functional record to deal with recursive reference, and it has a unit mapping to solve type reference sameness checking. use `1mutualNameTy.tig` to test.
 - In "codegen.sml," we added optimization matchings
     - BINOP add with CONST 0 is turned into an Assem.MOVE (not OPER), in this way, adding with 0 can be optimized as potential move edges in coloring
@@ -21,10 +30,3 @@
     - Used calleesaves will be spilled automatically, and unused calleesaves won't be stored/restored, saving instructions. The difference could be shown in `../testcases/merge.tig`.
     - Only non-leaf functions will save and restore RA. Could be shown in `../testcases/simpleTest.tig`.
 
-
-
-
-## Features
-- Added `runtime-le.s` and `sysspim.s` before generated `.s` file. Modified library function name (ex. ord to tig_ord), so that external calls find them correctly
-- Added needed headers, such as `.data` and the word-aligned ascii strings into it, also `.text` directive.
-- Fix procEntryExit1/2/3, and tested to ensure entry/exit function work correctly during actual run.

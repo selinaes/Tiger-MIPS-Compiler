@@ -59,7 +59,7 @@ struct
                         computeReaching()
                     else
                         ()
-                        (* app (fn (k: int,v) => (print ("Instr" ^ (Int.toString k) ^ ":"^ rdsetToString(v) ^ "\n"))) (G.Table.listItemsi(!rdInMap)) *)
+                        (* app (fn (k: int,v) => (print ("I" ^ (Int.toString k) ^ "reach:"^ rdsetToString(v) ^ "\n"))) (G.Table.listItemsi(!rdInMap)) *)
                     )
                 end
 

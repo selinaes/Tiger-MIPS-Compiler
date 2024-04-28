@@ -891,53 +891,42 @@ addi $sp, $sp, 24
 jr $ra
 # ----- emit skipto -----
 skipto:
-addi $sp, $sp, -36
+addi $sp, $sp, -40
 sw $fp, 4($sp)
-add $fp, $sp, 36
+add $fp, $sp, 40
 L46:
 sw $a0, 0($fp)
 sw $ra, -4($fp)
-move $t0, $s0
-sw $t0, -8($fp)
-move $t0, $s1
-sw $t0, -12($fp)
-move $t0, $s2
-sw $t0, -16($fp)
-move $t0, $s3
-sw $t0, -20($fp)
-move $t0, $s4
-sw $t0, -24($fp)
+sw $s0, -8($fp)
+sw $s1, -12($fp)
+sw $s2, -16($fp)
+sw $s3, -20($fp)
+sw $s4, -24($fp)
+sw $s5, -28($fp)
 L47:
-j L13 
-addi $t1, $0, 1
-
-jal tig_getchar
 lw $s0, 0($fp)
 addi $s1, $0, 0
-
-la $s2, L10
-lw $s3, 0($fp)
-addi $s4, $0, 0
-
-la $t2, L9
-lw $t3, 0($fp)
+lw $s2, 0($fp)
+addi $s3, $0, 0
+lw $s4, 0($fp)
 L15:
-lw $t0, 0($t3)
+lw $t0, 0($s4)
 lw $a0, -4($t0)
-move $a1, $t2
+la $a1, L9
 jal tig_stringEqual
-move $t0, $v0
-bne $t0, $s4, L11
+
+bne $v0, $s3, L11
 L12:
-lw $t0, 0($s3)
+lw $t0, 0($s2)
 lw $a0, -4($t0)
-move $a1, $s2
+la $a1, L10
 jal tig_stringEqual
-move $t1, $v0
+
 L13:
-bne $t1, $s1, L14
+bne $v0, $s1, L14
 L8:
 addi $v0, $0, 0
+lw $s5, -28($fp)
 lw $s4, -24($fp)
 lw $s3, -20($fp)
 lw $s2, -16($fp)
@@ -948,20 +937,24 @@ j L45
 L14:
 lw $t0, 0($s0)
 addi $t0, $t0, -4
-move $t1, $v0
-sw $t1, 0($t0)
+move $s5, $t0
+jal tig_getchar
+
+sw $v0, 0($s5)
 j L15 
 L11:
+addi $v0, $0, 1
+j L13 
 L45:
 
 lw $fp, 4($sp)
-addi $sp, $sp, 36
+addi $sp, $sp, 40
 jr $ra
 # ----- emit readint -----
 readint:
-addi $sp, $sp, -44
+addi $sp, $sp, -48
 sw $fp, 4($sp)
-add $fp, $sp, 44
+add $fp, $sp, 48
 L49:
 sw $a1, -4($fp)
 sw $a0, 0($fp)
@@ -971,6 +964,7 @@ sw $s1, -20($fp)
 sw $s2, -24($fp)
 sw $s3, -28($fp)
 sw $s4, -32($fp)
+sw $s5, -36($fp)
 addi $t0, $0, 0
 sw $t0, -8($fp)
 move $a0, $fp
@@ -984,25 +978,20 @@ jal isdigit
 
 sw $v0, 0($s0)
 L50:
-
-jal tig_getchar
 lw $s0, 0($fp)
-
-la $s1, L1
-
-lw $s2, 0($fp)
-addi $s3, $0, 10
-addi $s4, $0, 0
-
-lw $t2, 0($fp)
-move $a0, $fp
+lw $s1, 0($fp)
+addi $s2, $0, 10
+addi $s3, $0, 0
+lw $s4, 0($fp)
 L18:
-lw $a1, -4($t2)
+move $a0, $fp
+lw $a1, -4($s4)
 jal isdigit
-move $t0, $v0
-bne $t0, $s4, L17
+
+bne $v0, $s3, L17
 L16:
 lw $v0, -8($fp)
+lw $s5, -36($fp)
 lw $s4, -32($fp)
 lw $s3, -28($fp)
 lw $s2, -24($fp)
@@ -1012,24 +1001,25 @@ lw $ra, -12($fp)
 j L48 
 L17:
 lw $t0, -8($fp)
-mul $t0, $t0, $s3
-lw $a0, -4($s2)
+mul $s5, $t0, $s2
+lw $a0, -4($s1)
 jal tig_ord
-move $t1, $v0
-add $t0, $t0, $t1
-move $a0, $s1
+
+add $s5, $s5, $v0
+la $a0, L1
 jal tig_ord
-move $t1, $v0
-sub $t0, $t0, $t1
+
+sub $t0, $s5, $v0
 sw $t0, -8($fp)
-addi $t0, $s0, -4
-move $t1, $v0
-sw $t1, 0($t0)
+addi $s5, $s0, -4
+jal tig_getchar
+
+sw $v0, 0($s5)
 j L18 
 L48:
 
 lw $fp, 4($sp)
-addi $sp, $sp, 44
+addi $sp, $sp, 48
 jr $ra
 # ----- emit readlist -----
 readlist:

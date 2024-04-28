@@ -826,48 +826,48 @@ exit:
 .text
 # ----- emit tig_main -----
 tig_main:
-addi $sp, $sp, -120
+addi $sp, $sp, -84
 sw $fp, 4($sp)
-add $fp, $sp, 120
+add $fp, $sp, 84
 L2:
 sw $a0, 0($fp)
 addi $t0, $0, 1
-sw $t0, -40($fp)
+sw $t0, -4($fp)
 addi $t0, $0, 2
 addi $t1, $0, 3
-sw $t1, -44($fp)
+sw $t1, -8($fp)
 addi $t1, $0, 4
-sw $t1, -48($fp)
+sw $t1, -12($fp)
 addi $t1, $0, 5
-sw $t1, -52($fp)
+sw $t1, -16($fp)
 addi $t1, $0, 6
-sw $t1, -56($fp)
+sw $t1, -20($fp)
 addi $t1, $0, 7
-sw $t1, -60($fp)
+sw $t1, -24($fp)
 addi $t1, $0, 8
-sw $t1, -64($fp)
+sw $t1, -28($fp)
 addi $t1, $0, 9
-sw $t1, -68($fp)
+sw $t1, -32($fp)
 addi $t1, $0, 10
-sw $t1, -72($fp)
+sw $t1, -36($fp)
 addi $t1, $0, 11
-sw $t1, -76($fp)
+sw $t1, -40($fp)
 addi $t1, $0, 12
-sw $t1, -80($fp)
+sw $t1, -44($fp)
 addi $t1, $0, 13
-sw $t1, -84($fp)
+sw $t1, -48($fp)
 addi $t1, $0, 14
-sw $t1, -88($fp)
+sw $t1, -52($fp)
 addi $t1, $0, 15
-sw $t1, -92($fp)
+sw $t1, -56($fp)
 addi $t1, $0, 16
-sw $t1, -96($fp)
+sw $t1, -60($fp)
 addi $t1, $0, 17
-sw $t1, -100($fp)
+sw $t1, -64($fp)
 addi $t1, $0, 18
-sw $t1, -104($fp)
+sw $t1, -68($fp)
 addi $t1, $0, 19
-sw $t1, -108($fp)
+sw $t1, -72($fp)
 addi $a3, $0, 20
 addi $a2, $0, 21
 addi $a1, $0, 22
@@ -882,7 +882,25 @@ addi $t3, $0, 30
 addi $t2, $0, 31
 addi $t1, $0, 32
 addi $v0, $0, 33
-lw $v1, -40($fp)
+lw $v1, -4($fp)
+add $v1, $v1, $t0
+lw $t0, -8($fp)
+add $v1, $v1, $t0
+lw $t0, -12($fp)
+add $v1, $v1, $t0
+lw $t0, -16($fp)
+add $v1, $v1, $t0
+lw $t0, -20($fp)
+add $v1, $v1, $t0
+lw $t0, -24($fp)
+add $v1, $v1, $t0
+lw $t0, -28($fp)
+add $v1, $v1, $t0
+lw $t0, -32($fp)
+add $v1, $v1, $t0
+lw $t0, -36($fp)
+add $v1, $v1, $t0
+lw $t0, -40($fp)
 add $v1, $v1, $t0
 lw $t0, -44($fp)
 add $v1, $v1, $t0
@@ -899,24 +917,6 @@ add $v1, $v1, $t0
 lw $t0, -68($fp)
 add $v1, $v1, $t0
 lw $t0, -72($fp)
-add $v1, $v1, $t0
-lw $t0, -76($fp)
-add $v1, $v1, $t0
-lw $t0, -80($fp)
-add $v1, $v1, $t0
-lw $t0, -84($fp)
-add $v1, $v1, $t0
-lw $t0, -88($fp)
-add $v1, $v1, $t0
-lw $t0, -92($fp)
-add $v1, $v1, $t0
-lw $t0, -96($fp)
-add $v1, $v1, $t0
-lw $t0, -100($fp)
-add $v1, $v1, $t0
-lw $t0, -104($fp)
-add $v1, $v1, $t0
-lw $t0, -108($fp)
 add $t0, $v1, $t0
 add $t0, $t0, $a3
 add $t0, $t0, $a2
@@ -934,6 +934,7 @@ add $t0, $t0, $t1
 add $v0, $t0, $v0
 j L1 
 L1:
+
 lw $fp, 4($sp)
-addi $sp, $sp, 120
+addi $sp, $sp, 84
 jr $ra

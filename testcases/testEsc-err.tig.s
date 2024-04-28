@@ -826,151 +826,89 @@ exit:
 .text
 # ----- emit y -----
 y:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -12
+sw $fp, 4($sp)
+add $fp, $sp, 12
 L8:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
+sw $a0, 0($fp)
 lw $t0, 0($fp)
-lw $t0, -8($t0)
+lw $t0, -4($t0)
 addi $v0, $t0, 1
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
 j L7 
 L7:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 12
 jr $ra
 # ----- emit x -----
 x:
-move $fp, $sp
-addi $sp, $sp, -48
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -16
+sw $fp, 4($sp)
+add $fp, $sp, 16
 L10:
-sw $a1, -8($fp)
-sw $a0, -4($fp)
-sw $s0, -12($fp)
-sw $s1, -16($fp)
-sw $s2, -20($fp)
-sw $s3, -24($fp)
-sw $s4, -28($fp)
-sw $s5, -32($fp)
-sw $s6, -36($fp)
-sw $s7, -40($fp)
+sw $a1, -4($fp)
+sw $a0, 0($fp)
 addi $v0, $0, 0
-lw $s0, -12($fp)
-lw $s1, -16($fp)
-lw $s2, -20($fp)
-lw $s3, -24($fp)
-lw $s4, -28($fp)
-lw $s5, -32($fp)
-lw $s6, -36($fp)
-lw $s7, -40($fp)
 j L9 
 L9:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 48
+
+lw $fp, 4($sp)
+addi $sp, $sp, 16
 jr $ra
 # ----- emit z -----
 z:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -12
+sw $fp, 4($sp)
+add $fp, $sp, 12
 L12:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
-addi $t0, $0, 8
-ble $a1, $t0, L5
+sw $a0, 0($fp)
+addi $t3, $0, 8
+ble $a1, $t3, L5
 L4:
 addi $v0, $0, 0
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
 j L11 
 L6:
-addi $a1, $a1, 1
+move $a1, $t0
+L14:
+addi $t1, $0, 8
+lw $t2, 0($fp)
+addi $t0, $a1, 1
 L5:
-lw $t0, 0($fp)
-lw $t0, -8($t0)
-add $t0, $a1, $t0
-addi $t0, $0, 8
-blt $a1, $t0, L6
+lw $t2, -4($t2)
+add $t2, $a1, $t2
+blt $a1, $t1, L6
 L13:
 j L4 
 L11:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 12
 jr $ra
 # ----- emit tig_main -----
 tig_main:
-move $fp, $sp
-addi $sp, $sp, -48
-sw $ra, 4($sp)
-sw $fp, 0($sp)
-L15:
-sw $a0, -4($fp)
-sw $s0, -12($fp)
-sw $s1, -16($fp)
-sw $s2, -20($fp)
-sw $s3, -24($fp)
-sw $s4, -28($fp)
-sw $s5, -32($fp)
-sw $s6, -36($fp)
-sw $s7, -40($fp)
+addi $sp, $sp, -20
+sw $fp, 4($sp)
+add $fp, $sp, 20
+L16:
+sw $a0, 0($fp)
+sw $ra, -8($fp)
 addi $t0, $0, 3
-sw $t0, -8($fp)
-addi $t0, $0, 3
+sw $t0, -4($fp)
+addi $t1, $0, 3
+L17:
+addi $t0, $0, 7
 L3:
-addi $t1, $0, 7
-blt $t0, $t1, L2
+blt $t1, $t0, L2
 L1:
 addi $a0, $0, 1
 jal exit
-lw $s0, -12($fp)
-lw $s1, -16($fp)
-lw $s2, -20($fp)
-lw $s3, -24($fp)
-lw $s4, -28($fp)
-lw $s5, -32($fp)
-lw $s6, -36($fp)
-lw $s7, -40($fp)
-j L14 
+
+lw $ra, -8($fp)
+j L15 
 L2:
 j L3 
-L14:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 48
+L15:
+
+lw $fp, 4($sp)
+addi $sp, $sp, 20
 jr $ra

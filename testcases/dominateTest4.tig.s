@@ -823,66 +823,268 @@ exit:
 	syscall
 	
 .data
+L4:
+ .word 1
+ .ascii "0"
+L7:
+ .word 1
+ .ascii "-"
+L15:
+ .word 1
+ .ascii "O"
+L18:
+ .word 1
+ .ascii "
+"
 .text
-# ----- emit tig_main -----
-tig_main:
+# ----- emit f -----
+f:
 addi $sp, $sp, -24
 sw $fp, 4($sp)
 add $fp, $sp, 24
+L26:
+sw $a1, -4($fp)
+sw $a0, 0($fp)
+sw $ra, -8($fp)
+sw $s0, -12($fp)
+addi $t1, $0, 0
+lw $t0, -4($fp)
+bgt $t0, $t1, L5
+L6:
+addi $v0, $0, 0
+lw $s0, -12($fp)
+lw $ra, -8($fp)
+j L25 
+L5:
+lw $a0, 0($fp)
+addi $t1, $0, 10
+lw $t0, -4($fp)
+div $a1, $t0, $t1
+jal f
+
+addi $t1, $0, 10
+lw $t0, -4($fp)
+div $t1, $t0, $t1
+addi $t0, $0, 10
+mul $t1, $t1, $t0
+lw $t0, -4($fp)
+sub $t0, $t0, $t1
+move $s0, $t0
+la $a0, L4
+jal tig_ord
+
+add $a0, $s0, $v0
+jal tig_chr
+
+move $a0, $v0
+jal tig_print
+
+j L6 
+L25:
+
+lw $fp, 4($sp)
+addi $sp, $sp, 24
+jr $ra
+# ----- emit printint -----
+printint:
+addi $sp, $sp, -20
+sw $fp, 4($sp)
+add $fp, $sp, 20
+L28:
+sw $a1, -4($fp)
+sw $a0, 0($fp)
+sw $ra, -8($fp)
+addi $t1, $0, 0
+lw $t0, -4($fp)
+blt $t0, $t1, L11
+L12:
+addi $t1, $0, 0
+lw $t0, -4($fp)
+bgt $t0, $t1, L8
+L9:
+la $a0, L4
+jal tig_print
+
+L10:
+L13:
+lw $ra, -8($fp)
+j L27 
+L11:
+la $a0, L7
+jal tig_print
+
+move $a0, $fp
+addi $t1, $0, 0
+lw $t0, -4($fp)
+sub $a1, $t1, $t0
+jal f
+
+j L13 
 L8:
+move $a0, $fp
+lw $a1, -4($fp)
+jal f
+
+j L10 
+L27:
+
+lw $fp, 4($sp)
+addi $sp, $sp, 20
+jr $ra
+# ----- emit simpleForLoop -----
+simpleForLoop:
+addi $sp, $sp, -24
+sw $fp, 4($sp)
+add $fp, $sp, 24
+L30:
 sw $a0, 0($fp)
 sw $ra, -12($fp)
-addi $t0, $0, 10
+addi $t0, $0, 8
 sw $t0, -4($fp)
-addi $t1, $0, 4
+addi $t0, $0, 0
+sw $t0, -8($fp)
 lw $t0, -4($fp)
-mul $t0, $t0, $t1
+addi $t1, $t0, -1
+lw $t0, -8($fp)
+ble $t0, $t1, L16
+L14:
+la $a0, L18
+jal tig_print
+
+lw $ra, -12($fp)
+j L29 
+L17:
+lw $t0, -8($fp)
+addi $t0, $t0, 1
+sw $t0, -8($fp)
+L16:
+la $a0, L15
+jal tig_print
+
+lw $t0, -4($fp)
+addi $t1, $t0, -1
+lw $t0, -8($fp)
+blt $t0, $t1, L17
+L31:
+j L14 
+L29:
+
+lw $fp, 4($sp)
+addi $sp, $sp, 24
+jr $ra
+# ----- emit printboard -----
+printboard:
+addi $sp, $sp, -16
+sw $fp, 4($sp)
+add $fp, $sp, 16
+L34:
+sw $a0, 0($fp)
+sw $ra, -4($fp)
+lw $t0, 0($fp)
+lw $t1, -4($t0)
+lw $t0, 0($fp)
+lw $t0, -4($t0)
+mul $t2, $t1, $t0
+addi $t1, $0, 0
+addi $t0, $t2, -1
+ble $t1, $t0, L20
+L19:
+la $a0, L18
+jal tig_print
+
+lw $ra, -4($fp)
+j L33 
+L21:
+addi $t1, $t1, 1
+L20:
+lw $t0, 0($fp)
+lw $t0, -4($t0)
+div $t0, $t1, $t0
+lw $t0, 0($fp)
+lw $t0, -4($t0)
+div $t0, $t1, $t0
+sub $t0, $t1, $t0
+lw $t0, 0($fp)
+lw $t0, -4($t0)
+addi $t0, $t2, -1
+blt $t1, $t0, L21
+L35:
+j L19 
+L33:
+
+lw $fp, 4($sp)
+addi $sp, $sp, 16
+jr $ra
+# ----- emit tig_main -----
+tig_main:
+addi $sp, $sp, -28
+sw $fp, 4($sp)
+add $fp, $sp, 28
+L38:
+sw $a0, 0($fp)
+sw $ra, -12($fp)
+sw $s0, -16($fp)
+addi $t0, $0, 8
+sw $t0, -4($fp)
+lw $t0, -4($fp)
+move $s0, $t0
+addi $t0, $0, 4
+mul $t0, $s0, $t0
 addi $a0, $t0, 4
 jal malloc
 
 addi $t0, $0, 0
-L9:
-addi $t1, $0, 0
-addi $t2, $0, 4
-addi $t4, $0, 0
-addi $t5, $0, 10
 L3:
-sub $t3, $t5, $t0
-bne $t3, $t4, L2
+lw $t1, -4($fp)
+sub $t2, $t1, $t0
+addi $t1, $0, 0
+bne $t2, $t1, L2
 L1:
-lw $t0, -4($fp)
-sw $t0, 0($v0)
+sw $s0, 0($v0)
 addi $t0, $v0, 4
 sw $t0, -8($fp)
-addi $t1, $0, 2
+move $s0, $fp
+addi $t1, $0, 0
 lw $t0, -8($fp)
 lw $t0, -4($t0)
-bge $t1, $t0, L4
-L5:
+bge $t1, $t0, L22
+L23:
 addi $t0, $0, 0
-blt $t1, $t0, L4
-L6:
-addi $t1, $0, 2
+blt $t1, $t0, L22
+L24:
+move $a0, $s0
+addi $t1, $0, 0
 addi $t0, $0, 4
 mul $t1, $t1, $t0
 lw $t0, -8($fp)
 add $t0, $t0, $t1
-lw $v0, 0($t0)
+lw $a1, 0($t0)
+jal printint
+
+move $a0, $fp
+jal simpleForLoop
+
+move $a0, $fp
+jal printboard
+
+lw $s0, -16($fp)
 lw $ra, -12($fp)
-j L7 
+j L37 
 L2:
-mul $t3, $t0, $t2
-add $t3, $v0, $t3
-sw $t1, 0($t3)
+addi $t1, $0, 4
+mul $t1, $t0, $t1
+add $t2, $v0, $t1
+addi $t1, $0, 3
+sw $t1, 0($t2)
 addi $t0, $t0, 1
 j L3 
-L4:
+L22:
 addi $a0, $0, 1
 jal exit
 
-j L6 
-L7:
+j L24 
+L37:
 
 lw $fp, 4($sp)
-addi $sp, $sp, 24
+addi $sp, $sp, 28
 jr $ra

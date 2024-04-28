@@ -826,41 +826,24 @@ exit:
 .text
 # ----- emit tig_main -----
 tig_main:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -12
+sw $fp, 4($sp)
+add $fp, $sp, 12
 L5:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
-addi $t0, $0, 0
+sw $a0, 0($fp)
 addi $t1, $0, 0
-beq $t0, $t1, L1
+addi $t0, $0, 0
+beq $t1, $t0, L1
 L1:
 addi $v0, $0, 1
-addi $t1, $0, 0
-bne $t0, $t1, L2
+addi $t0, $0, 0
+bne $t1, $t0, L2
 L3:
 addi $v0, $0, 0
 L2:
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
 j L4 
 L4:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 12
 jr $ra

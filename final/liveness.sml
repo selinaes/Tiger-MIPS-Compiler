@@ -29,8 +29,8 @@ struct
             TextIO.output(out, "Moves: \n");
             printMoves (out, moves)
         end
-    (* igraph * (Graph.node -> Temp.temp list) *)
-    fun interferenceGraph (Flow.FGRAPH {control, def, use, ismove, ...}) : igraph * (Graph.node -> liveSet) = 
+
+    fun handleLiveness(Flow.FGRAPH {control, nodeToInstr,labelNodeMap, def, use, rdgen, rdkill, ismove}) =
         let
             val N = Temp.getTemps() - 100
             val reversedNodes = rev (Graph.nodes control)
@@ -74,15 +74,31 @@ struct
                     else
                         ())
                 end
-
-            fun livesetToString(ls:liveSet) = 
-                let
-                    val oneIdLst = BitArray.getBits(ls)
-                    fun oneIdToString (id) = Int.toString id ^ " "
-                in
-                    foldl (fn (id, acc) => acc ^ oneIdToString id) "" oneIdLst
-                end
+                
             
+        in
+            computeLiveness ();
+            (* print("nodes: " ^ Int.toString(length (Graph.nodes control)));
+            print("liveOutMap: ");
+            app (fn (k: int,v) => (print ("n"^(Int.toString k)^", "))) (G.Table.listItemsi(!liveOutMap)); *)
+            (!liveInMap, !liveOutMap)
+        end
+
+    fun livesetToString(ls:liveSet) = 
+        let
+            val oneIdLst = BitArray.getBits(ls)
+            fun oneIdToString (id) = Int.toString id ^ " "
+        in
+            foldl (fn (id, acc) => acc ^ oneIdToString id) "" oneIdLst
+        end
+
+
+    (* igraph * (Graph.node -> Temp.temp list) *)
+    fun interferenceGraph (fgr as Flow.FGRAPH {control, def, use, ismove, ...}) : igraph * (Graph.node -> liveSet) = 
+        let
+            val N = Temp.getTemps() - 100
+         
+
             fun addAllINodes (graph: G.graph) = 
                 let
                     fun addNodeByTemp n = 
@@ -190,16 +206,16 @@ struct
                 
             val _ = gtempMap := Graph.Table.empty
             val _ = tnodeMap := Temp.Table.empty
-            val _ = computeLiveness()
+            val (liveInMap, liveOutMap) = handleLiveness(fgr)
             val gr = G.newGraph()
             val igraph = addAllINodes(gr)
             val igraph' = addAllMoves(igraph)
-            val _ = app (fn (k: int,v) => (addEdgesAtOneLiveset(k, v, gr))) (G.Table.listItemsi(!liveOutMap))
+            val _ = app (fn (k: int,v) => (addEdgesAtOneLiveset(k, v, gr))) (G.Table.listItemsi(liveOutMap))
             (* val _ = app (fn (k: int,v) => (print ("n"^(Int.toString k)^": ");addEdgesAtOneLiveset(v, gr))) (G.Table.listItemsi(!liveOutMap)) *)
 
         in
             (igraph', 
-            fn node => Option.getOpt(Graph.Table.look(!liveOutMap, node), 
+            fn node => Option.getOpt(Graph.Table.look(liveOutMap, node), 
                     ErrorMsg.impossible "interferenceGraph: liveOutMap can't find"))
         end 
 

@@ -823,106 +823,68 @@ exit:
 	syscall
 	
 .data
-L1 : .ascii "str" 
-L2 : .ascii "str2" 
+L1:
+ .word 3
+ .ascii "str"
+L2:
+ .word 4
+ .ascii "str2"
 .text
 # ----- emit do_nothing1 -----
 do_nothing1:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -16
+sw $fp, 4($sp)
+add $fp, $sp, 16
 L4:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
+sw $a0, 0($fp)
+sw $ra, -4($fp)
 lw $a0, 0($fp)
 addi $a1, $a1, 1
 jal do_nothing2
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
+
+lw $ra, -4($fp)
 j L3 
 L3:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 16
 jr $ra
 # ----- emit do_nothing2 -----
 do_nothing2:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -16
+sw $fp, 4($sp)
+add $fp, $sp, 16
 L6:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
+sw $a0, 0($fp)
+sw $ra, -4($fp)
 lw $a0, 0($fp)
 la $a2, L1
 jal do_nothing1
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
+
+lw $ra, -4($fp)
 j L5 
 L5:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 16
 jr $ra
 # ----- emit tig_main -----
 tig_main:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -16
+sw $fp, 4($sp)
+add $fp, $sp, 16
 L8:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
+sw $a0, 0($fp)
+sw $ra, -4($fp)
 move $a0, $fp
 addi $a1, $0, 0
 la $a2, L2
 jal do_nothing1
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
+
+lw $ra, -4($fp)
 j L7 
 L7:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 16
 jr $ra

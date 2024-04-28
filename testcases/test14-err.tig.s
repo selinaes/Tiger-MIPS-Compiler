@@ -823,71 +823,65 @@ exit:
 	syscall
 	
 .data
-L1 : .ascii "aname" 
+L1:
+ .word 5
+ .ascii "aname"
 .text
 # ----- emit tig_main -----
 tig_main:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -24
+sw $fp, 4($sp)
+add $fp, $sp, 24
 L9:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
+sw $a0, 0($fp)
+sw $ra, -12($fp)
 addi $a0, $0, 8
 jal malloc
+
 la $t0, L1
 sw $t0, 0($v0)
 addi $t0, $0, 0
 sw $t0, 4($v0)
-move $t2, $v0
-addi $t1, $0, 3
-addi $t0, $0, 4
-mul $t0, $t1, $t0
+sw $v0, -4($fp)
+addi $t0, $0, 3
+sw $t0, -8($fp)
+addi $t1, $0, 4
+lw $t0, -8($fp)
+mul $t0, $t0, $t1
 addi $a0, $t0, 4
 jal malloc
+
 addi $t0, $0, 0
+L10:
+addi $t1, $0, 0
+addi $t2, $0, 4
+addi $t4, $0, 0
+addi $t5, $0, 3
 L4:
-addi $t3, $0, 3
-sub $t4, $t3, $t0
-addi $t3, $0, 0
-bne $t4, $t3, L3
+sub $t3, $t5, $t0
+bne $t3, $t4, L3
 L2:
-sw $t1, 0($v0)
+lw $t0, -8($fp)
+sw $t0, 0($v0)
 addi $t0, $v0, 4
-bne $t2, $t0, L5
+lw $t1, -4($fp)
+bne $t1, $t0, L5
 L6:
 addi $v0, $0, 4
 L7:
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
+lw $ra, -12($fp)
 j L8 
 L3:
-addi $t3, $0, 4
-mul $t3, $t0, $t3
-add $t4, $v0, $t3
-addi $t3, $0, 0
-sw $t3, 0($t4)
+mul $t3, $t0, $t2
+add $t3, $v0, $t3
+sw $t1, 0($t3)
 addi $t0, $t0, 1
 j L4 
 L5:
 addi $v0, $0, 3
 j L7 
 L8:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 24
 jr $ra

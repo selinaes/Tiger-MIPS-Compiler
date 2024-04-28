@@ -1,0 +1,24 @@
+/* Dominate Test for ts(defs of hoisting statement) are not liveout of loop preheader */
+/* used to test pg.412 Hoisting pitfall case 3. line 20 t := t + 8; will not be hoisted */
+let
+    var t := 0
+    var i := 6
+    var x := 1
+    var N := 5
+    var a := 2
+
+    function printint(i: int) =
+        let function f(i:int) = if i>0 
+                then (f(i/10); print(chr(i-i/10*10+ord("0"))))
+        in if i<0 then (print("-"); f(-i))
+            else if i>0 then f(i)
+            else print("0")
+        end
+in
+    while i <= N do (
+        a := t + 1; 
+        t := t + 8;
+        i := i + 1
+    );
+    printint(a)
+end

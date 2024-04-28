@@ -823,48 +823,35 @@ exit:
 	syscall
 	
 .data
-L2 : .ascii " " 
+L2:
+ .word 1
+ .ascii " "
 .text
 # ----- emit tig_main -----
 tig_main:
-move $fp, $sp
-addi $sp, $sp, -44
-sw $ra, 4($sp)
-sw $fp, 0($sp)
+addi $sp, $sp, -12
+sw $fp, 4($sp)
+add $fp, $sp, 12
 L6:
-sw $a0, -4($fp)
-sw $s0, -8($fp)
-sw $s1, -12($fp)
-sw $s2, -16($fp)
-sw $s3, -20($fp)
-sw $s4, -24($fp)
-sw $s5, -28($fp)
-sw $s6, -32($fp)
-sw $s7, -36($fp)
-addi $t0, $0, 10
-la $t1, L2
-ble $t0, $t1, L3
+sw $a0, 0($fp)
+addi $t1, $0, 10
+la $t2, L2
+ble $t1, $t2, L3
 L1:
 addi $v0, $0, 0
-lw $s0, -8($fp)
-lw $s1, -12($fp)
-lw $s2, -16($fp)
-lw $s3, -20($fp)
-lw $s4, -24($fp)
-lw $s5, -28($fp)
-lw $s6, -32($fp)
-lw $s7, -36($fp)
 j L5 
 L4:
-addi $t0, $t0, 1
+addi $t1, $t1, 1
+L8:
+addi $t0, $t1, -1
 L3:
-addi $t0, $t0, -1
-la $t1, L2
-blt $t0, $t1, L4
+move $t1, $t0
+la $t0, L2
+blt $t1, $t0, L4
 L7:
 j L1 
 L5:
-lw $ra, 4($sp)
-lw $fp, 0($sp)
-addi $sp, $sp, 44
+
+lw $fp, 4($sp)
+addi $sp, $sp, 12
 jr $ra

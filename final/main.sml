@@ -25,16 +25,17 @@ structure Main = struct
         (* val _ = TextIO.output(out,"# ----- Assembly " ^ Symbol.name (Frame.name frame) ^ " -----\n"); *)
         val instrs = List.concat(map (MipsGen.codegen frame) stms') 
         val instrs' = Frame.procEntryExit2(frame, instrs)
+        
 
         (* Optimization *)
         val (fgr, ndlist) = MakeGraph.instrs2graph instrs'
-        val _ = print("makegraph done\n")
+        (* val _ = print("makegraph done\n") *)
         val rdInMap: Reaching_Def.rdMap = Reaching_Def.handleReachingDef(fgr)
-        val _ = MakeGraph.printInstrs(instrs')
-        val _ = print("reaching done\n")
+        (* val _ = print("reaching done\n") *)
         val instrs'' = Dominator.loopReachDefOptimize(fgr, instrs', rdInMap)
-        val _ = MakeGraph.printInstrs(instrs'')
-        val _ = print("dominator done\n")
+        (* val _ = print("dominator done\n")  *)
+        (* val _ = MakeGraph.printInstrs(instrs'') *)
+        
 
         val (body', alloc) = Reg_Alloc.alloc(instrs'', frame)
 

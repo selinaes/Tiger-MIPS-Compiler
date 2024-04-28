@@ -1,0 +1,24 @@
+/* used to test pg.412 Hoisting pitfall case 1. Instr: n37 : move t132, t204 will not be hoisted */
+let
+    var t := 0
+    var i := 6
+    var x := 1
+    var N := 5
+    var a := 2
+
+    
+    function printint(i: int) =
+        let function f(i:int) = if i>0 
+                then (f(i/10); print(chr(i-i/10*10+ord("0"))))
+        in if i<0 then (print("-"); f(-i))
+            else if i>0 then f(i)
+            else print("0")
+        end
+in
+    while i <= N do (
+        t := 2 + x; 
+        i := i + 1
+    );
+    x := t;
+    printint(x)
+end

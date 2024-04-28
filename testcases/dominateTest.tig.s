@@ -926,17 +926,21 @@ addi $sp, $sp, 20
 jr $ra
 # ----- emit tig_main -----
 tig_main:
-addi $sp, $sp, -16
+addi $sp, $sp, -20
 sw $fp, 4($sp)
-add $fp, $sp, 16
+add $fp, $sp, 20
 L19:
 sw $a0, 0($fp)
-sw $ra, -4($fp)
+sw $ra, -8($fp)
 addi $a1, $0, 1
 addi $t0, $0, 2
-addi $t0, $0, 3
+addi $t1, $0, 3
+addi $t0, $0, 0
+addi $t0, $0, 6
+sw $t0, -4($fp)
 L20:
-addi $t1, $0, 5
+move $t0, $t1
+addi $t2, $0, 5
 addi $t0, $0, 20
 L13:
 blt $a1, $t0, L12
@@ -944,13 +948,21 @@ L11:
 move $a0, $fp
 jal printint
 
-lw $ra, -4($fp)
+move $a0, $fp
+lw $a1, -4($fp)
+jal printint
+
+lw $ra, -8($fp)
 j L18 
 L12:
-add $a1, $a1, $t1
-j L13 
+add $a1, $a1, $t2
+addi $t0, $0, 4
+addi $t0, $t0, 5
+sw $t0, -4($fp)
+move $t0, $t1
+j L20 
 L18:
 
 lw $fp, 4($sp)
-addi $sp, $sp, 16
+addi $sp, $sp, 20
 jr $ra

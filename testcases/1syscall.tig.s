@@ -831,15 +831,18 @@ L1:
 tig_main:
 addi $sp, $sp, -12
 sw $fp, 4($sp)
-sw $ra, 8($sp)
 add $fp, $sp, 12
 L3:
+sw $a0, 0($fp)
+move $fp, $ra
 addi $t0, $0, 0
 la $a0, L1
 jal tig_print
-updownj L2 
+
+move $ra, $fp
+j L2 
 L2:
-lw $ra, 8($sp)
+
 lw $fp, 4($sp)
 addi $sp, $sp, 12
 jr $ra
